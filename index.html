@@ -18,15 +18,17 @@
     
     <style>
         :root {
+            /* CORPORATIVO CYBERPUNK PREMIUM */
             --bg: #0a0a0a; 
             --card: #1a1a1a; 
+            --card-light: #252525;
             --text: #ffffff; 
-            --muted: #b0b0b0;
-            --accent: #ff4444;       /* Rojo Vivo */
+            --muted: #888888;
+            --accent: #ff4444;       /* Rojo Neón */
             --success: #22dd88; 
             --warning: #ffaa00;
             
-            /* SAFE AREA */
+            /* SAFE AREAS */
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -38,49 +40,55 @@
             min-height:100vh; 
             padding-bottom: calc(90px + var(--safe-bottom)); 
             overscroll-behavior-y:none; 
+            user-select: none;
         }
         
+        /* UTILIDADES */
         .hidden { display:none !important; }
         .container { max-width:600px; margin:0 auto; padding:20px; padding-top:10px; }
+        h1, h2, h3, h4 { font-weight:800; letter-spacing:-0.5px; margin-bottom:10px; }
+        .text-accent { color:var(--accent); }
+        .text-muted { color:var(--muted); font-size:0.85rem; }
         
         /* HEADER FIJO */
         .navbar-top {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(26, 26, 26, 0.98);
-            backdrop-filter: blur(10px);
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(12px);
             border-bottom: 2px solid var(--accent);
             padding: 15px 20px;
             padding-top: calc(15px + var(--safe-top)); 
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
 
-        /* BOTONES */
-        .btn { width:100%; padding:14px; border:none; border-radius:10px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; font-size:0.95rem; transition:0.2s; }
-        .btn:active { transform:scale(0.97); opacity:0.9; }
-        .btn-primary { background:var(--accent); color:white; box-shadow:0 4px 15px rgba(255, 68, 68, 0.3); }
-        .btn-secondary { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; }
-        .btn-success { background:var(--success); color:black; }
+        /* BOTONES E INPUTS */
+        .btn { width:100%; padding:14px; border:none; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; font-size:0.95rem; transition: transform 0.1s; }
+        .btn:active { transform:scale(0.97); }
+        .btn-primary { background:var(--accent); color:white; box-shadow:0 4px 15px rgba(255, 68, 68, 0.25); }
+        .btn-secondary { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); color:white; }
+        .btn-success { background:var(--success); color:black; font-weight: 800; }
         .btn-icon { width:auto; padding:8px 12px; font-size:1.2rem; background:rgba(255,255,255,0.1); border-radius:8px; }
         
         .input { width:100%; padding:14px; margin-bottom:12px; background:#222; border:1px solid #333; color:white; border-radius:10px; font-size:1rem; }
         .input:focus { border-color:var(--accent); background:#2a2a2a; }
-        .input:disabled { opacity: 0.6; color: var(--muted); border-color: transparent; }
 
         /* CARDS */
-        .card { background:var(--card); padding:20px; border-radius:16px; margin-bottom:15px; border:1px solid #222; position:relative; overflow:hidden; border-left:4px solid var(--accent); }
+        .card { background:var(--card); padding:20px; border-radius:16px; margin-bottom:15px; border:1px solid #333; position:relative; overflow:hidden; border-left:4px solid var(--accent); }
         
-        /* --- GENERADOR IMÁGENES (SVG PREMIUM) --- */
+        /* --- SVG EXERCISE ICON --- */
         .ex-img { 
             width: 70px; height: 70px; 
             background: white; border: 3px solid var(--accent); border-radius: 12px;
             padding: 0; object-fit: contain; flex-shrink: 0; display: block;
         }
 
-        /* WORKOUT UI */
-        .set-row { display:grid; grid-template-columns:30px 1fr 1fr 40px 40px; gap:8px; align-items:center; background:#222; padding:10px; border-radius:8px; margin-bottom:6px; position:relative; border:1px solid #333; }
+        /* WORKOUT UI - SETS */
+        .set-row { display:grid; grid-template-columns:30px 1fr 1fr 40px 40px; gap:8px; align-items:center; background:#222; padding:10px; border-radius:8px; margin-bottom:8px; position:relative; border:1px solid #333; }
         .set-row.done { border-color:var(--success); background:rgba(34,221,136,0.05); }
-        .prev-weight { position:absolute; top:-9px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#888; background:#222; padding:0 6px; border-radius:4px; border:1px solid #333; }
+        /* Shadow Data (Peso Anterior) */
+        .prev-val { position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#666; background:#222; padding:0 6px; border-radius:4px; border:1px solid #333; z-index: 5; }
+        
         .check-btn { width:32px; height:32px; border-radius:10px; border:2px solid #444; background:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; transition:0.2s; }
         .check-btn.checked { background:var(--success); border-color:var(--success); color:black; transform:scale(1.1); }
         .check-btn.checked::after { content:'✓'; }
@@ -93,64 +101,73 @@
             padding-bottom: calc(12px + var(--safe-bottom)); 
             z-index:100; 
         }
-        .nav-item { color:#555; background:none; border:none; font-size:0.65rem; display:flex; flex-direction:column; align-items:center; width:20%; text-transform:uppercase; font-weight:600; letter-spacing:0.5px; transition:0.3s; }
+        .nav-item { color:#555; background:none; border:none; font-size:0.65rem; display:flex; flex-direction:column; align-items:center; width:20%; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; transition:0.3s; }
         .nav-item.active { color:var(--accent); transform:translateY(-2px); }
-        .nav-item i { font-size:1.3rem; margin-bottom:4px; font-style: normal; }
+        .nav-item i { font-size:1.4rem; margin-bottom:4px; font-style: normal; }
 
-        /* ADMIN SPECIFIC */
-        .user-row { display:flex; justify-content:space-between; align-items:center; padding:15px; background:#1f1f1f; border-radius:10px; margin-bottom:10px; border-left:3px solid #444; }
-        .stat-badge { background: #333; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: var(--muted); margin-top: 4px; display: inline-block; }
+        /* STATS BOXES */
+        .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+        .stat-box { background:var(--card-light); padding:15px; border-radius:12px; text-align:center; border:1px solid #333; }
+        .stat-val { font-size:1.4rem; font-weight:800; color:white; display:block; }
+        .stat-lbl { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
 
         /* MODALS */
         .screen { display:none; opacity:0; transition:opacity 0.3s; }
         .screen.active { display:block; opacity:1; }
         .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(5px); }
-        .modal-content { background:var(--card); width:95%; max-width:500px; padding:25px; border-radius:20px; border:1px solid #333; max-height:85vh; overflow-y:auto; padding-bottom: 50px; }
+        .modal-content { background:var(--card); width:95%; max-width:500px; padding:25px; border-radius:20px; border:1px solid #444; max-height:85vh; overflow-y:auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
 
-        /* UTILS */
-        .timer-float { position:fixed; bottom: calc(90px + var(--safe-bottom)); right:20px; width:65px; height:65px; background:var(--bg); border:2px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-family:monospace; color:var(--accent); box-shadow:0 0 20px rgba(255,68,68,0.3); z-index:1000; cursor:pointer; }
-        
-        #toast { visibility:hidden; min-width:250px; background-color:#222; color:#fff; text-align:center; border-radius:50px; padding:12px 20px; position:fixed; z-index:3000; left:50%; bottom:calc(90px + var(--safe-bottom)); transform:translateX(-50%); border:1px solid var(--accent); box-shadow:0 5px 15px rgba(0,0,0,0.5); font-size:0.9rem; }
+        /* TIMER & ALERTS */
+        .timer-overlay { position:fixed; bottom: calc(95px + var(--safe-bottom)); right:20px; width:70px; height:70px; background:var(--bg); border:3px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-family:monospace; color:var(--accent); box-shadow:0 0 20px rgba(255,68,68,0.4); z-index:1000; cursor:pointer; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4);} 70% {box-shadow: 0 0 0 10px rgba(255, 68, 68, 0);} 100% {box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);} }
+
+        #toast { visibility:hidden; min-width:250px; background-color:#222; color:#fff; text-align:center; border-radius:50px; padding:12px 24px; position:fixed; z-index:3000; left:50%; bottom:calc(90px + var(--safe-bottom)); transform:translateX(-50%); border:1px solid var(--accent); box-shadow:0 5px 15px rgba(0,0,0,0.5); font-size:0.9rem; font-weight:bold; }
         #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from{bottom:60px; opacity:0;} to{bottom:calc(90px + var(--safe-bottom)); opacity:1;} }
         @keyframes fadeout { from{bottom:calc(90px + var(--safe-bottom)); opacity:1;} to{bottom:60px; opacity:0;} }
 
-        .loading-logo { width: 140px; height: 140px; margin-bottom: 20px; border-radius: 25px; animation: pulse-logo 2.5s infinite ease-in-out; box-shadow: 0 0 40px rgba(255, 68, 68, 0.4); }
-        @keyframes pulse-logo { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.9; } 100% { transform: scale(1); opacity: 1; } }
+        /* LOADING LOGO */
+        .loading-logo { width: 140px; height: 140px; margin-bottom: 20px; border-radius: 30px; animation: heartbeat 2.5s infinite ease-in-out; box-shadow: 0 0 50px rgba(255, 68, 68, 0.3); }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        
+        /* ADMIN LIST */
+        .user-row { display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-light); border-radius:10px; margin-bottom:10px; border-left:3px solid #444; }
     </style>
 </head>
 <body>
 
     <div id="toast">Notificación</div>
 
-    <div id="loading" class="screen active" style="text-align:center; padding-top:30vh; background: #000;">
+    <div id="loading" class="screen active" style="text-align:center; padding-top:30vh; background: #000; z-index: 5000;">
         <img src="favicon.png" alt="Logo" class="loading-logo">
         <h1 style="color:var(--accent); font-size:3.5rem; margin:0; letter-spacing:-2px;">FIT DATA</h1>
-        <p style="color:var(--muted); margin-top:10px; font-size:1.1rem;">Coach Intelligence System</p>
+        <p style="color:var(--muted); margin-top:10px; font-size:1.1rem; letter-spacing: 1px;">COACH INTELLIGENCE</p>
     </div>
 
     <div id="login" class="screen">
         <div class="container" style="padding-top:60px; text-align:center;">
-            <img src="favicon.png" style="width:100px; border-radius:20px; margin-bottom:15px; box-shadow: 0 0 20px rgba(255,68,68,0.2);">
+            <img src="favicon.png" style="width:100px; border-radius:20px; margin-bottom:20px; box-shadow: 0 0 20px rgba(255,68,68,0.2);">
             <h1 style="color:var(--accent); font-size:3rem; margin-bottom:10px;">FIT DATA</h1>
-            <p style="color:var(--muted); margin-bottom:40px;">Entrenamiento de Alto Rendimiento</p>
+            <p style="color:var(--muted); margin-bottom:40px;">Acceso Atletas</p>
             <div class="card" style="border:none; background:transparent;">
                 <input id="log-email" class="input" type="email" placeholder="Email">
                 <input id="log-pass" class="input" type="password" placeholder="Contraseña">
                 <button onclick="doLogin()" class="btn btn-primary">INICIAR SESIÓN</button>
-                <p onclick="toRegister()" style="margin-top:20px; color:var(--muted); cursor:pointer; font-size:0.9rem;">Solicitar Acceso</p>
+                <p onclick="toRegister()" style="margin-top:20px; color:var(--muted); cursor:pointer; font-size:0.9rem;">Solicitar Cuenta</p>
             </div>
         </div>
     </div>
 
     <div id="register" class="screen">
-        <div class="container" style="padding-top:40px;">
-            <h2 class="text-center text-accent">Registro Atleta</h2>
+        <div class="container" style="padding-top:20px;">
+            <h2 class="text-center text-accent">Nuevo Atleta</h2>
             <div class="card">
                 <input id="reg-name" class="input" placeholder="Nombre Completo">
+                <input id="reg-age" type="number" class="input" placeholder="Edad">
+                <input id="reg-height" type="number" class="input" placeholder="Altura (cm)">
                 <input id="reg-email" class="input" type="email" placeholder="Email">
                 <input id="reg-pass" class="input" type="password" placeholder="Contraseña">
-                <label class="text-accent" style="font-weight:bold; font-size:0.75rem; margin-left:5px;">CÓDIGO DE INVITACIÓN</label>
+                <label class="text-accent" style="font-weight:bold; font-size:0.75rem; margin-left:5px;">CÓDIGO SECRETO</label>
                 <input id="reg-code" class="input" style="text-align:center; border-color:var(--accent); letter-spacing:4px; font-weight:bold;">
                 <button onclick="doRegister()" class="btn btn-primary">SOLICITAR ACCESO</button>
                 <button onclick="toLogin()" class="btn btn-secondary">Cancelar</button>
@@ -164,34 +181,34 @@
             <div class="navbar-top">
                 <div>
                     <h2 id="u-name" style="margin:0; font-size:1.5rem;">Hola</h2>
-                    <span id="u-goal" style="color:var(--muted); font-size:0.75rem; text-transform:uppercase;">Cargando...</span>
+                    <span id="u-goal" style="color:var(--muted); font-size:0.75rem; text-transform:uppercase;">Objetivo no fijado</span>
                 </div>
                 <button id="admin-btn" onclick="nav('view-admin')" class="btn-icon hidden">👑</button>
             </div>
 
             <div class="container">
-                <div id="stagnation-alert" class="card hidden" style="background:rgba(255,170,0,0.1); border-color:var(--warning); padding:10px;">
-                    ⚠️ <strong style="color:var(--warning)">Atención:</strong> Sin actividad en 14 días.
+                <div id="stagnation-alert" class="card hidden" style="background:rgba(255,170,0,0.1); border-color:var(--warning); padding:12px;">
+                    ⚠️ <strong style="color:var(--warning)">Alerta Coach:</strong> Sin actividad > 14 días.
                 </div>
 
                 <div id="nutrition-panel" class="card hidden" style="border-left-color:var(--success);">
-                    <h3>Objetivo Diario (Coach)</h3>
+                    <h3>Objetivo Diario</h3>
                     <div style="display:flex; gap:10px; margin-top:10px;">
                         <div style="flex:1; background:#222; padding:10px; border-radius:10px; text-align:center;">
                             <span style="font-size:1.5rem;">🔥</span>
-                            <div id="target-kcal" style="font-weight:bold; font-size:1.2rem;">-</div>
+                            <div id="target-kcal" style="font-weight:bold; font-size:1.2rem; color:white;">-</div>
                             <small class="text-muted">Kcal</small>
                         </div>
                         <div style="flex:1; background:#222; padding:10px; border-radius:10px; text-align:center;">
                             <span style="font-size:1.5rem;">💧</span>
-                            <div id="target-water" style="font-weight:bold; font-size:1.2rem;">-</div>
+                            <div id="target-water" style="font-weight:bold; font-size:1.2rem; color:white;">-</div>
                             <small class="text-muted">Litros</small>
                         </div>
                     </div>
                 </div>
 
                 <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <button onclick="openRoutineModal()" class="btn btn-primary" style="margin:0; flex:2;">+ Nueva Rutina</button>
+                    <button onclick="openRoutineModal()" class="btn btn-primary" style="margin:0; flex:2;">+ Crear Rutina</button>
                 </div>
 
                 <h3 class="text-accent" style="border-bottom:1px solid #333; margin-bottom:15px; padding-bottom:5px; font-size:1rem; text-transform:uppercase;">Mis Rutinas</h3>
@@ -200,50 +217,39 @@
         </div>
 
         <div id="view-profile" class="view hidden">
-            <div class="navbar-top">
-                <h2>Mi Rendimiento</h2>
-            </div>
+            <div class="navbar-top"><h2>Rendimiento</h2></div>
             <div class="container">
                 
-                <div class="card" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div>
-                        <small class="text-muted">Edad</small>
-                        <input id="u-age" type="number" class="input" style="margin:0; text-align:center;" onchange="saveProfileData()">
-                    </div>
-                    <div>
-                        <small class="text-muted">Altura (cm)</small>
-                        <input id="u-height" type="number" class="input" style="margin:0; text-align:center;" onchange="saveProfileData()">
-                    </div>
+                <div class="card" style="text-align:center;">
+                    <h3>Mapa de Calor</h3>
+                    <p class="text-muted" style="font-size:0.8rem;">Volumen de trabajo acumulado</p>
+                    <div id="heatmap-render" style="height:220px; margin:0 auto;"></div>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
-                    <div style="background:#1f1f1f; padding:15px; border-radius:10px; text-align:center;">
-                        <span id="stat-kg" style="font-size:1.2rem; font-weight:bold;">0</span><br>
-                        <span style="font-size:0.7rem; color:var(--muted);">TOTAL KG</span>
-                    </div>
-                    <div style="background:#1f1f1f; padding:15px; border-radius:10px; text-align:center;">
-                        <span id="stat-sets" style="font-size:1.2rem; font-weight:bold;">0</span><br>
-                        <span style="font-size:0.7rem; color:var(--muted);">SERIES TOTALES</span>
-                    </div>
+                <div class="stats-grid">
+                    <div class="stat-box"><span id="stat-kg" class="stat-val">0</span><span class="stat-lbl">TONELADAS</span></div>
+                    <div class="stat-box"><span id="stat-workouts" class="stat-val">0</span><span class="stat-lbl">ENTRENOS</span></div>
+                    <div class="stat-box"><span id="stat-sets" class="stat-val">0</span><span class="stat-lbl">SERIES TOTALES</span></div>
+                    <div class="stat-box"><span id="stat-reps" class="stat-val">0</span><span class="stat-lbl">REPS TOTALES</span></div>
                 </div>
 
                 <div class="card">
                     <h3>Evolución Peso</h3>
                     <canvas id="weightChart" style="max-height:180px; margin-bottom:15px;"></canvas>
                     <div style="display:flex; gap:10px;">
-                        <input id="new-weight" type="number" class="input" placeholder="Nuevo peso (kg)" style="margin:0;">
-                        <button onclick="saveWeight()" class="btn btn-primary" style="width:auto; margin:0;">Guardar</button>
+                        <input id="new-weight" type="number" class="input" placeholder="Peso actual (kg)" style="margin:0;">
+                        <button onclick="saveWeight()" class="btn btn-primary" style="width:auto; margin:0;">Registrar</button>
                     </div>
                 </div>
 
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <h3>Check Físico</h3>
-                        <label class="btn btn-secondary" style="width:auto; padding:5px 12px; font-size:0.8rem;">
-                            📷 <input type="file" id="photo-in" accept="image/*" hidden onchange="uploadPhoto(this)">
+                        <label class="btn btn-secondary" style="width:auto; padding:6px 12px; font-size:0.8rem;">
+                            📷 Subir <input type="file" id="photo-in" accept="image/*" hidden onchange="uploadPhoto(this)">
                         </label>
                     </div>
-                    <p class="text-muted" style="margin:10px 0; font-size:0.8rem;">⚠️ Recuerda: Misma luz, misma ropa y mismo lugar.</p>
+                    <p class="text-muted" style="margin:10px 0; font-size:0.8rem; background:#222; padding:8px; border-radius:6px;">💡 Usa siempre la misma luz, misma ropa y mismo lugar.</p>
                     
                     <div style="display:flex; gap:5px; margin-bottom:15px;">
                         <div id="comp-before" style="flex:1; aspect-ratio:3/4; border:1px dashed #444; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;"><small>Inicio</small></div>
@@ -265,15 +271,25 @@
                         <option value="Volumen">Volumen (Superávit)</option>
                     </select>
 
+                    <h3>Datos Físicos</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <input id="cfg-age" type="number" class="input" placeholder="Edad" onchange="saveConfig()">
+                        <input id="cfg-height" type="number" class="input" placeholder="Altura (cm)" onchange="saveConfig()">
+                    </div>
+
                     <h3>Sistema</h3>
-                    <div style="margin-top:15px;">
+                    <div style="margin-top:10px;">
                         <label style="color:var(--muted); font-size:0.9rem;">Tiempo Descanso (seg)</label>
                         <input id="cfg-rest" type="number" class="input" value="60" onchange="saveConfig()">
                     </div>
                     
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding:10px 0; border-top:1px solid #333;">
                         <span>Sonido Alarma</span>
-                        <input type="checkbox" id="cfg-sound" onchange="saveConfig()" style="width:20px; height:20px;">
+                        <input type="checkbox" id="cfg-sound" onchange="saveConfig()" style="width:20px; height:20px; accent-color:var(--accent);">
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">
+                        <span>Pantalla Encendida</span>
+                        <input type="checkbox" id="cfg-screen" onchange="saveConfig()" style="width:20px; height:20px; accent-color:var(--accent);">
                     </div>
                 </div>
                 <button onclick="auth.signOut()" class="btn btn-secondary">Cerrar Sesión</button>
@@ -290,7 +306,7 @@
                     <h3>Solicitudes (<span id="count-pending">0</span>)</h3>
                     <div id="adm-pending"></div>
                 </div>
-                <h3>Atletas Activos</h3>
+                <h3>Cartera de Atletas</h3>
                 <div id="adm-users"></div>
             </div>
         </div>
@@ -312,36 +328,35 @@
         <div style="position:fixed; bottom:0; left:0; width:100%; background:var(--bg); padding:15px; border-top:1px solid #333; padding-bottom:calc(15px + var(--safe-bottom));">
             <button onclick="finishPrompt()" class="btn btn-success" style="margin:0;">FINALIZAR ENTRENAMIENTO</button>
         </div>
-        <div id="float-timer" class="timer-float hidden" onclick="stopRest()">60</div>
+        <div id="float-timer" class="timer-float hidden">
+            <span id="timer-val" onclick="stopRest()">60</span>
+            <div onclick="addTime()" style="font-size:0.6rem; position:absolute; bottom:-15px; background:#333; padding:2px 5px; border-radius:4px; color:white;">+30s</div>
+        </div>
     </div>
 
     <div id="modal-athlete" class="modal hidden">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between;">
-                <h2 id="athlete-name">Atleta</h2>
+                <h2 id="adm-ath-name">Atleta</h2>
                 <button onclick="document.getElementById('modal-athlete').classList.add('hidden')" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
             </div>
             
             <div class="card">
-                <h3>Asignar Objetivos</h3>
+                <h3>Asignar Nutrición</h3>
                 <div style="display:flex; gap:10px;">
-                    <div>
-                        <small>Kcal Objetivo</small>
-                        <input id="adm-kcal" type="number" class="input" style="margin:0;">
-                    </div>
-                    <div>
-                        <small>Agua (L) Objetivo</small>
-                        <input id="adm-water" type="number" class="input" style="margin:0;">
-                    </div>
+                    <div><small>Kcal</small><input id="adm-set-kcal" type="number" class="input"></div>
+                    <div><small>Agua (L)</small><input id="adm-set-water" type="number" class="input"></div>
                 </div>
-                <button onclick="saveAthleteTargets()" class="btn btn-primary" style="margin-top:10px;">Guardar Objetivos</button>
+                <button onclick="adminSaveTargets()" class="btn btn-primary">Guardar Objetivos</button>
             </div>
 
             <div class="card">
-                <h3>Datos Físicos</h3>
-                <p>Edad: <span id="adm-age">-</span> | Altura: <span id="adm-height">-</span></p>
-                <p>Total Kg: <span id="adm-total-kg">-</span></p>
-                <p>Series: <span id="adm-total-sets">-</span></p>
+                <h3>Datos & Stats</h3>
+                <p>Edad: <span id="adm-ath-age">-</span> | Altura: <span id="adm-ath-height">-</span></p>
+                <div class="stats-grid" style="margin-top:10px;">
+                    <div class="stat-box"><span id="adm-ath-kg" class="stat-val">0</span><small>KG</small></div>
+                    <div class="stat-box"><span id="adm-ath-sets" class="stat-val">0</span><small>SERIES</small></div>
+                </div>
             </div>
 
             <div class="card">
@@ -349,7 +364,7 @@
                 <canvas id="adminWeightChart" style="max-height:150px;"></canvas>
             </div>
 
-            <h3>Fotos</h3>
+            <h3>Fotos Recientes</h3>
             <div id="admin-gallery" style="display:grid; grid-template-columns:1fr 1fr; gap:5px;"></div>
         </div>
     </div>
@@ -357,7 +372,7 @@
     <div id="modal-create" class="modal hidden">
         <div class="modal-content">
             <h3>Nueva Rutina</h3>
-            <input id="new-rout-name" class="input" placeholder="Nombre (Ej: Pierna A)">
+            <input id="new-rout-name" class="input" placeholder="Nombre (Ej: Pierna Hipertrofia)">
             <input id="search-ex" class="input" placeholder="🔍 Buscar..." onkeyup="renderExSelector()">
             <div id="ex-list" style="max-height:300px; overflow-y:auto; margin-bottom:15px; border:1px solid #333; border-radius:8px; padding:5px;"></div>
             <div style="display:flex; gap:10px;">
@@ -369,7 +384,7 @@
 
     <div id="modal-rpe" class="modal hidden">
         <div class="modal-content" style="text-align:center;">
-            <h3>Intensidad (RPE)</h3>
+            <h3>Dificultad (RPE)</h3>
             <div style="display:grid; gap:10px; margin-top:20px;">
                 <button onclick="saveWorkoutLog(1)" class="btn" style="background:#22dd88; color:black;">RPE 1-4 (Fácil)</button>
                 <button onclick="saveWorkoutLog(2)" class="btn" style="background:#ffaa00; color:black;">RPE 5-7 (Medio)</button>
@@ -378,10 +393,21 @@
         </div>
     </div>
 
+    <div id="modal-note" class="modal hidden">
+        <div class="modal-content">
+            <h3>Nota del Ejercicio</h3>
+            <textarea id="note-text" class="input" rows="4" placeholder="Ej: Sillín al 6, molestias en hombro..."></textarea>
+            <div style="display:flex; gap:10px;">
+                <button onclick="saveNote()" class="btn btn-primary">Guardar</button>
+                <button onclick="document.getElementById('modal-note').classList.add('hidden')" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
 
     <script>
-        // 1. FIREBASE CONFIG (PON TUS CLAVES AQUÍ)
+        // --- 1. FIREBASE CONFIG (PON TUS CLAVES AQUÍ) ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
@@ -394,7 +420,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // 2. CONSTANTES
+        // --- 2. CONSTANTES GLOBALES ---
         const ADMIN_EMAIL = "toni@fitdata.com";
         const SECRET_CODE = "fityhab";
         
@@ -408,34 +434,33 @@
         let wakeLock = null;
         let weightChart = null;
         let adminWeightChart = null;
-        let currentAdminUser = null; // ID del usuario que el admin está viendo
+        let currentAdminUser = null;
+        let currentNoteExId = null;
 
-        // 3. GENERADOR DE IMÁGENES SVG ESTILO ICONO (SILUETA SÓLIDA)
+        // --- 3. GENERADOR SVG "ANATÓMICO" (Silueta Negra + Músculo Rojo) ---
         function getMuscleSvg(muscle) {
             const m = muscle.toLowerCase();
             let silhouette = "";
             let highlight = "";
 
-            // SILUETA TREN SUPERIOR (De cintura para arriba)
-            const upperBodyPath = "M 20,90 L 20,80 C 20,80 15,40 10,35 C 5,30 15,10 50,10 C 85,10 95,30 90,35 C 85,40 80,80 80,80 L 80,90 L 20,90 Z";
-            
-            // SILUETA TREN INFERIOR (De cintura para abajo)
-            const lowerBodyPath = "M 20,10 L 80,10 L 85,30 L 90,90 L 60,90 L 55,50 L 45,50 L 40,90 L 10,90 L 15,30 Z";
+            // PATHS DE SILUETAS
+            const torsoPath = "M 50,10 L 70,15 L 75,30 L 65,75 L 67,90 L 33,90 L 35,75 L 25,30 L 30,15 Z"; // Cintura para arriba
+            const legsPath = "M 25,5 L 75,5 L 80,30 L 85,90 L 55,90 L 50,45 L 45,90 L 15,90 L 20,30 Z"; // Cintura para abajo
 
             if (m.includes('pierna') || m.includes('glute') || m.includes('femoral') || m.includes('gemelo') || m.includes('abductor')) {
                 // TREN INFERIOR
-                silhouette = `<path d="${lowerBodyPath}" fill="#000000"/>`;
-                highlight = `<path d="${lowerBodyPath}" fill="#FF0000" stroke="none"/>`; 
+                silhouette = `<path d="${legsPath}" fill="#000000"/>`;
+                highlight = `<path d="${legsPath}" fill="#FF0000" stroke="none"/>`; 
             } else {
                 // TREN SUPERIOR
-                silhouette = `<path d="${upperBodyPath}" fill="#000000"/>`;
+                silhouette = `<path d="${torsoPath}" fill="#000000"/>`;
                 
-                if (m.includes('pecho')) highlight = `<circle cx="50" cy="40" r="12" fill="#FF0000"/>`; 
-                else if (m.includes('hombro')) highlight = `<circle cx="20" cy="30" r="8" fill="#FF0000"/><circle cx="80" cy="30" r="8" fill="#FF0000"/>`;
-                else if (m.includes('biceps') || m.includes('brazo')) highlight = `<rect x="10" y="40" width="10" height="20" fill="#FF0000"/><rect x="80" y="40" width="10" height="20" fill="#FF0000"/>`;
-                else if (m.includes('espalda')) highlight = `<path d="M 30,30 L 70,30 L 60,70 L 40,70 Z" fill="#FF0000"/>`;
+                if (m.includes('pecho')) highlight = `<rect x="35" y="30" width="30" height="15" fill="#FF0000"/>`;
+                else if (m.includes('hombro')) highlight = `<circle cx="25" cy="25" r="8" fill="#FF0000"/><circle cx="75" cy="25" r="8" fill="#FF0000"/>`;
+                else if (m.includes('biceps') || m.includes('brazo')) highlight = `<rect x="15" y="40" width="10" height="20" fill="#FF0000"/><rect x="75" y="40" width="10" height="20" fill="#FF0000"/>`;
+                else if (m.includes('espalda')) highlight = `<path d="M 30,25 L 70,25 L 60,60 L 40,60 Z" fill="#FF0000"/>`;
                 else if (m.includes('abs')) highlight = `<rect x="40" y="50" width="20" height="25" fill="#FF0000"/>`;
-                else if (m.includes('triceps')) highlight = `<rect x="5" y="40" width="8" height="20" fill="#FF0000"/><rect x="87" y="40" width="8" height="20" fill="#FF0000"/>`;
+                else if (m.includes('triceps')) highlight = `<rect x="10" y="40" width="8" height="20" fill="#FF0000"/><rect x="82" y="40" width="8" height="20" fill="#FF0000"/>`;
             }
 
             return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
@@ -446,26 +471,123 @@
             </svg>`);
         }
 
-        // 4. BASE DE DATOS COMPLETA (82 EJERCICIOS)
-        const rawList = [
-            "Sentadilla con Barra|Piernas", "Sentadilla Jaca|Piernas", "Sentadilla Cinturón|Piernas", "Prensa de Piernas|Piernas", "Extensión Cuádriceps|Piernas", "Estocadas|Piernas", "Curl Femoral Tumbado|Piernas", "Curl Femoral Sentado|Piernas", "Prensa Horizontal|Piernas", "Prensa 45|Piernas", "Gemelo Sentado|Piernas", "Gemelo de Pie|Piernas", "Hip Thrust|Piernas", "Sentadilla Búlgara|Piernas", "Patada Glúteo|Piernas", "Abductores|Piernas",
-            "Peso Muerto|Espalda", "Peso Muerto Rumano|Piernas", "Peso Muerto Sumo|Espalda", "Remo Barra|Espalda", "Remo Mancuernas|Espalda", "Jalón al Pecho|Espalda", "Jalón Cerrado|Espalda", "Remo Máquina|Espalda", "Remo Polea Baja|Espalda", "Dominadas|Espalda", "Dominadas Asistidas|Espalda", "Remo Invertido|Espalda", "Remo T|Espalda", "Hiperextensión|Espalda", "Buenos Días|Espalda",
-            "Press Banca|Pecho", "Press Inclinado Mancuernas|Pecho", "Aperturas|Pecho", "Cruces Polea|Pecho", "Press Máquina|Pecho", "Press Declinado|Pecho", "Fondos|Pecho", "Press Inclinado Barra|Pecho", "Press Plano Mancuernas|Pecho",
-            "Encogimientos|Hombros", "Press Militar|Hombros", "Press Militar Mancuernas|Hombros", "Press Máquina Hombros|Hombros", "Elevaciones Laterales|Hombros", "Elevaciones Frontales|Hombros", "Pájaros|Hombros", "Elevación Polea|Hombros", "Press Arnold|Hombros", "Face Pull|Hombros", "Remo al Mentón|Hombros",
-            "Curl Barra|Bíceps", "Curl Mancuernas|Bíceps", "Curl Polea|Bíceps", "Curl Martillo|Bíceps", "Curl Concentrado|Bíceps", "Curl Predicador|Bíceps",
-            "Extensión Polea|Tríceps", "Press Francés|Tríceps", "Rompecráneos|Tríceps", "Fondos Tríceps|Tríceps", "Extensión Unilateral|Tríceps", "Tríceps Barra|Tríceps",
-            "Rueda Abdominal|Abs", "Crunch Polea|Abs", "Elevación Piernas|Abs", "Crunch Banco|Abs", "Crunch Máquina|Abs", "Plancha|Abs"
+        // GENERADOR DE HEATMAP (Cuerpo Completo)
+        function renderHeatmap(stats) {
+            const container = document.getElementById('heatmap-render');
+            if (!container) return;
+            const getOp = (key) => Math.min(0.2 + ((stats[key]||0) / 50), 1);
+            
+            container.innerHTML = `
+            <svg viewBox="0 0 100 120" style="height:100%; display:block; margin:0 auto;">
+                <path d="M50,5 C55,5 60,10 60,15 C60,20 55,23 50,23 C45,23 40,20 40,15 C40,10 45,5 50,5 M30,25 L70,25 L65,70 L35,70 Z M35,72 L32,115 L45,115 L48,80 L52,80 L55,115 L68,115 L65,72 Z" fill="#333"/>
+                
+                <path d="M35,28 L65,28 L63,45 L37,45 Z" fill="#ff4444" fill-opacity="${getOp('Pecho')}"/>
+                <path d="M40,48 L60,48 L58,68 L42,68 Z" fill="#ff4444" fill-opacity="${getOp('Abs')}"/>
+                <path d="M35,72 L32,110 L45,110 L48,80 L52,80 L55,110 L68,110 L65,72 Z" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
+            </svg>`;
+        }
+
+        // 4. BASE DE DATOS DE EJERCICIOS (82 Items)
+        const rawExercisesDB = [
+            { id: 1, name: 'Sentadilla con Barra', muscle: 'Piernas', emoji: '🏋️' },
+            { id: 2, name: 'Sentadilla Jaca', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 3, name: 'Sentadilla con Cinturón', muscle: 'Piernas', emoji: '🏋️' },
+            { id: 4, name: 'Prensa de Piernas', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 5, name: 'Extensión de Cuádriceps', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 6, name: 'Estocadas con Mancuernas', muscle: 'Piernas', emoji: '🏋️' },
+            { id: 7, name: 'Curl de Pierna Tumbado', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 8, name: 'Curl de Pierna Sentado', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 9, name: 'Prensa Horizontal', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 10, name: 'Prensa de piernas 45°', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 11, name: 'Elevación de Talones Sentado', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 12, name: 'Elevación de Talones de Pie', muscle: 'Piernas', emoji: '🏋️' },
+            { id: 13, name: 'Elevación de Talones en Máquina', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 14, name: 'Elevación de Cadera', muscle: 'Piernas', emoji: '🏋️' },
+            { id: 15, name: 'Sentadilla Búlgara', muscle: 'Piernas', emoji: '🏋️' },
+            { id: 16, name: 'Patada de Glúteo en Polea', muscle: 'Piernas', emoji: '🔗' },
+            { id: 17, name: 'Abducción de Cadera en Máquina', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 18, name: 'Prensa de Glúteos', muscle: 'Piernas', emoji: '⚙️' },
+            { id: 19, name: 'Peso Muerto', muscle: 'Espalda', emoji: '🏋️' },
+            { id: 20, name: 'Peso Muerto Rumano', muscle: 'Piernas', emoji: '🏋️' },
+            { id: 21, name: 'Peso Muerto Sumo', muscle: 'Espalda', emoji: '🏋️' },
+            { id: 22, name: 'Remo con Barra', muscle: 'Espalda', emoji: '🏋️' },
+            { id: 23, name: 'Remo con Mancuernas', muscle: 'Espalda', emoji: '🏋️' },
+            { id: 24, name: 'Jalón Lateral', muscle: 'Espalda', emoji: '🔗' },
+            { id: 25, name: 'Jalón Lateral Cerrado', muscle: 'Espalda', emoji: '🔗' },
+            { id: 26, name: 'Remo en Máquina', muscle: 'Espalda', emoji: '⚙️' },
+            { id: 27, name: 'Remo en Polea Baja', muscle: 'Espalda', emoji: '🔗' },
+            { id: 28, name: 'Dominadas', muscle: 'Espalda', emoji: '🤸' },
+            { id: 29, name: 'Dominadas Asistidas', muscle: 'Espalda', emoji: '⚙️' },
+            { id: 30, name: 'Remo Invertido', muscle: 'Espalda', emoji: '🤸' },
+            { id: 31, name: 'Remo T', muscle: 'Espalda', emoji: '🏋️' },
+            { id: 32, name: 'Hiperextensión', muscle: 'Espalda', emoji: '⚙️' },
+            { id: 33, name: 'Buenos Días', muscle: 'Espalda', emoji: '🏋️' },
+            { id: 34, name: 'Press de Banca', muscle: 'Pecho', emoji: '🏋️' },
+            { id: 35, name: 'Press Inclinado con Mancuernas', muscle: 'Pecho', emoji: '🏋️' },
+            { id: 36, name: 'Aperturas con Mancuernas', muscle: 'Pecho', emoji: '🦅' },
+            { id: 37, name: 'Cruces en Polea', muscle: 'Pecho', emoji: '🔗' },
+            { id: 38, name: 'Prensa de Pecho en Máquina', muscle: 'Pecho', emoji: '⚙️' },
+            { id: 39, name: 'Prensa de Pecho Declinado', muscle: 'Pecho', emoji: '🏋️' },
+            { id: 40, name: 'Fondos en Paralelas', muscle: 'Pecho', emoji: '🤸' },
+            { id: 41, name: 'Encogimiento de Hombros', muscle: 'Hombros', emoji: '🏋️' },
+            { id: 42, name: 'Encogimiento con Mancuernas', muscle: 'Hombros', emoji: '🏋️' },
+            { id: 43, name: 'Press Militar', muscle: 'Hombros', emoji: '🏋️' },
+            { id: 44, name: 'Press de Hombros con Mancuernas', muscle: 'Hombros', emoji: '🏋️' },
+            { id: 45, name: 'Press de Hombros en Máquina', muscle: 'Hombros', emoji: '⚙️' },
+            { id: 46, name: 'Elevación Lateral', muscle: 'Hombros', emoji: '🏋️' },
+            { id: 47, name: 'Elevación Frontal', muscle: 'Hombros', emoji: '🏋️' },
+            { id: 48, name: 'Pájaros Inversos', muscle: 'Hombros', emoji: '🦅' },
+            { id: 49, name: 'Elevación Lateral en Polea', muscle: 'Hombros', emoji: '🔗' },
+            { id: 50, name: 'Press Arnold', muscle: 'Hombros', emoji: '🏋️' },
+            { id: 51, name: 'Curl de Barra', muscle: 'Biceps', emoji: '💪' },
+            { id: 52, name: 'Curl de Mancuernas', muscle: 'Biceps', emoji: '💪' },
+            { id: 53, name: 'Curl en Polea', muscle: 'Biceps', emoji: '🔗' },
+            { id: 54, name: 'Curl Martillo', muscle: 'Biceps', emoji: '💪' },
+            { id: 55, name: 'Curl Concentrado', muscle: 'Biceps', emoji: '💪' },
+            { id: 56, name: 'Extensión de Tríceps en Polea', muscle: 'Triceps', emoji: '🔗' },
+            { id: 57, name: 'Extensión Francesa', muscle: 'Triceps', emoji: '🏋️' },
+            { id: 58, name: 'Extensiones Acostadas', muscle: 'Triceps', emoji: '🏋️' },
+            { id: 59, name: 'Fondos en Paralelas', muscle: 'Triceps', emoji: '🤸' },
+            { id: 60, name: 'Extensión Unilateral Tríceps', muscle: 'Triceps', emoji: '💪' },
+            { id: 61, name: 'Abdominales con Rueda', muscle: 'Abs', emoji: '⭕' },
+            { id: 62, name: 'Crunch en Polea', muscle: 'Abs', emoji: '🔗' },
+            { id: 63, name: 'Elevaciones de Pierna Colgadas', muscle: 'Abs', emoji: '🤸' },
+            { id: 64, name: 'Abdominales en Banco', muscle: 'Abs', emoji: '🏋️' },
+            { id: 65, name: 'Crunch en Máquina', muscle: 'Abs', emoji: '⚙️' },
+            { id: 66, name: 'Levantamiento de Rodillas Colgado', muscle: 'Abs', emoji: '🤸' },
+            { id: 67, name: 'Aperturas de Pecho', muscle: 'Pecho', emoji: '🦅' },
+            { id: 68, name: 'Press Inclinado', muscle: 'Pecho', emoji: '🏋️' },
+            { id: 69, name: 'Press Plano', muscle: 'Pecho', emoji: '🏋️' },
+            { id: 70, name: 'Prensa Lateral Iso', muscle: 'Pecho', emoji: '⚙️' },
+            { id: 71, name: 'Prensa de Pecho', muscle: 'Pecho', emoji: '⚙️' },
+            { id: 72, name: 'Triceps Polea', muscle: 'Triceps', emoji: '🔗' },
+            { id: 73, name: 'Triceps Barra', muscle: 'Triceps', emoji: '🏋️' },
+            { id: 74, name: 'Remo Hammer', muscle: 'Espalda', emoji: '⚙️' },
+            { id: 75, name: 'Jalón Agarre Cerrado', muscle: 'Espalda', emoji: '🔗' },
+            { id: 76, name: 'Jalón Agarre Abierto', muscle: 'Espalda', emoji: '🔗' },
+            { id: 77, name: 'Remo alto', muscle: 'Espalda', emoji: '⚙️' },
+            { id: 78, name: 'Press de Hombros', muscle: 'Hombros', emoji: '🏋️' },
+            { id: 79, name: 'Face Pull', muscle: 'Hombros', emoji: '🔗' },
+            { id: 80, name: 'Curl Predicador', muscle: 'Biceps', emoji: '💪' },
+            { id: 81, name: 'Curl Concentrado', muscle: 'Biceps', emoji: '💪' },
+            { id: 82, name: 'Prensa 45°', muscle: 'Piernas', emoji: '⚙️' },
         ];
-        const exercisesDB = rawList.map((s,i) => { const [n,m]=s.split('|'); return {id:i+1, name:n, muscle:m, image:getMuscleSvg(m)}; });
+
+        const exercisesDB = rawExercisesDB.map(ex => ({
+            ...ex,
+            image: getMuscleSvg(ex.muscle)
+        }));
 
         function showToast(msg) { const t=document.getElementById("toast"); t.innerText=msg; t.className="show"; setTimeout(()=>t.className="",3000); }
 
-        // 5. AUTH & LOGIC
+        // --- 5. AUTH & LOGIC ---
         auth.onAuthStateChanged(async u => {
             if(u) {
+                // LISTENER TIEMPO REAL AL USUARIO
                 db.collection('users').doc(u.uid).onSnapshot(doc => {
                     if(doc.exists) {
                         userData = doc.data();
+                        
                         if(userData.email.toLowerCase() === ADMIN_EMAIL) listenToAllUsers();
                         
                         if(userData.approved || userData.email.toLowerCase() === ADMIN_EMAIL) {
@@ -492,6 +614,7 @@
         function toLogin() { showScreen('login'); }
         
         async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('log-email').value, document.getElementById('log-pass').value); } catch(e) { showToast(e.message); } }
+        
         async function doRegister() {
             if(document.getElementById('reg-code').value !== SECRET_CODE) return showToast("Código incorrecto");
             try {
@@ -499,10 +622,13 @@
                 const isAdmin = email.toLowerCase() === ADMIN_EMAIL;
                 const cred = await auth.createUserWithEmailAndPassword(email, document.getElementById('reg-pass').value);
                 await db.collection('users').doc(cred.user.uid).set({
-                    username: document.getElementById('reg-name').value, email, 
+                    username: document.getElementById('reg-name').value, 
+                    email, 
+                    age: document.getElementById('reg-age').value,
+                    height: document.getElementById('reg-height').value,
                     role: isAdmin?'admin':'user', approved: isAdmin, 
                     settings:{rest:60, screen:true, sound:true, goal:'Mantenimiento'},
-                    stats:{kg:0, workouts:0, sets:0, reps:0},
+                    stats:{kg:0, workouts:0, sets:0, reps:0, heatmap:{}},
                     targets:{kcal:0, water:0},
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -511,13 +637,21 @@
             } catch(e) { showToast(e.message); }
         }
 
-        // 6. APP INIT
+        // --- 6. APP INIT ---
         async function initApp() {
             showScreen('app'); nav('view-home');
             document.getElementById('u-name').innerText = userData.username.split(' ')[0];
             document.getElementById('u-goal').innerText = userData.settings.goal || 'Objetivo no fijado';
             
-            // Mostrar panel nutrición si hay objetivos
+            // Cargar datos en config
+            document.getElementById('cfg-age').value = userData.age || '';
+            document.getElementById('cfg-height').value = userData.height || '';
+            document.getElementById('cfg-goal').value = userData.settings.goal || 'Mantenimiento';
+            document.getElementById('cfg-rest').value = userData.settings.rest || 60;
+            document.getElementById('cfg-screen').checked = userData.settings.screen;
+            document.getElementById('cfg-sound').checked = userData.settings.sound;
+
+            // Nutrición
             if(userData.targets && (userData.targets.kcal > 0 || userData.targets.water > 0)) {
                 document.getElementById('nutrition-panel').classList.remove('hidden');
                 document.getElementById('target-kcal').innerText = userData.targets.kcal || '-';
@@ -527,11 +661,6 @@
             }
 
             if(userData.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
-            
-            // Cargar datos perfil
-            document.getElementById('u-age').value = userData.age || '';
-            document.getElementById('u-height').value = userData.height || '';
-
             loadRoutines(); loadProfile();
         }
 
@@ -544,9 +673,10 @@
             if(vid.includes('config')) document.querySelector('.nav-item:nth-child(3)').classList.add('active');
         }
 
-        // 7. DASHBOARD & ROUTINES
+        // --- 7. DASHBOARD & RUTINAS ---
         async function loadRoutines() {
             const l = document.getElementById('routines-list'); 
+            // Escuchar cambios en rutinas
             db.collection('users').doc(currentUser.uid).collection('routines').orderBy('createdAt','desc').onSnapshot(s => {
                 l.innerHTML = '';
                 if(s.empty) l.innerHTML = '<p style="color:#666;">No tienes rutinas asignadas.</p>';
@@ -563,7 +693,7 @@
             });
         }
 
-        // 8. AUTOGUARDADO & WORKOUT
+        // --- 8. WORKOUT SYSTEM ---
         function saveWorkoutToStorage() {
             if (activeRoutine) {
                 localStorage.setItem('fitdata_wo', JSON.stringify({routine: activeRoutine, start: woStartTime}));
@@ -586,6 +716,7 @@
         async function startWo(id) {
             const doc = await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).get();
             const r = doc.data(); 
+            // 5 Series por defecto: 1x20, 4x16
             const preparedExercises = r.exercises.map(ex => ({
                 ...ex,
                 series: Array(5).fill().map((_, i) => ({ weight: '', reps: i===0?20:16, completed: false }))
@@ -620,13 +751,23 @@
                         <div style="text-align:center; color:#888;">${i+1}</div>
                         <input type="number" class="input reps" value="${s.reps}" onchange="updateSet(${idx},${i},'reps',this.value)" style="margin:0; text-align:center; height:35px;">
                         <div style="position:relative;">
-                            <span class="prev-weight">${prev}kg</span>
+                            <span class="prev-val">${prev}kg</span>
                             <input type="number" class="input weight" value="${s.weight}" onchange="updateSet(${idx},${i},'weight',this.value)" placeholder="kg" style="margin:0; text-align:center; height:35px;">
                         </div>
                         <div class="${checkClass}" onclick="checkSet(this, ${idx}, ${i})">✓</div>
                     </div>`;
                 });
-                c.innerHTML += `<div class="card"><div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><img src="${ex.image}" class="ex-img"><h4>${ex.name}</h4></div>${rows}</div>`;
+                c.innerHTML += `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${ex.image}" class="ex-img">
+                            <h4>${ex.name}</h4>
+                        </div>
+                        <button onclick="openNote(${idx})" class="btn-icon">📝</button>
+                    </div>
+                    ${rows}
+                </div>`;
             });
 
             if(woTimerInt) clearInterval(woTimerInt);
@@ -648,7 +789,6 @@
             activeRoutine.exercises[exIdx].series[sIdx].completed = true;
             saveWorkoutToStorage();
 
-            // 1RM
             const s = activeRoutine.exercises[exIdx].series[sIdx];
             if(s.weight > 0) {
                 const onerm = s.weight * (1 + s.reps/30);
@@ -658,11 +798,14 @@
         }
 
         function startRest() {
-            const t = document.getElementById('float-timer'); t.classList.remove('hidden');
-            let sec = userData.settings.rest || 60; t.innerText = sec;
+            const t = document.getElementById('float-timer'); 
+            const val = document.getElementById('timer-val');
+            t.classList.remove('hidden');
+            let sec = userData.settings.rest || 60; val.innerText = sec;
+            
             if(restTimerInt) clearInterval(restTimerInt);
             restTimerInt = setInterval(()=>{
-                sec--; t.innerText=sec;
+                sec--; val.innerText=sec;
                 if(sec<=0) { 
                     clearInterval(restTimerInt); t.classList.add('hidden'); 
                     if(userData.settings.sound) document.getElementById('beep').play().catch(e=>{}); 
@@ -670,12 +813,14 @@
                 }
             },1000);
         }
+        function addTime() { let v = document.getElementById('timer-val'); v.innerText = parseInt(v.innerText)+30; }
         function stopRest() { clearInterval(restTimerInt); document.getElementById('float-timer').classList.add('hidden'); }
         function finishPrompt() { document.getElementById('modal-rpe').classList.remove('hidden'); }
         
         async function saveWorkoutLog(rpe) {
             document.getElementById('modal-rpe').classList.add('hidden');
             let totalKg=0, totalSets=0, totalReps=0;
+            
             activeRoutine.exercises.forEach(ex => {
                 ex.series.forEach(s => {
                     if(s.completed) {
@@ -690,7 +835,8 @@
                 kg: (userData.stats?.kg||0) + totalKg,
                 sets: (userData.stats?.sets||0) + totalSets,
                 reps: (userData.stats?.reps||0) + totalReps,
-                workouts: (userData.stats?.workouts||0) + 1
+                workouts: (userData.stats?.workouts||0) + 1,
+                heatmap: userData.stats?.heatmap || {} 
             };
 
             await db.collection('users').doc(currentUser.uid).update({ stats: newStats });
@@ -707,20 +853,42 @@
         }
         function exitWorkout() { document.getElementById('workout-ui').classList.remove('active'); stopRest(); initApp(); }
 
-        // 9. PROFILE & STATS
+        function openNote(exIdx) {
+            currentNoteExId = exIdx;
+            document.getElementById('modal-note').classList.remove('hidden');
+        }
+        function saveNote() {
+            // Aquí iría la lógica de guardar nota, simplificada por ahora
+            showToast("Nota guardada");
+            document.getElementById('modal-note').classList.add('hidden');
+        }
+
+        // --- 9. PROFILE & STATS ---
         function loadProfile() {
             const s = userData.stats || {kg:0, workouts:0, sets:0, reps:0};
             document.getElementById('stat-kg').innerText = (s.kg/1000).toFixed(1) + 't';
             document.getElementById('stat-workouts').innerText = s.workouts;
-            document.getElementById('stat-sets').innerText = s.sets; // Total Series
+            document.getElementById('stat-sets').innerText = s.sets;
+            document.getElementById('stat-reps').innerText = s.reps;
+            renderHeatmap(s.heatmap || { 'Pecho': 20, 'Espalda': 30 });
             loadGraph(); loadPhotos();
         }
 
-        async function saveProfileData() {
-            const age = document.getElementById('u-age').value;
-            const height = document.getElementById('u-height').value;
-            await db.collection('users').doc(currentUser.uid).update({ age, height });
-            showToast("Datos guardados");
+        async function saveConfig() {
+            const goal = document.getElementById('cfg-goal').value;
+            const age = document.getElementById('cfg-age').value;
+            const height = document.getElementById('cfg-height').value;
+            const screen = document.getElementById('cfg-screen').checked;
+            const sound = document.getElementById('cfg-sound').checked;
+            const rest = parseInt(document.getElementById('cfg-rest').value);
+            
+            await db.collection('users').doc(currentUser.uid).update({
+                age, height,
+                'settings.goal': goal, 'settings.screen': screen, 'settings.sound': sound, 'settings.rest': rest
+            });
+            userData.settings = { goal, screen, sound, rest };
+            userData.age = age; userData.height = height;
+            showToast("Perfil Actualizado");
         }
 
         async function loadGraph() {
@@ -765,7 +933,7 @@
             });
         }
 
-        // 10. ADMIN REAL-TIME
+        // --- 10. ADMIN REAL-TIME ---
         function listenToAllUsers() {
             db.collection('users').orderBy('createdAt','desc').onSnapshot(snap => {
                 const pend = document.getElementById('adm-pending'); const usrs = document.getElementById('adm-users');
@@ -780,8 +948,9 @@
                         <div><b>${u.username}</b><br><small style="color:#888">${u.email}</small>
                         <br><span class="stat-badge">${u.settings?.goal || '-'}</span></div>
                         <div style="text-align:right;">
-                            ${u.approved ? `<button onclick="viewUserAdmin('${d.id}')" class="btn-icon">👁️ Ficha</button>` : 
+                            ${u.approved ? `<button onclick="viewUserAdmin('${d.id}')" class="btn-icon">👁️</button>` : 
                             `<button onclick="approve('${d.id}')" class="btn-success" style="padding:4px 8px; width:auto; font-size:0.8rem;">OK</button>`}
+                            <button onclick="assignRout('${d.id}')" style="background:#333; border:none; padding:5px; margin-right:5px;">📋</button>
                             <button onclick="delUser('${d.id}')" style="background:none; border:none; color:#666;">❌</button>
                         </div>
                     </div>`;
@@ -795,41 +964,35 @@
             });
         }
 
-        // --- ADMIN: VER FICHA DE ATLETA ---
         async function viewUserAdmin(uid) {
             currentAdminUser = uid;
             const uDoc = await db.collection('users').doc(uid).get();
             const u = uDoc.data();
             
-            document.getElementById('athlete-name').innerText = u.username;
-            document.getElementById('adm-kcal').value = u.targets?.kcal || '';
-            document.getElementById('adm-water').value = u.targets?.water || '';
-            document.getElementById('adm-age').innerText = u.age || '-';
-            document.getElementById('adm-height').innerText = u.height || '-';
-            
-            document.getElementById('adm-total-kg').innerText = (u.stats?.kg/1000).toFixed(1) + 't';
-            document.getElementById('adm-total-sets').innerText = u.stats?.sets || 0;
+            document.getElementById('adm-ath-name').innerText = u.username;
+            document.getElementById('adm-set-kcal').value = u.targets?.kcal || '';
+            document.getElementById('adm-set-water').value = u.targets?.water || '';
+            document.getElementById('adm-ath-age').innerText = u.age || '-';
+            document.getElementById('adm-ath-height').innerText = u.height || '-';
+            document.getElementById('adm-ath-kg').innerText = (u.stats?.kg/1000).toFixed(1) + 't';
+            document.getElementById('adm-ath-sets').innerText = u.stats?.sets || 0;
 
-            // Cargar gráfica Admin
             const ctx = document.getElementById('adminWeightChart').getContext('2d');
             const wSnap = await db.collection('users').doc(uid).collection('weights').orderBy('date','asc').limit(10).get();
             const data = wSnap.docs.map(x => ({x: x.data().date.toDate().toLocaleDateString(), y: x.data().val}));
             if(adminWeightChart) adminWeightChart.destroy();
             adminWeightChart = new Chart(ctx, { type:'line', data:{labels:data.map(i=>i.x), datasets:[{label:'Peso', data:data.map(i=>i.y), borderColor:'#ff4444'}]} });
 
-            // Cargar Fotos Admin
             const pSnap = await db.collection('users').doc(uid).collection('photos').orderBy('date','desc').limit(4).get();
             const gallery = document.getElementById('admin-gallery'); gallery.innerHTML='';
-            pSnap.forEach(d => {
-                gallery.innerHTML += `<div class="photo-item"><img src="${d.data().img}"></div>`;
-            });
+            pSnap.forEach(d => { gallery.innerHTML += `<div class="photo-item"><img src="${d.data().img}"></div>`; });
 
             document.getElementById('modal-athlete').classList.remove('hidden');
         }
 
-        async function saveAthleteTargets() {
-            const k = document.getElementById('adm-kcal').value;
-            const w = document.getElementById('adm-water').value;
+        async function adminSaveTargets() {
+            const k = document.getElementById('adm-set-kcal').value;
+            const w = document.getElementById('adm-set-water').value;
             await db.collection('users').doc(currentAdminUser).update({ 'targets.kcal': k, 'targets.water': w });
             showToast("Objetivos actualizados");
             document.getElementById('modal-athlete').classList.add('hidden');
@@ -837,17 +1000,15 @@
 
         async function approve(id) { await db.collection('users').doc(id).update({approved:true}); }
         async function delUser(id) { if(confirm("Borrar?")) await db.collection('users').doc(id).delete(); }
-
-        // Config & Utils
-        async function saveConfig() {
-            const goal = document.getElementById('cfg-goal').value;
-            const screen = document.getElementById('cfg-screen').checked;
-            const sound = document.getElementById('cfg-sound').checked;
-            const rest = parseInt(document.getElementById('cfg-rest').value);
-            await db.collection('users').doc(currentUser.uid).update({'settings': { goal, screen, sound, rest }});
-            userData.settings = { goal, screen, sound, rest }; showToast("Guardado");
+        async function assignRout(uid) {
+            if(confirm("¿Asignar rutina básica?")) {
+                const exs = exercisesDB.slice(0,5); 
+                await db.collection('users').doc(uid).collection('routines').add({name:"Rutina Coach", exercises:exs, createdAt:new Date()});
+                showToast("Rutina enviada");
+            }
         }
 
+        // --- UTILS ---
         function openRoutineModal() { selectedExs=[]; document.getElementById('new-rout-name').value=''; renderExSelector(); document.getElementById('modal-create').classList.remove('hidden'); }
         function renderExSelector() {
             const f = document.getElementById('search-ex').value.toLowerCase();
@@ -871,5 +1032,4 @@
     </script>
 </body>
 </html>
-
 
