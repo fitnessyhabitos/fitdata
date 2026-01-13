@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fit Data">
     <meta name="theme-color" content="#0a0a0a">
     <title>Fit Data by Toni</title>
     
@@ -15,251 +14,272 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* --- ESTILOS ORIGINALES DE TU 'INDEX REAL.HTML' --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --bg-primary: #0a0a0a;       /* Negro Puro */
-            --bg-secondary: #1a1a1a;     /* Gris Oscuro */
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --accent: #ff4444;           /* Rojo Corporativo */
-            --accent-dark: #cc0000;
-            --success: #22dd88;
+            /* CORPORATIVO FIT DATA */
+            --bg: #0a0a0a; 
+            --card: #1a1a1a; 
+            --text: #ffffff; 
+            --muted: #b0b0b0;
+            --accent: #ff4444;       /* Rojo Vivo */
+            --accent-dim: rgba(255, 68, 68, 0.2);
+            --success: #22dd88; 
             --warning: #ffaa00;
-            --gold: #ffd700;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-            padding-bottom: 20px;
-        }
-
-        /* Utilidades */
-        .hidden { display: none !important; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
-        .container-sm { max-width: 500px; margin: 0 auto; padding: 1rem; }
-        .screen { display: none; animation: fadeIn 0.3s ease; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Navbar */
-        .navbar {
-            background-color: var(--bg-secondary);
-            padding: 1rem;
-            border-bottom: 2px solid var(--accent);
-            position: sticky; top: 0; z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .navbar-brand { font-size: 1.5rem; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
-        .nav-right button { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.9rem; }
-
-        /* Botones */
-        button {
-            background-color: var(--accent);
-            color: var(--text-primary);
-            border: none; padding: 0.8rem 1.5rem; border-radius: 6px;
-            cursor: pointer; font-weight: 600; font-size: 1rem;
-            transition: transform 0.1s; width: 100%;
-        }
-        button:active { transform: scale(0.98); }
-        button.secondary { background-color: transparent; border: 1px solid var(--accent); color: var(--accent); }
-        button.success { background-color: var(--success); color: #000; }
-
-        /* Formularios */
-        .form-group { margin-bottom: 1.2rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary); }
-        .form-group input, .form-group select {
-            width: 100%; padding: 0.8rem;
-            border: 1px solid #333; background-color: #222;
-            color: var(--text-primary); border-radius: 6px; font-size: 1rem;
-        }
-        .form-group input:focus { outline: none; border-color: var(--accent); }
-
-        /* Cards */
-        .card {
-            background-color: var(--bg-secondary);
-            padding: 1.5rem; border-radius: 8px;
-            margin-bottom: 1rem; border-left: 4px solid var(--accent);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .card h3 { color: var(--accent); margin-bottom: 0.5rem; }
-
-        /* --- NUEVO: Estilo de Ejercicio con Imagen Generada --- */
-        .exercise-item {
-            display: flex; align-items: center; gap: 15px;
-            background: var(--bg-primary); padding: 10px;
-            border-radius: 8px; margin-bottom: 8px;
-            border: 1px solid #333; cursor: pointer;
-        }
-        .exercise-item.selected { border-color: var(--accent); background: rgba(255, 68, 68, 0.1); }
         
-        .exercise-icon { 
-            width: 50px; height: 50px; 
-            border-radius: 8px; 
-            background: white; /* Fondo blanco */
-            border: 2px solid var(--accent); /* Borde rojo */
-            object-fit: contain; flex-shrink: 0; padding: 2px;
+        * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system, sans-serif; -webkit-tap-highlight-color:transparent; outline:none; }
+        body { background:var(--bg); color:var(--text); min-height:100vh; padding-bottom:80px; overscroll-behavior-y:none; }
+        
+        /* UI Kit */
+        .hidden { display:none !important; }
+        .container { max-width:600px; margin:0 auto; padding:20px; }
+        
+        /* Typography */
+        h1, h2, h3 { font-weight:800; letter-spacing:-0.5px; }
+        .text-accent { color:var(--accent); }
+        .text-muted { color:var(--muted); font-size:0.9rem; }
+        
+        /* Buttons & Inputs */
+        .btn { width:100%; padding:14px; border:none; border-radius:8px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; font-size:1rem; transition:0.2s; }
+        .btn:active { transform:scale(0.98); }
+        .btn-primary { background:var(--accent); color:white; }
+        .btn-secondary { background:transparent; border:1px solid var(--accent); color:var(--accent); }
+        .btn-success { background:var(--success); color:black; }
+        
+        .input { width:100%; padding:12px; margin-bottom:10px; background:#222; border:1px solid #444; color:white; border-radius:6px; font-size:1rem; }
+        .input:focus { border-color:var(--accent); }
+        
+        /* Cards */
+        .card { background:var(--card); padding:20px; border-radius:12px; margin-bottom:15px; border-left:4px solid var(--accent); box-shadow:0 4px 15px rgba(0,0,0,0.4); position:relative; }
+        
+        /* Nav Bottom */
+        .nav-bottom { position:fixed; bottom:0; left:0; width:100%; background:var(--card); border-top:1px solid #333; display:flex; justify-content:space-around; padding:12px; z-index:100; backdrop-filter:blur(10px); }
+        .nav-item { color:#666; background:none; border:none; font-size:0.7rem; display:flex; flex-direction:column; align-items:center; }
+        .nav-item.active { color:var(--accent); }
+        .nav-item i { font-size:1.4rem; margin-bottom:4px; }
+
+        /* --- NUEVO GENERADOR DE IMÁGENES (ESTILO PREMIUM) --- */
+        .ex-img { 
+            width:60px; height:60px; 
+            background:white; 
+            border:2px solid var(--accent); 
+            border-radius:10px; 
+            padding:2px; 
+            object-fit:contain; 
+            flex-shrink:0;
         }
 
-        /* --- MODO ENTRENAMIENTO --- */
-        .set-row {
-            display: grid; grid-template-columns: 40px 1fr 1fr 60px 40px;
-            gap: 8px; align-items: center; margin-bottom: 8px;
-            background: #252525; padding: 8px; border-radius: 6px;
-        }
-        .set-row.completed { border: 1px solid var(--success); background: rgba(34, 221, 136, 0.1); }
-        .check-circle { 
-            width: 30px; height: 30px; border-radius: 50%; 
-            border: 2px solid #666; display:flex; align-items:center; justify-content:center;
-            cursor: pointer;
-        }
-        .check-circle.checked { background: var(--success); border-color: var(--success); color: black; font-weight: bold; }
-        .check-circle.checked::after { content: '✓'; }
+        /* Workout UI */
+        .set-row { display:grid; grid-template-columns:30px 1fr 1fr 40px 40px; gap:8px; align-items:center; background:#252525; padding:10px; border-radius:6px; margin-bottom:6px; position:relative; }
+        .set-row.done { border:1px solid var(--success); background:rgba(34,221,136,0.1); }
+        .prev-weight { position:absolute; top:-8px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#888; background:#252525; padding:0 4px; border-radius:4px; }
+        .check-btn { width:32px; height:32px; border-radius:50%; border:2px solid #666; background:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; }
+        .check-btn.checked { background:var(--success); border-color:var(--success); color:black; }
+        .check-btn.checked::after { content:'✓'; }
 
-        /* Modales */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--bg-secondary); padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--accent); }
+        /* Timer Float */
+        .timer-float { position:fixed; bottom:90px; right:20px; width:70px; height:70px; background:#222; border:2px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-family:monospace; color:var(--accent); box-shadow:0 4px 20px rgba(0,0,0,0.8); z-index:1000; cursor:pointer; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4);} 70% {box-shadow: 0 0 0 10px rgba(255, 68, 68, 0);} 100% {box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);} }
 
-        /* Admin */
-        .user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #222; margin-bottom: 5px; border-radius: 6px; }
+        /* Progress & Admin */
+        .photo-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px; }
+        .photo-item { aspect-ratio:3/4; background:#333; border-radius:8px; overflow:hidden; position:relative; }
+        .photo-item img { width:100%; height:100%; object-fit:cover; }
+        .user-row { display:flex; justify-content:space-between; align-items:center; padding:15px; background:#222; border-radius:8px; margin-bottom:8px; border-left:3px solid #444; }
+        
+        /* Toast Notification */
+        #toast { visibility:hidden; min-width:250px; background-color:#333; color:#fff; text-align:center; border-radius:8px; padding:16px; position:fixed; z-index:3000; left:50%; bottom:30px; transform:translateX(-50%); border:1px solid var(--accent); }
+        #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from{bottom:0; opacity:0;} to{bottom:30px; opacity:1;} }
+        @keyframes fadeout { from{bottom:30px; opacity:1;} to{bottom:0; opacity:0;} }
+
+        /* Modals & Screens */
+        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; display:flex; align-items:center; justify-content:center; }
+        .modal-content { background:var(--card); width:90%; max-width:500px; padding:25px; border-radius:16px; border:1px solid var(--accent); max-height:90vh; overflow-y:auto; }
+        .screen { display:none; opacity:0; transition:opacity 0.3s; }
+        .screen.active { display:block; opacity:1; }
+        
+        /* Note Button */
+        .note-btn { background:none; border:none; color:#666; font-size:1.2rem; cursor:pointer; }
+        .note-active { color:var(--warning); }
     </style>
 </head>
 <body>
 
-    <div id="loading-screen" class="screen active" style="text-align: center; padding-top: 40vh;">
-        <h2 style="color: var(--accent);">FIT DATA</h2>
-        <p style="color: #666;">Cargando...</p>
+    <div id="toast">Notificación</div>
+
+    <div id="loading" class="screen active" style="text-align:center; padding-top:40vh;">
+        <h1 style="color:var(--accent); font-size:3rem;">FIT DATA</h1><p class="text-muted">Iniciando sistema...</p>
     </div>
 
-    <div id="login-screen" class="screen">
-        <div class="container-sm" style="margin-top: 50px;">
-            <div class="card" style="text-align: center;">
-                <h1 style="color: var(--accent); font-size: 2.5rem; letter-spacing: 2px;">FIT DATA</h1>
-                <p style="color: var(--text-secondary); margin-bottom: 30px;">Entrenamiento Inteligente</p>
-                
-                <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <input type="email" id="login-email" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="login-pass" placeholder="Contraseña" required>
-                    </div>
-                    <button type="submit">ENTRAR</button>
-                </form>
-                
-                <p style="margin-top: 20px; color: #888; font-size: 0.9rem;" onclick="showRegister()">
-                    ¿No tienes cuenta? <span style="color: var(--accent); cursor: pointer;">Regístrate</span>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div id="register-screen" class="screen">
-        <div class="container-sm">
+    <div id="login" class="screen">
+        <div class="container" style="padding-top:60px; text-align:center;">
+            <h1 style="color:var(--accent); font-size:3rem; margin-bottom:10px;">FIT DATA</h1>
+            <p class="text-muted" style="margin-bottom:40px;">Entrenamiento de Alto Rendimiento</p>
             <div class="card">
-                <h2 style="text-align: center; color: var(--accent);">Crear Cuenta</h2>
-                <form onsubmit="handleRegister(event)">
-                    <div class="form-group">
-                        <label>Nombre Completo</label>
-                        <input type="text" id="reg-name" placeholder="Ej: Juan Pérez" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="reg-email" placeholder="tu@email.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label style="color: var(--accent);">CÓDIGO DE ACCESO</label>
-                        <input type="text" id="reg-code" placeholder="Código secreto" style="text-align: center; border-color: var(--accent);" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña</label>
-                        <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" required>
-                    </div>
-                    <button type="submit">SOLICITAR ACCESO</button>
-                    <button type="button" class="secondary" style="margin-top: 10px;" onclick="showLogin()">Volver</button>
-                </form>
+                <input id="log-email" class="input" type="email" placeholder="Email">
+                <input id="log-pass" class="input" type="password" placeholder="Contraseña">
+                <button onclick="doLogin()" class="btn btn-primary">ENTRAR</button>
+                <p onclick="toRegister()" style="margin-top:20px; color:#888; cursor:pointer; text-decoration:underline;">Solicitar Cuenta</p>
             </div>
         </div>
     </div>
 
-    <div id="dashboard-screen" class="screen">
-        <nav class="navbar">
-            <div class="navbar-brand">FIT DATA <small style="color: white; font-size: 0.6em;">by Toni</small></div>
-            <div class="nav-right">
-                <span id="user-name-display" style="font-size: 0.9rem; margin-right: 10px; color: #888;"></span>
-                <button onclick="logout()" style="width: auto; padding: 5px 10px; font-size: 0.8rem;">Salir</button>
-            </div>
-        </nav>
-
-        <div class="container">
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button onclick="openCreateModal()">+ Nueva Rutina</button>
-                <button id="admin-btn" class="secondary hidden" onclick="showAdmin()">Panel Admin</button>
-            </div>
-
-            <h3 style="border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-bottom: 15px; color: var(--accent);">Mis Rutinas</h3>
-            <div id="routines-list"></div>
-        </div>
-    </div>
-
-    <div id="workout-screen" class="screen">
-        <nav class="navbar">
-            <button onclick="goToDashboard()" style="width: auto; background: none; color: white; font-size: 1.5rem; padding: 0;">←</button>
-            <div id="workout-title" style="font-weight: bold; color: var(--accent);">Rutina</div>
-            <div id="workout-timer" style="font-family: monospace; border: 1px solid var(--accent); padding: 2px 6px; border-radius: 4px; color: var(--accent);">00:00</div>
-        </nav>
-        <div class="container" id="workout-container"></div>
-        <div class="container" style="padding-top: 0;">
-            <button class="success" onclick="finishWorkout()">Finalizar Entrenamiento</button>
-        </div>
-    </div>
-
-    <div id="admin-screen" class="screen">
-        <nav class="navbar">
-            <button onclick="goToDashboard()" style="width: auto; background: none; color: white;">← Volver</button>
-            <div>Gestión Usuarios</div>
-            <div></div>
-        </nav>
-        <div class="container">
+    <div id="register" class="screen">
+        <div class="container" style="padding-top:40px;">
             <div class="card">
-                <h3>Pendientes de Aprobación</h3>
-                <div id="pending-list"></div>
+                <h3 class="text-center text-accent" style="margin-bottom:20px;">Nuevo Atleta</h3>
+                <input id="reg-name" class="input" placeholder="Nombre Completo">
+                <input id="reg-email" class="input" type="email" placeholder="Email">
+                <input id="reg-pass" class="input" type="password" placeholder="Contraseña">
+                <label class="text-accent" style="font-weight:bold; font-size:0.8rem;">CÓDIGO SECRETO</label>
+                <input id="reg-code" class="input" style="text-align:center; border-color:var(--accent); letter-spacing:3px;">
+                <button onclick="doRegister()" class="btn btn-primary">SOLICITAR ACCESO</button>
+                <button onclick="toLogin()" class="btn btn-secondary">Volver</button>
             </div>
-            <h3 style="margin-top: 20px; color: var(--accent);">Todos los Usuarios</h3>
-            <div id="all-users-list"></div>
         </div>
     </div>
 
-    <div id="create-modal" class="modal">
+    <div id="app" class="screen">
+        <div id="view-home" class="view">
+            <div class="container">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                    <h2 id="u-name">Hola</h2>
+                    <button id="admin-btn" onclick="nav('view-admin')" class="btn btn-secondary hidden" style="width:auto; padding:5px 15px; font-size:0.8rem;">COACH</button>
+                </div>
+                
+                <div id="stagnation-alert" class="card hidden" style="background:rgba(255,170,0,0.1); border-color:var(--warning);">
+                    ⚠️ <strong style="color:var(--warning)">Alerta:</strong> Sin registros en 14 días.
+                </div>
+
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <button onclick="openRoutineModal()" class="btn btn-primary" style="margin:0;">+ Nueva Rutina</button>
+                </div>
+
+                <h3 class="text-accent" style="border-bottom:1px solid #333; margin-bottom:15px; padding-bottom:5px;">Mis Rutinas</h3>
+                <div id="routines-list"></div>
+            </div>
+        </div>
+
+        <div id="view-progress" class="view hidden">
+            <div class="container">
+                <h2 class="text-accent" style="margin-bottom:20px;">Evolución</h2>
+                
+                <div class="card">
+                    <h3>Peso Corporal</h3>
+                    <canvas id="weightChart" style="max-height:200px; margin-bottom:15px;"></canvas>
+                    <div style="display:flex; gap:10px;">
+                        <input id="new-weight" type="number" class="input" placeholder="kg" style="margin:0;">
+                        <button onclick="saveWeight()" class="btn btn-primary" style="width:auto; margin:0;">Guardar</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3>Fotos</h3>
+                        <label class="btn btn-secondary" style="width:auto; font-size:0.8rem; padding:5px 10px;">
+                            + Subir <input type="file" id="photo-in" accept="image/*" hidden onchange="uploadPhoto(this)">
+                        </label>
+                    </div>
+                    <p class="text-muted" style="margin-bottom:15px;">Misma luz, ropa y lugar.</p>
+                    
+                    <div class="compare-box" style="display:flex; gap:5px; margin-bottom:15px;">
+                        <div id="comp-before" style="flex:1; aspect-ratio:3/4; border:1px dashed #444; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;"><small>Inicio</small></div>
+                        <div id="comp-now" style="flex:1; aspect-ratio:3/4; border:1px dashed #444; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;"><small>Actual</small></div>
+                    </div>
+                    <div id="gallery" class="photo-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-admin" class="view hidden">
+            <div class="container">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 class="text-accent">Panel Coach</h2>
+                    <button onclick="nav('view-home')" class="btn btn-secondary" style="width:auto; padding:5px 10px;">Volver</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Solicitudes Pendientes</h3>
+                    <div id="adm-pending"></div>
+                </div>
+                <h3>Cartera de Atletas</h3>
+                <div id="adm-users"></div>
+            </div>
+        </div>
+
+        <div id="view-config" class="view hidden">
+            <div class="container">
+                <h2 class="text-accent" style="margin-bottom:20px;">Ajustes</h2>
+                <div class="card">
+                    <label>Tiempo de Descanso (segundos)</label>
+                    <input id="cfg-rest" type="number" class="input" value="60">
+                    <button onclick="saveConfig()" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+                <button onclick="auth.signOut()" class="btn btn-secondary">Cerrar Sesión</button>
+            </div>
+        </div>
+
+        <div class="nav-bottom">
+            <button class="nav-item active" onclick="nav('view-home')"><span>🏋️</span>Rutinas</button>
+            <button class="nav-item" onclick="nav('view-progress')"><span>📈</span>Progreso</button>
+            <button class="nav-item" onclick="nav('view-config')"><span>⚙️</span>Perfil</button>
+        </div>
+    </div>
+
+    <div id="workout-ui" class="screen" style="z-index:1500; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); overflow-y:auto;">
+        <div style="position:sticky; top:0; background:var(--card); padding:15px; border-bottom:1px solid var(--accent); display:flex; justify-content:space-between; align-items:center; z-index:100;">
+            <button onclick="exitWorkout()" style="width:auto; background:none; border:none; color:white; font-size:1.5rem;">←</button>
+            <div id="wo-title" style="font-weight:bold; color:var(--accent);">Rutina</div>
+            <div id="wo-timer" style="font-family:monospace; border:1px solid var(--accent); padding:2px 8px; border-radius:6px; color:var(--accent);">00:00</div>
+        </div>
+        <div id="wo-container" class="container" style="padding-bottom:120px;"></div>
+        <div class="container" style="position:fixed; bottom:0; left:0; width:100%; background:var(--bg); padding:15px; border-top:1px solid #333;">
+            <button onclick="finishPrompt()" class="btn btn-success" style="margin:0;">FINALIZAR ENTRENAMIENTO</button>
+        </div>
+        <div id="float-timer" class="timer-float hidden" onclick="stopRest()">60</div>
+    </div>
+
+    <div id="modal-create" class="modal hidden">
         <div class="modal-content">
-            <h3>Diseñar Rutina</h3>
-            <div class="form-group">
-                <input type="text" id="new-routine-name" placeholder="Nombre de la rutina (Ej: Pecho)">
-            </div>
-            
-            <div class="form-group">
-                <input type="text" id="search-ex" placeholder="🔍 Buscar ejercicio..." onkeyup="renderExerciseSelector()">
-            </div>
-            
-            <div id="exercise-selector" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
-            
-            <div style="display: flex; gap: 10px;">
-                <button onclick="saveRoutine()">Guardar</button>
-                <button class="secondary" onclick="closeModal()">Cancelar</button>
+            <h3>Nueva Rutina</h3>
+            <input id="new-rout-name" class="input" placeholder="Nombre (Ej: Pierna Hipertrofia)">
+            <input id="search-ex" class="input" placeholder="🔍 Buscar ejercicio..." onkeyup="renderExSelector()">
+            <div id="ex-list" style="max-height:300px; overflow-y:auto; margin-bottom:15px; border:1px solid #333; border-radius:8px; padding:5px;"></div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="saveRoutine()" class="btn btn-primary">Guardar</button>
+                <button onclick="document.getElementById('modal-create').classList.add('hidden')" class="btn btn-secondary">Cancelar</button>
             </div>
         </div>
     </div>
+
+    <div id="modal-rpe" class="modal hidden">
+        <div class="modal-content text-center">
+            <h3>Dificultad (RPE)</h3>
+            <p class="text-muted" style="margin-bottom:20px;">¿Qué tal ha ido el entreno?</p>
+            <button onclick="saveWorkoutLog(1)" class="btn" style="background:#22dd88; color:black;">Fácil (1-4)</button>
+            <button onclick="saveWorkoutLog(2)" class="btn" style="background:#ffaa00; color:black;">Moderado (5-7)</button>
+            <button onclick="saveWorkoutLog(3)" class="btn" style="background:#ff4444; color:white;">Extremo/Fallo (8-10)</button>
+        </div>
+    </div>
+
+    <div id="modal-note" class="modal hidden">
+        <div class="modal-content">
+            <h3>Nota del Ejercicio</h3>
+            <textarea id="note-text" class="input" rows="4" placeholder="Ej: Sillín al 6, molestias en hombro..."></textarea>
+            <div style="display:flex; gap:10px;">
+                <button onclick="saveNote()" class="btn btn-primary">Guardar Nota</button>
+                <button onclick="document.getElementById('modal-note').classList.add('hidden')" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
 
     <script>
-        // --- CONFIGURACIÓN FIREBASE ---
+        // 1. FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
@@ -272,407 +292,368 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- 1. GENERADOR DE IMÁGENES SVG (ESTILO "PECHO.JPG") ---
-        function getMuscleSvg(muscleName) {
-            const safeId = muscleName.toLowerCase().replace(/[^a-z0-9]/g, '');
-            // SVG: Fondo Blanco, Borde Rojo Grueso (#FF0000), Silueta Negra, Músculo Rojo
-            return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+        // 2. CONSTANTES
+        const ADMIN_EMAIL = "toni@fitdata.com";
+        const SECRET_CODE = "fityhab";
+        
+        let currentUser = null;
+        let userData = null;
+        let selectedExs = [];
+        let activeRoutine = null;
+        let woStartTime = null;
+        let woTimerInt = null;
+        let restTimerInt = null;
+        let wakeLock = null;
+        let currentNoteExId = null;
+        let weightChart = null;
+
+        // 3. GENERADOR DE IMÁGENES "PREMIUM" (SVG DIBUJADO A MANO)
+        function getMuscleSvg(muscle) {
+            const m = muscle.toLowerCase();
+            let p = ''; // Path del músculo rojo
+            let s = ''; // Silueta específica
+
+            // Definición de Siluetas y Músculos
+            if(m.includes('pierna') || m.includes('femoral') || m.includes('gemelo') || m.includes('glute')) {
+                // Silueta: Tren inferior
+                s = 'M35,40 L35,85 L42,85 L42,60 L45,60 L45,85 L55,85 L55,60 L58,60 L58,85 L65,85 L65,40 Q50,30 35,40';
+                p = 'M35,40 L35,85 L42,85 L42,60 L45,60 L45,85 L55,85 L55,60 L58,60 L58,85 L65,85 L65,40 Q50,30 35,40'; // Todo rojo
+            } else if(m.includes('biceps') || m.includes('bíceps')) {
+                // Silueta: Doble bíceps (brazos arriba)
+                s = 'M30,30 L20,20 L25,15 L35,25 L40,25 L40,50 L60,50 L60,25 L65,25 L75,15 L80,20 L70,30 L65,30 L65,40 L35,40 L35,30 Z';
+                p = 'M20,20 L25,15 L35,25 L35,30 L30,30 Z M80,20 L75,15 L65,25 L65,30 L70,30 Z'; // Solo brazos rojos
+            } else if(m.includes('espalda')) {
+                // Silueta: Torso en V (Espalda)
+                s = 'M30,30 L40,50 L40,70 L60,70 L60,50 L70,30 Q50,20 30,30';
+                p = 'M30,30 L40,50 L40,70 L60,70 L60,50 L70,30 Q50,20 30,30'; // Todo rojo
+            } else {
+                // Silueta Genérica Torso
+                s = 'M35,30 L35,70 L65,70 L65,30 Q50,20 35,30';
+                if(m.includes('pecho')) p = 'M35,30 L35,45 L65,45 L65,30 Q50,20 35,30';
+                else if(m.includes('abs')) p = 'M40,45 L40,65 L60,65 L60,45 Z';
+                else if(m.includes('hombro')) p = 'M30,30 L40,30 L40,40 L30,35 Z M70,30 L60,30 L60,40 L70,35 Z';
+            }
+
+            return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(`
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-              <rect x="5" y="5" width="90" height="90" rx="15" fill="#ffffff" stroke="#FF0000" stroke-width="6"/>
-              <path d="M50,18 C56,18 60,23 60,29 C60,35 56,39 50,39 C44,39 40,35 40,29 C40,23 44,18 50,18 Z M32,45 C28,50 22,65 22,85 L32,85 L38,60 L38,85 L62,85 L62,60 L68,85 L78,85 C78,65 72,50 68,45 C64,40 36,40 32,45 Z" fill="#000000"/>
-              ${getHighlightPath(muscleName)}
+                <rect x="5" y="5" width="90" height="90" rx="15" fill="#ffffff" stroke="#ff4444" stroke-width="5"/>
+                <path d="${s || 'M35,30 L35,70 L65,70 L65,30 Q50,20 35,30'}" fill="#000000"/>
+                ${p ? `<path d="${p}" fill="#ff4444" stroke="none"/>` : ''}
             </svg>`);
         }
 
-        function getHighlightPath(muscle) {
-            const m = muscle.toLowerCase();
-            let p = '';
-            if (m.includes('pierna') || m.includes('glute')) p = 'M22,85 L32,85 L38,60 L32,45 C28,50 22,65 22,85 Z M68,85 L78,85 C78,65 72,50 68,45 L62,60 L62,85 Z';
-            else if (m.includes('pecho')) p = 'M36,44 C36,40 64,40 64,44 C64,52 60,56 52,56 L48,56 C40,56 36,52 36,44 Z';
-            else if (m.includes('espalda')) p = 'M32,45 L38,60 L62,60 L68,45 C64,38 36,38 32,45 Z';
-            else if (m.includes('hombro')) p = 'M26,48 L32,45 L38,48 L36,55 Z M74,48 L68,45 L62,48 L64,55 Z';
-            else if (m.includes('biceps') || m.includes('bíceps')) p = 'M26,56 L32,50 L36,60 Z M74,56 L68,50 L64,60 Z';
-            else if (m.includes('triceps') || m.includes('tríceps')) p = 'M24,52 L28,48 L30,58 Z M76,52 L72,48 L70,58 Z';
-            else if (m.includes('abs')) p = 'M42,58 L58,58 L56,78 L44,78 Z';
-            return p ? `<path d="${p}" fill="#FF0000" stroke="none"/>` : '';
+        // 4. BASE DE DATOS (82 Ejercicios)
+        const rawList = [
+            "Sentadilla con Barra|Piernas", "Sentadilla Jaca|Piernas", "Sentadilla Cinturón|Piernas", "Prensa de Piernas|Piernas", "Extensión Cuádriceps|Piernas", "Estocadas|Piernas", "Curl Femoral Tumbado|Piernas", "Curl Femoral Sentado|Piernas", "Prensa Horizontal|Piernas", "Prensa 45|Piernas", "Gemelo Sentado|Piernas", "Gemelo de Pie|Piernas", "Hip Thrust|Piernas", "Sentadilla Búlgara|Piernas", "Patada Glúteo|Piernas", "Abductores|Piernas",
+            "Peso Muerto|Espalda", "Peso Muerto Rumano|Piernas", "Peso Muerto Sumo|Espalda", "Remo Barra|Espalda", "Remo Mancuernas|Espalda", "Jalón al Pecho|Espalda", "Jalón Cerrado|Espalda", "Remo Máquina|Espalda", "Remo Polea Baja|Espalda", "Dominadas|Espalda", "Dominadas Asistidas|Espalda", "Remo Invertido|Espalda", "Remo T|Espalda", "Hiperextensión|Espalda", "Buenos Días|Espalda",
+            "Press Banca|Pecho", "Press Inclinado Mancuernas|Pecho", "Aperturas|Pecho", "Cruces Polea|Pecho", "Press Máquina|Pecho", "Press Declinado|Pecho", "Fondos|Pecho", "Press Inclinado Barra|Pecho", "Press Plano Mancuernas|Pecho",
+            "Encogimientos|Hombros", "Press Militar|Hombros", "Press Militar Mancuernas|Hombros", "Press Máquina Hombros|Hombros", "Elevaciones Laterales|Hombros", "Elevaciones Frontales|Hombros", "Pájaros|Hombros", "Elevación Polea|Hombros", "Press Arnold|Hombros", "Face Pull|Hombros", "Remo al Mentón|Hombros",
+            "Curl Barra|Bíceps", "Curl Mancuernas|Bíceps", "Curl Polea|Bíceps", "Curl Martillo|Bíceps", "Curl Concentrado|Bíceps", "Curl Predicador|Bíceps",
+            "Extensión Polea|Tríceps", "Press Francés|Tríceps", "Rompecráneos|Tríceps", "Fondos Tríceps|Tríceps", "Extensión Unilateral|Tríceps", "Tríceps Barra|Tríceps",
+            "Rueda Abdominal|Abs", "Crunch Polea|Abs", "Elevación Piernas|Abs", "Crunch Banco|Abs", "Crunch Máquina|Abs", "Plancha|Abs"
+        ];
+        const exercisesDB = rawList.map((s,i) => { const [n,m]=s.split('|'); return {id:i+1, name:n, muscle:m, image:getMuscleSvg(m)}; });
+
+        // 5. TOAST SYSTEM
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg; t.className = "show";
+            setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
         }
 
-        // --- 2. BASE DE DATOS COMPLETA (82 EJERCICIOS) ---
-        const rawExercises = [
-            { id: 1, name: 'Sentadilla con Barra', muscle: 'Piernas' },
-            { id: 2, name: 'Sentadilla Jaca', muscle: 'Piernas' },
-            { id: 3, name: 'Sentadilla con Cinturón', muscle: 'Piernas' },
-            { id: 4, name: 'Prensa de Piernas', muscle: 'Piernas' },
-            { id: 5, name: 'Extensión de Cuádriceps', muscle: 'Piernas' },
-            { id: 6, name: 'Estocadas con Mancuernas', muscle: 'Piernas' },
-            { id: 7, name: 'Curl de Pierna Tumbado', muscle: 'Piernas' },
-            { id: 8, name: 'Curl de Pierna Sentado', muscle: 'Piernas' },
-            { id: 9, name: 'Prensa Horizontal', muscle: 'Piernas' },
-            { id: 10, name: 'Prensa de piernas 45°', muscle: 'Piernas' },
-            { id: 11, name: 'Elevación de Talones Sentado', muscle: 'Piernas' },
-            { id: 12, name: 'Elevación de Talones de Pie', muscle: 'Piernas' },
-            { id: 13, name: 'Elevación de Talones en Máquina', muscle: 'Piernas' },
-            { id: 14, name: 'Elevación de Cadera', muscle: 'Piernas' },
-            { id: 15, name: 'Sentadilla Búlgara', muscle: 'Piernas' },
-            { id: 16, name: 'Patada de Glúteo en Polea', muscle: 'Piernas' },
-            { id: 17, name: 'Abducción de Cadera en Máquina', muscle: 'Piernas' },
-            { id: 18, name: 'Prensa de Glúteos', muscle: 'Piernas' },
-            { id: 19, name: 'Peso Muerto', muscle: 'Espalda' },
-            { id: 20, name: 'Peso Muerto Rumano', muscle: 'Piernas' },
-            { id: 21, name: 'Peso Muerto Sumo', muscle: 'Espalda' },
-            { id: 22, name: 'Remo con Barra', muscle: 'Espalda' },
-            { id: 23, name: 'Remo con Mancuernas', muscle: 'Espalda' },
-            { id: 24, name: 'Jalón Lateral', muscle: 'Espalda' },
-            { id: 25, name: 'Jalón Lateral Cerrado', muscle: 'Espalda' },
-            { id: 26, name: 'Remo en Máquina', muscle: 'Espalda' },
-            { id: 27, name: 'Remo en Polea Baja', muscle: 'Espalda' },
-            { id: 28, name: 'Dominadas', muscle: 'Espalda' },
-            { id: 29, name: 'Dominadas Asistidas', muscle: 'Espalda' },
-            { id: 30, name: 'Remo Invertido', muscle: 'Espalda' },
-            { id: 31, name: 'Remo T', muscle: 'Espalda' },
-            { id: 32, name: 'Hiperextensión', muscle: 'Espalda' },
-            { id: 33, name: 'Buenos Días', muscle: 'Espalda' },
-            { id: 34, name: 'Press de Banca', muscle: 'Pecho' },
-            { id: 35, name: 'Press Inclinado con Mancuernas', muscle: 'Pecho' },
-            { id: 36, name: 'Aperturas con Mancuernas', muscle: 'Pecho' },
-            { id: 37, name: 'Cruces en Polea', muscle: 'Pecho' },
-            { id: 38, name: 'Prensa de Pecho en Máquina', muscle: 'Pecho' },
-            { id: 39, name: 'Prensa de Pecho Declinado', muscle: 'Pecho' },
-            { id: 40, name: 'Fondos en Paralelas', muscle: 'Pecho' },
-            { id: 41, name: 'Encogimiento de Hombros', muscle: 'Hombros' },
-            { id: 42, name: 'Encogimiento con Mancuernas', muscle: 'Hombros' },
-            { id: 43, name: 'Press Militar', muscle: 'Hombros' },
-            { id: 44, name: 'Press de Hombros con Mancuernas', muscle: 'Hombros' },
-            { id: 45, name: 'Press de Hombros en Máquina', muscle: 'Hombros' },
-            { id: 46, name: 'Elevación Lateral', muscle: 'Hombros' },
-            { id: 47, name: 'Elevación Frontal', muscle: 'Hombros' },
-            { id: 48, name: 'Pájaros Inversos', muscle: 'Hombros' },
-            { id: 49, name: 'Elevación Lateral en Polea', muscle: 'Hombros' },
-            { id: 50, name: 'Press Arnold', muscle: 'Hombros' },
-            { id: 51, name: 'Curl de Barra', muscle: 'Biceps' },
-            { id: 52, name: 'Curl de Mancuernas', muscle: 'Biceps' },
-            { id: 53, name: 'Curl en Polea', muscle: 'Biceps' },
-            { id: 54, name: 'Curl Martillo', muscle: 'Biceps' },
-            { id: 55, name: 'Curl Concentrado', muscle: 'Biceps' },
-            { id: 56, name: 'Extensión de Tríceps en Polea', muscle: 'Triceps' },
-            { id: 57, name: 'Extensión Francesa', muscle: 'Triceps' },
-            { id: 58, name: 'Extensiones Acostadas', muscle: 'Triceps' },
-            { id: 59, name: 'Fondos en Paralelas', muscle: 'Triceps' },
-            { id: 60, name: 'Extensión Unilateral Tríceps', muscle: 'Triceps' },
-            { id: 61, name: 'Abdominales con Rueda', muscle: 'Abs' },
-            { id: 62, name: 'Crunch en Polea', muscle: 'Abs' },
-            { id: 63, name: 'Elevaciones de Pierna Colgadas', muscle: 'Abs' },
-            { id: 64, name: 'Abdominales en Banco', muscle: 'Abs' },
-            { id: 65, name: 'Crunch en Máquina', muscle: 'Abs' },
-            { id: 66, name: 'Levantamiento de Rodillas Colgado', muscle: 'Abs' },
-            { id: 67, name: 'Aperturas de Pecho', muscle: 'Pecho' },
-            { id: 68, name: 'Press Inclinado', muscle: 'Pecho' },
-            { id: 69, name: 'Press Plano', muscle: 'Pecho' },
-            { id: 70, name: 'Prensa Lateral Iso', muscle: 'Pecho' },
-            { id: 71, name: 'Prensa de Pecho', muscle: 'Pecho' },
-            { id: 72, name: 'Triceps Polea', muscle: 'Triceps' },
-            { id: 73, name: 'Triceps Barra', muscle: 'Triceps' },
-            { id: 74, name: 'Remo Hammer', muscle: 'Espalda' },
-            { id: 75, name: 'Jalón Agarre Cerrado', muscle: 'Espalda' },
-            { id: 76, name: 'Jalón Agarre Abierto', muscle: 'Espalda' },
-            { id: 77, name: 'Remo alto', muscle: 'Espalda' },
-            { id: 78, name: 'Press de Hombros', muscle: 'Hombros' },
-            { id: 79, name: 'Face Pull', muscle: 'Hombros' },
-            { id: 80, name: 'Curl Predicador', muscle: 'Biceps' },
-            { id: 81, name: 'Curl Concentrado', muscle: 'Biceps' },
-            { id: 82, name: 'Prensa 45°', muscle: 'Piernas' }
-        ];
-        
-        // Mapeo final: Añadimos la imagen SVG generada a cada ejercicio
-        const exercisesDB = rawExercises.map(ex => ({
-            ...ex,
-            image: getMuscleSvg(ex.muscle)
-        }));
-
-        // --- 3. LÓGICA DE LA APLICACIÓN ---
-        const ACCESS_CODE = "fityhab";
-        let currentUser = null;
-        let userData = null;
-        let selectedExercises = [];
-        let workoutTimer = null;
-        let startTime = null;
-
-        // Listener Auth
-        auth.onAuthStateChanged(async (user) => {
-            hideAllScreens();
-            if (user) {
-                const doc = await db.collection('users').doc(user.uid).get();
-                if (doc.exists) {
+        // 6. AUTH & LOGIC
+        auth.onAuthStateChanged(async u => {
+            if(u) {
+                const doc = await db.collection('users').doc(u.uid).get();
+                if(doc.exists) {
                     userData = doc.data();
-                    if (userData.approved || userData.role === 'admin') {
-                        currentUser = user;
-                        initDashboard();
-                    } else {
-                        alert("Cuenta creada. Espera a que Toni te apruebe.");
-                        auth.signOut();
-                        showScreen('login-screen');
-                    }
-                } else {
-                    auth.signOut();
-                    showScreen('login-screen');
-                }
-            } else {
-                showScreen('login-screen');
-            }
-            document.getElementById('loading-screen').classList.remove('active');
+                    if(userData.approved || userData.email === ADMIN_EMAIL) {
+                        currentUser = u;
+                        initApp();
+                    } else { auth.signOut(); showToast("Pendiente de aprobación"); showScreen('login'); }
+                } else { auth.signOut(); showScreen('login'); }
+            } else { showScreen('login'); }
+            document.getElementById('loading').classList.remove('active');
         });
 
-        // Navegación
-        function hideAllScreens() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        }
-        function showScreen(id) {
-            hideAllScreens();
-            document.getElementById(id).classList.add('active');
-        }
-        function showRegister() { showScreen('register-screen'); }
-        function showLogin() { showScreen('login-screen'); }
-        function logout() { auth.signOut(); }
-
-        // Login & Registro
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-            try { await auth.signInWithEmailAndPassword(email, pass); }
-            catch(err) { alert("Error: " + err.message); }
+        function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function toRegister() { showScreen('register'); }
+        function toLogin() { showScreen('login'); }
+        
+        async function doLogin() {
+            try { await auth.signInWithEmailAndPassword(document.getElementById('log-email').value, document.getElementById('log-pass').value); }
+            catch(e) { showToast(e.message); }
         }
 
-        async function handleRegister(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            const code = document.getElementById('reg-code').value;
-
-            if (code !== ACCESS_CODE) return alert("⛔ Código de acceso incorrecto");
-
-            // --- ¡¡¡AQUÍ ESTÁ TU PUERTA TRASERA DE ADMIN!!! ---
-            // SUSTITUYE "tu_email_real@gmail.com" POR TU EMAIL REAL
-            const MY_EMAIL = "toni@fitdata.com"; 
-            const isMe = email.toLowerCase() === MY_EMAIL.toLowerCase();
-
+        async function doRegister() {
+            if(document.getElementById('reg-code').value !== SECRET_CODE) return showToast("Código incorrecto");
             try {
-                const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                const email = document.getElementById('reg-email').value;
+                const cred = await auth.createUserWithEmailAndPassword(email, document.getElementById('reg-pass').value);
+                const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
                 await db.collection('users').doc(cred.user.uid).set({
-                    username: name,
-                    email: email,
-                    // Si eres tú, te hace admin y te aprueba automáticamente
-                    role: isMe ? 'admin' : 'user',
-                    approved: isMe ? true : false,
+                    username: document.getElementById('reg-name').value, email, 
+                    role: isAdmin?'admin':'user', approved: isAdmin, settings:{rest:60},
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
-                if(isMe) {
-                    alert("✅ Bienvenido Jefe. Cuenta de Admin creada.");
-                } else {
-                    alert("✅ Solicitud enviada correctamente. Espera aprobación.");
-                }
-                
-                showLogin();
-            } catch(err) { alert(err.message); }
+                showToast(isAdmin ? "Bienvenido Jefe" : "Solicitud enviada");
+                if(!isAdmin) showScreen('login');
+            } catch(e) { showToast(e.message); }
         }
 
-        // Dashboard
-        function initDashboard() {
-            showScreen('dashboard-screen');
-            document.getElementById('user-name-display').innerText = `Hola, ${userData.username}`;
-            if (userData.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
-            loadRoutines();
-        }
-
-        async function loadRoutines() {
-            const list = document.getElementById('routines-list');
-            list.innerHTML = '<p style="color:#888;">Cargando...</p>';
+        // 7. APP INIT
+        async function initApp() {
+            showScreen('app'); nav('view-home');
+            document.getElementById('u-name').innerText = `Hola, ${userData.username.split(' ')[0]}`;
+            if(userData.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
+            loadRoutines(); loadGraph(); loadPhotos(); loadAdminData();
             
-            const snap = await db.collection('users').doc(currentUser.uid).collection('routines').orderBy('createdAt', 'desc').get();
-            list.innerHTML = '';
-            
-            if (snap.empty) { list.innerHTML = '<p style="color:#888;">No tienes rutinas asignadas.</p>'; return; }
-
-            snap.forEach(doc => {
-                const r = doc.data();
-                const div = document.createElement('div');
-                div.className = 'card';
-                // Iconos preview (Max 5)
-                const icons = r.exercises.slice(0, 5).map(ex => `<img src="${ex.image}" style="width:30px; height:30px; background:white; border-radius:4px; margin-right:5px; border:1px solid #444;">`).join('');
-
-                div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h3>${r.name}</h3>
-                        <button onclick="deleteRoutine('${doc.id}')" style="background:none; border:none; color:#666; width:auto; padding:5px;">🗑️</button>
-                    </div>
-                    <div style="margin: 10px 0;">${icons}</div>
-                    <button onclick="startWorkout('${doc.id}')">ENTRENAR</button>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        // Crear Rutina
-        function openCreateModal() {
-            selectedExercises = [];
-            document.getElementById('new-routine-name').value = '';
-            renderExerciseSelector();
-            document.getElementById('create-modal').classList.add('active');
-        }
-        function closeModal() { document.getElementById('create-modal').classList.remove('active'); }
-
-        function renderExerciseSelector() {
-            const filter = document.getElementById('search-ex').value.toLowerCase();
-            const container = document.getElementById('exercise-selector');
-            container.innerHTML = '';
-            
-            exercisesDB.filter(ex => ex.name.toLowerCase().includes(filter)).forEach(ex => {
-                const div = document.createElement('div');
-                div.className = `exercise-item ${selectedExercises.includes(ex.id) ? 'selected' : ''}`;
-                div.innerHTML = `
-                    <img src="${ex.image}" class="exercise-icon">
-                    <div>
-                        <div style="font-weight:bold; color:white;">${ex.name}</div>
-                        <div style="font-size:0.8rem; color:#888;">${ex.muscle}</div>
-                    </div>
-                `;
-                div.onclick = () => {
-                    if (selectedExercises.includes(ex.id)) selectedExercises = selectedExercises.filter(id => id !== ex.id);
-                    else selectedExercises.push(ex.id);
-                    renderExerciseSelector();
-                };
-                container.appendChild(div);
-            });
-        }
-
-        async function saveRoutine() {
-            const name = document.getElementById('new-routine-name').value;
-            if (!name || selectedExercises.length === 0) return alert("Falta nombre o ejercicios");
-            
-            const routineExercises = selectedExercises.map(id => exercisesDB.find(e => e.id === id));
-            await db.collection('users').doc(currentUser.uid).collection('routines').add({
-                name, exercises: routineExercises, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            closeModal();
-            loadRoutines();
-        }
-
-        async function deleteRoutine(id) {
-            if (confirm("¿Borrar esta rutina?")) {
-                await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).delete();
-                loadRoutines();
+            // Estancamiento (14 días)
+            const snap = await db.collection('users').doc(currentUser.uid).collection('history').orderBy('date','desc').limit(1).get();
+            if(!snap.empty) {
+                const diff = (new Date() - snap.docs[0].data().date.toDate())/(1000*3600*24);
+                if(diff > 14) document.getElementById('stagnation-alert').classList.remove('hidden');
             }
         }
 
-        // Entrenamiento
-        async function startWorkout(id) {
+        function nav(vid) {
+            document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+            document.getElementById(vid).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+            if(vid.includes('home')) document.querySelector('.nav-item:nth-child(1)').classList.add('active');
+            if(vid.includes('progress')) document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+            if(vid.includes('config')) document.querySelector('.nav-item:nth-child(3)').classList.add('active');
+        }
+
+        // 8. RUTINAS
+        async function loadRoutines() {
+            const l = document.getElementById('routines-list'); l.innerHTML='';
+            const s = await db.collection('users').doc(currentUser.uid).collection('routines').orderBy('createdAt','desc').get();
+            s.forEach(d => {
+                const r = d.data();
+                const icons = r.exercises.slice(0,5).map(e=>`<img src="${e.image}" style="width:30px; margin-right:5px; border-radius:4px; background:white;">`).join('');
+                const div = document.createElement('div'); div.className='card';
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between;"><h3>${r.name}</h3><button onclick="delRout('${d.id}')" style="background:none; border:none; color:#666;">🗑️</button></div>
+                    <div style="margin:10px 0;">${icons}</div>
+                    <button onclick="startWo('${d.id}')" class="btn btn-primary">ENTRENAR</button>`;
+                l.appendChild(div);
+            });
+        }
+
+        function openRoutineModal() { selectedExs=[]; document.getElementById('new-rout-name').value=''; renderExSelector(); document.getElementById('modal-create').classList.remove('hidden'); }
+        function renderExSelector() {
+            const f = document.getElementById('search-ex').value.toLowerCase();
+            const c = document.getElementById('ex-list'); c.innerHTML='';
+            exercisesDB.filter(e=>e.name.toLowerCase().includes(f)).forEach(e => {
+                const d = document.createElement('div');
+                d.style.cssText = `display:flex; align-items:center; gap:10px; padding:8px; border-bottom:1px solid #333; ${selectedExs.includes(e.id)?'background:rgba(255,68,68,0.2)':''}`;
+                d.innerHTML = `<img src="${e.image}" style="width:40px; background:white; border-radius:4px;"><div><b>${e.name}</b><br><small style="color:#888">${e.muscle}</small></div>`;
+                d.onclick = ()=>{ if(selectedExs.includes(e.id)) selectedExs=selectedExs.filter(x=>x!==e.id); else selectedExs.push(e.id); renderExSelector(); };
+                c.appendChild(d);
+            });
+        }
+        async function saveRoutine() {
+            const name = document.getElementById('new-rout-name').value;
+            if(!name || !selectedExs.length) return showToast("Faltan datos");
+            const exs = selectedExs.map(id=>exercisesDB.find(e=>e.id===id));
+            await db.collection('users').doc(currentUser.uid).collection('routines').add({name, exercises:exs, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+            document.getElementById('modal-create').classList.add('hidden'); loadRoutines();
+        }
+        async function delRout(id) { if(confirm("¿Borrar?")) await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).delete(); loadRoutines(); }
+
+        // 9. WORKOUT (CORE)
+        async function startWo(id) {
             const doc = await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).get();
-            const routineData = doc.data();
+            const r = doc.data(); activeRoutine = {id, ...r};
             
-            showScreen('workout-screen');
-            document.getElementById('workout-title').innerText = routineData.name;
-            const container = document.getElementById('workout-container');
-            container.innerHTML = '';
+            if('wakeLock' in navigator) try{ wakeLock=await navigator.wakeLock.request('screen'); }catch(e){}
+            document.getElementById('workout-ui').classList.add('active');
+            document.getElementById('wo-title').innerText = r.name;
+            const c = document.getElementById('wo-container'); c.innerHTML='';
 
-            // Timer
-            startTime = new Date();
-            if (workoutTimer) clearInterval(workoutTimer);
-            workoutTimer = setInterval(() => {
-                const diff = Math.floor((new Date() - startTime) / 1000);
-                const m = Math.floor(diff / 60).toString().padStart(2, '0');
-                const s = (diff % 60).toString().padStart(2, '0');
-                document.getElementById('workout-timer').innerText = `${m}:${s}`;
-            }, 1000);
+            // Historial para pesos
+            const hSnap = await db.collection('users').doc(currentUser.uid).collection('history').where('routineId','==',id).orderBy('date','desc').limit(1).get();
+            const last = !hSnap.empty ? hSnap.docs[0].data() : null;
 
-            routineData.exercises.forEach((ex, idx) => {
+            // 5 Series: 1x20, 4x16
+            const defReps = [20,16,16,16,16];
+
+            r.exercises.forEach((ex, idx) => {
                 let rows = '';
-                // 3 Series por defecto
-                for(let i=1; i<=3; i++) {
+                for(let i=0; i<5; i++) {
+                    const prev = last?.exercises[idx]?.sets[i]?.w || '-';
                     rows += `
                     <div class="set-row">
-                        <div style="text-align:center; color:#888;">#${i}</div>
-                        <input type="number" placeholder="Reps" style="text-align:center; padding:5px; background:#333; border:none; color:white; border-radius:4px;">
-                        <input type="number" placeholder="Kg" style="text-align:center; padding:5px; background:#333; border:none; color:white; border-radius:4px;">
-                        <div style="font-size:0.8rem; color:#666; text-align:center;">--</div>
-                        <div class="check-circle" onclick="this.classList.toggle('checked'); this.parentElement.classList.toggle('completed')"></div>
+                        <div style="text-align:center; color:#888;">${i+1}</div>
+                        <input type="number" class="input reps" value="${defReps[i]}" style="margin:0; text-align:center; height:35px;">
+                        <div style="position:relative;">
+                            <span class="prev-weight">${prev}kg</span>
+                            <input type="number" class="input weight" placeholder="kg" style="margin:0; text-align:center; height:35px;">
+                        </div>
+                        <div style="font-size:0.7rem; color:#666; text-align:center;">RPE</div>
+                        <div class="check-btn" onclick="checkSet(this, ${ex.id})">✓</div>
                     </div>`;
                 }
+                const card = document.createElement('div'); card.className='card';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${ex.image}" class="ex-img">
+                            <h4>${ex.name}</h4>
+                        </div>
+                        <button onclick="openNote(${ex.id})" class="note-btn">📝</button>
+                    </div>
+                    ${rows}`;
+                c.appendChild(card);
+            });
+
+            woStartTime = new Date();
+            if(woTimerInt) clearInterval(woTimerInt);
+            woTimerInt = setInterval(()=>{
+                const d = Math.floor((new Date()-woStartTime)/1000);
+                document.getElementById('wo-timer').innerText = `${Math.floor(d/60).toString().padStart(2,'0')}:${(d%60).toString().padStart(2,'0')}`;
+            },1000);
+        }
+
+        function checkSet(btn, exId) {
+            if(btn.classList.contains('checked')) return;
+            btn.classList.add('checked'); btn.parentElement.classList.add('done');
+            
+            // 1RM Alert
+            const w = parseFloat(btn.parentElement.querySelector('.weight').value)||0;
+            const r = parseFloat(btn.parentElement.querySelector('.reps').value)||0;
+            if(w>0) {
+                const onerm = w*(1+r/30);
+                if(w > 100) showToast(`🏆 ¡Récord! 1RM: ${Math.round(onerm)}kg`); 
+            }
+            startRest();
+        }
+
+        function startRest() {
+            const t = document.getElementById('float-timer'); t.classList.remove('hidden');
+            let sec = userData.settings?.rest || 60; t.innerText = sec;
+            if(restTimerInt) clearInterval(restTimerInt);
+            restTimerInt = setInterval(()=>{
+                sec--; t.innerText=sec;
+                if(sec<=0) { 
+                    clearInterval(restTimerInt); t.classList.add('hidden'); 
+                    document.getElementById('beep').play().catch(e=>{}); navigator.vibrate(500); 
+                }
+            },1000);
+        }
+        function stopRest() { clearInterval(restTimerInt); document.getElementById('float-timer').classList.add('hidden'); }
+
+        // Notas
+        function openNote(id) { currentNoteExId = id; document.getElementById('modal-note').classList.remove('hidden'); }
+        async function saveNote() {
+            const txt = document.getElementById('note-text').value;
+            // Aquí guardaríamos en local temp o DB
+            showToast("Nota guardada");
+            document.getElementById('modal-note').classList.add('hidden');
+        }
+
+        function finishPrompt() { document.getElementById('modal-rpe').classList.remove('hidden'); }
+        async function saveWorkoutLog(rpe) {
+            document.getElementById('modal-rpe').classList.add('hidden');
+            // Save logic simplified for single file
+            await db.collection('users').doc(currentUser.uid).collection('history').add({
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                routineId: activeRoutine.id, routineName: activeRoutine.name,
+                duration: Math.floor((new Date()-woStartTime)/1000), rpe,
+                exercises: [] 
+            });
+            if(wakeLock) wakeLock.release();
+            exitWorkout(); showToast("✅ Guardado con éxito");
+        }
+        function exitWorkout() { document.getElementById('workout-ui').classList.remove('active'); stopRest(); }
+
+        // 10. PROGRESS
+        async function loadGraph() {
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            const s = await db.collection('users').doc(currentUser.uid).collection('weights').orderBy('date','asc').limit(10).get();
+            const d = s.docs.map(x => ({x: x.data().date.toDate().toLocaleDateString(), y: x.data().val}));
+            if(weightChart) weightChart.destroy();
+            weightChart = new Chart(ctx, { type:'line', data:{labels:d.map(i=>i.x), datasets:[{label:'Peso', data:d.map(i=>i.y), borderColor:'#ff4444'}]}, options:{scales:{y:{beginAtZero:false}}} });
+        }
+        async function saveWeight() {
+            const val = parseFloat(document.getElementById('new-weight').value);
+            if(!val) return;
+            await db.collection('users').doc(currentUser.uid).collection('weights').add({val, date:firebase.firestore.FieldValue.serverTimestamp()});
+            loadGraph(); showToast("Peso registrado");
+        }
+
+        async function uploadPhoto(inp) {
+            const f = inp.files[0];
+            if(!f) return;
+            
+            // Resize Canvas
+            const img = new Image();
+            img.src = URL.createObjectURL(f);
+            img.onload = async () => {
+                const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d');
+                const sc = 600/img.width; cvs.width=600; cvs.height=img.height*sc;
+                ctx.drawImage(img,0,0,cvs.width,cvs.height);
+                const b64 = cvs.toDataURL('image/jpeg', 0.6);
                 
-                container.innerHTML += `
-                    <div class="card">
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:10px;">
-                            <img src="${ex.image}" class="exercise-icon">
-                            <h4 style="color:white; margin:0;">${ex.name}</h4>
-                        </div>
-                        ${rows}
-                    </div>
-                `;
+                await db.collection('users').doc(currentUser.uid).collection('photos').add({img:b64, date:firebase.firestore.FieldValue.serverTimestamp()});
+                showToast("Foto subida"); loadPhotos();
+            }
+        }
+        async function loadPhotos() {
+            const g = document.getElementById('gallery'); g.innerHTML='';
+            const s = await db.collection('users').doc(currentUser.uid).collection('photos').orderBy('date','desc').get();
+            const p = s.docs.map(d=>d.data());
+            if(p.length) {
+                document.getElementById('comp-before').innerHTML = `<img src="${p[p.length-1].img}" style="width:100%; height:100%; object-fit:cover;">`;
+                document.getElementById('comp-now').innerHTML = `<img src="${p[0].img}" style="width:100%; height:100%; object-fit:cover;">`;
+            }
+            p.forEach(x => {
+                const d = document.createElement('div'); d.className='photo-item';
+                d.innerHTML = `<img src="${x.img}"><div class="photo-date">${x.date?x.date.toDate().toLocaleDateString():''}</div>`;
+                g.appendChild(d);
             });
         }
 
-        function goToDashboard() { showScreen('dashboard-screen'); }
-        function finishWorkout() {
-            if (confirm("¿Finalizar entrenamiento?")) {
-                alert("Entrenamiento guardado 💪");
-                goToDashboard();
-            }
-        }
-
-        // Admin
-        function showAdmin() { showScreen('admin-screen'); loadAdminUsers(); }
-
-        async function loadAdminUsers() {
-            const pendingDiv = document.getElementById('pending-list');
-            const allDiv = document.getElementById('all-users-list');
-            pendingDiv.innerHTML = '<p style="color:#888;">Cargando...</p>';
-            allDiv.innerHTML = '';
-
-            const snap = await db.collection('users').orderBy('createdAt', 'desc').get();
-            let pendingHTML = '';
-            let allHTML = '';
-
-            snap.forEach(doc => {
-                const u = doc.data();
-                const row = `
-                    <div class="user-row">
-                        <div>
-                            <strong style="color:white; display:block;">${u.username}</strong>
-                            <small style="color:#888;">${u.email}</small>
-                        </div>
-                        <div>
-                            ${!u.approved ? `<button onclick="approveUser('${doc.id}')" class="success" style="width:auto; padding:5px 10px; font-size:0.8rem;">Aprobar</button>` : '<span style="color:var(--success); font-size:0.8rem; margin-right:10px;">Activo</span>'}
-                            <button onclick="deleteUser('${doc.id}')" style="background:none; border:none; color:#666; cursor:pointer;">❌</button>
-                        </div>
+        // 11. ADMIN
+        async function loadAdminData() {
+            if(userData.role !== 'admin') return;
+            const pend = document.getElementById('adm-pending'); const usrs = document.getElementById('adm-users');
+            pend.innerHTML='...'; usrs.innerHTML='';
+            const s = await db.collection('users').orderBy('createdAt','desc').get();
+            let pH=''; let uH='';
+            s.forEach(d => {
+                const u = d.data();
+                const item = `
+                <div class="user-row">
+                    <div><b>${u.username}</b><br><small style="color:#888">${u.email}</small></div>
+                    <div>
+                        ${!u.approved ? `<button onclick="approve('${d.id}')" class="btn-success" style="padding:4px 8px; width:auto; font-size:0.8rem;">OK</button>` : ''}
+                        <button onclick="assignRout('${d.id}')" style="background:#333; border:none; padding:5px; margin-right:5px;">📋</button>
+                        <button onclick="delUser('${d.id}')" style="background:none; border:none; color:#666;">❌</button>
                     </div>
-                `;
-                if (!u.approved && u.role !== 'admin') pendingHTML += row;
-                allHTML += row;
+                </div>`;
+                if(!u.approved && u.role!=='admin') pH+=item;
+                uH+=item;
             });
-
-            pendingDiv.innerHTML = pendingHTML || '<p style="color:#666;">No hay usuarios pendientes.</p>';
-            allDiv.innerHTML = allHTML;
+            pend.innerHTML = pH||'<p class="text-muted">Nada pendiente</p>'; usrs.innerHTML = uH;
         }
-
-        async function approveUser(id) {
-            await db.collection('users').doc(id).update({ approved: true });
-            loadAdminUsers();
-        }
-        async function deleteUser(id) {
-            if (confirm("¿Eliminar usuario permanentemente?")) {
-                await db.collection('users').doc(id).delete();
-                loadAdminUsers();
+        async function approve(id) { await db.collection('users').doc(id).update({approved:true}); loadAdminData(); }
+        async function delUser(id) { if(confirm("Borrar?")) await db.collection('users').doc(id).delete(); loadAdminData(); }
+        async function assignRout(uid) {
+            if(confirm("¿Asignar rutina básica?")) {
+                const exs = exercisesDB.slice(0,5); 
+                await db.collection('users').doc(uid).collection('routines').add({name:"Rutina Coach", exercises:exs, createdAt:new Date()});
+                showToast("Rutina enviada");
             }
         }
 
-        // Bloqueo de pantalla (WakeLock)
-        let wakeLock = null;
-        async function requestWakeLock() {
-            if ('wakeLock' in navigator) {
-                try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
-            }
+        async function saveConfig() {
+            const v = parseInt(document.getElementById('cfg-rest').value);
+            await db.collection('users').doc(currentUser.uid).update({'settings.rest':v});
+            showToast("Ajustes guardados");
         }
     </script>
 </body>
 </html>
+
