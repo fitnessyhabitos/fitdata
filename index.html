@@ -22,7 +22,7 @@
             --input-bg: #1f1f1f;
             --text-color: #ffffff;
             --text-dim: #888888;
-            --accent-color: #ff3333;
+            --accent-color: #ff3333; /* Rojo Neón */
             --accent-dim: rgba(255, 51, 51, 0.2);
             --accent-glow: 0 0 12px rgba(255, 51, 51, 0.5);
             --success-color: #00ff88;
@@ -43,7 +43,7 @@
 
         .hidden { display: none !important; }
         .btn {
-            background: var(--accent-color); color: white; border: none; padding: 14px;
+            background: var(--accent-color); color: white; border: none; padding: 12px;
             border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
             cursor: pointer; width: 100%; box-shadow: var(--accent-glow); display: flex; justify-content: center; align-items: center;
         }
@@ -295,7 +295,7 @@
                     <input type="number" id="cfg-rest-time" value="60" style="width:70px; padding:5px; margin:0; text-align:center;">
                 </div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
-                    <span>Sonido</span>
+                    <span>Sonido (5 Beeps)</span>
                     <div style="display:flex; gap:10px; align-items:center;">
                         <button class="btn-small btn-outline" style="margin:0; padding:2px 8px; font-size:0.7rem;" onclick="testSound()">🔊 PROBAR</button>
                         <label class="switch"><input type="checkbox" id="cfg-sound" checked><span class="slider"></span></label>
@@ -391,15 +391,9 @@
         const ADMIN = "toni@fitdatapro.es";
         const CODE = "fityhab";
 
-        // BEEP SOUND (MP3 Base64 encoded - High Pitch for Alarm)
-        const BEEP_SRC = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjQ1LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA//uQZAAABIAAAAA0gAAAAAAAABAAAAAAAAAAAAAAA";
-        // NOTA: Para el ejemplo usaré un tono generado sintéticamente más seguro para evitar problemas de CORS/Codec
-        // Pero mantengo la estructura de objeto Audio para compatibilidad.
-        
+        // AUDIO SYSTEM (MULTI-BEEP)
         let audioCtx = null;
-        let oscillator = null;
 
-        // UNLOCK AUDIO IOS (SYSTEM CHECK - Plays a silent sound on first touch)
         function unlockAudio() {
             if(!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -408,41 +402,44 @@
             if(audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-            // Play empty buffer to unlock
+            // Play silent buffer to unlock iOS
             const buffer = audioCtx.createBuffer(1, 1, 22050);
             const source = audioCtx.createBufferSource();
             source.buffer = buffer;
             source.connect(audioCtx.destination);
             source.start(0);
-            
-            // AUDIBLE CONFIRMATION (Short Beep)
-            playSystemBeep(0.1); 
         }
         document.addEventListener('touchstart', unlockAudio, {once:true});
         document.addEventListener('click', unlockAudio, {once:true});
 
-        // FUNCION PARA REPRODUCIR BEEP
-        function playSystemBeep(duration = 0.5) {
+        function playAlarmSequence() {
             if(!audioCtx) unlockAudio();
             if(audioCtx) {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'square'; // Sonido tipo alarma digital
-                osc.frequency.value = 880; // A5
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                
-                // Fade out
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.stop(audioCtx.currentTime + duration);
+                const now = audioCtx.currentTime;
+                // 5 Beeps Sequence
+                for(let i=0; i<5; i++) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.value = 880; 
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    const startTime = now + (i * 0.4); // 0.4s interval
+                    const stopTime = startTime + 0.2;  // 0.2s beep duration
+                    
+                    osc.start(startTime);
+                    osc.stop(stopTime);
+                    
+                    gain.gain.setValueAtTime(0.5, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, stopTime);
+                }
             }
         }
 
         window.testSound = () => {
-            playSystemBeep(0.5);
-            alert("Si no has oído nada, revisa el interruptor de silencio de tu iPhone.");
+            playAlarmSequence();
+            alert("Si no oyes 5 pitidos, verifica que el interruptor lateral de silencio de tu iPhone esté desactivado.");
         };
 
         // BASE DE DATOS
@@ -729,7 +726,7 @@
                 if(restTimeRemaining <= 0) {
                     clearInterval(timerInt); m.classList.remove('active');
                     if(document.getElementById('cfg-sound').checked) {
-                        playSystemBeep(0.5);
+                        playAlarmSequence();
                     }
                 }
             }, 1000);
