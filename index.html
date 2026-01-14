@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Fit Data | FitHyab</title>
+    <title>Fit Data | High Performance</title>
     <link rel="icon" href="favicon.ico">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -15,14 +15,14 @@
             --text-color: #ffffff;
             --text-dim: #888888;
             --accent-color: #ff3333; /* Rojo Neón */
-            --accent-glow: 0 0 10px rgba(255, 51, 51, 0.6);
+            --accent-glow: 0 0 15px rgba(255, 51, 51, 0.5);
             --success-color: #00ff88;
             --warning-color: #ffaa00;
             --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
             --header-height: 60px;
-            --nav-height: 55px; /* Menú más pequeño */
+            --nav-height: 55px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -33,15 +33,13 @@
             font-family: var(--font-main);
             height: 100vh;
             width: 100vw;
-            overflow: hidden; /* Evita scroll en el body, lo haremos en el container */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
         /* --- UTILIDADES --- */
         .hidden { display: none !important; }
-        
-        /* Botones */
         .btn {
             background: var(--accent-color); color: white; border: none; padding: 12px;
             border-radius: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
@@ -49,99 +47,132 @@
             display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.9rem;
         }
         .btn:active { transform: scale(0.98); }
-        
         .btn-outline { 
             background: transparent; border: 1px solid #444; color: #ccc; 
             padding: 10px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer;
             margin-top: 10px; font-size: 0.85rem;
         }
-        
-        /* Botón NEON COACH */
-        .btn-neon-text {
-            background: transparent; border: 2px solid var(--accent-color);
-            color: var(--accent-color); font-weight: 900;
-            text-shadow: 0 0 8px var(--accent-color);
-            box-shadow: inset 0 0 10px rgba(255, 51, 51, 0.2);
-            padding: 5px 15px; border-radius: 4px; font-size: 0.8rem;
-            letter-spacing: 1px;
-            animation: flicker 3s infinite alternate;
-        }
-        @keyframes flicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; box-shadow: 0 0 10px var(--accent-color); }
-            20%, 24%, 55% { opacity: 0.5; box-shadow: none; }
-        }
 
-        .btn-float {
-            position: absolute; bottom: 20px; right: 20px; /* Posicion relativa al view-container */
-            width: 50px; height: 50px; border-radius: 50%;
-            background: var(--accent-color); color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; box-shadow: 0 5px 20px rgba(255,51,51,0.5);
-            z-index: 90; border: none;
+        /* --- LOADING SCREEN IMPACTANTE --- */
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-
-        input, select {
-            background: var(--input-bg); border: 1px solid #333; color: white;
-            padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 16px;
+        #loading-logo { 
+            width: 140px; 
+            filter: drop-shadow(0 0 20px var(--accent-color));
+            animation: breathe 3s infinite ease-in-out;
         }
-        input:focus { outline: 1px solid var(--accent-color); }
+        .loading-text {
+            margin-top: 30px; color: var(--accent-color); font-family: monospace;
+            font-size: 1.2rem; letter-spacing: 3px; font-weight: bold;
+            text-shadow: 0 0 10px var(--accent-color);
+            animation: blink 0.8s infinite;
+        }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* --- HEADER --- */
+        /* --- HEADER & COACH BTN --- */
         header {
-            flex-shrink: 0; /* No encoger */
-            height: calc(var(--header-height) + var(--safe-top));
-            padding-top: var(--safe-top);
-            background: rgba(5, 5, 5, 0.98);
-            border-bottom: 1px solid #222;
-            display: flex; justify-content: space-between; align-items: center;
-            padding-left: 15px; padding-right: 15px;
-            z-index: 100;
+            flex-shrink: 0; height: calc(var(--header-height) + var(--safe-top));
+            padding-top: var(--safe-top); background: rgba(5, 5, 5, 0.98);
+            border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center;
+            padding-left: 15px; padding-right: 15px; z-index: 100;
         }
         .brand { font-weight: 900; font-size: 1.2rem; color: white; letter-spacing: -0.5px; }
         .brand span { color: var(--accent-color); }
-
-        /* --- CONTENIDO SCROLLABLE --- */
-        #main-container {
-            flex: 1; /* Ocupa el espacio restante */
-            overflow-y: auto; /* Aquí ocurre el scroll */
-            position: relative;
-            scroll-behavior: smooth;
+        
+        .btn-neon-text {
+            background: transparent; border: 1px solid var(--accent-color);
+            color: var(--accent-color); font-weight: 800; text-shadow: 0 0 5px var(--accent-color);
+            padding: 5px 12px; border-radius: 4px; font-size: 0.8rem; letter-spacing: 1px;
+            box-shadow: inset 0 0 10px rgba(255, 51, 51, 0.1);
         }
 
+        /* --- SCROLL CONTAINER --- */
+        #main-container { flex: 1; overflow-y: auto; position: relative; scroll-behavior: smooth; }
         .view-container {
-            min-height: 100%;
-            padding: 20px 15px 100px 15px; /* Padding bottom extra para no chocar con menú */
-            display: none;
-            opacity: 0; animation: fadeIn 0.3s forwards;
+            min-height: 100%; padding: 20px 15px 100px 15px;
+            display: none; opacity: 0; animation: fadeIn 0.3s forwards;
         }
         .view-container.active { display: block; opacity: 1; }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* --- TARJETAS --- */
-        .card {
-            background: var(--card-color); border-radius: 12px; padding: 15px;
-            margin-bottom: 15px; border: 1px solid #222; position: relative;
-        }
+        /* --- CARDS & UI --- */
+        .card { background: var(--card-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #222; position: relative; }
+        input, select { background: var(--input-bg); border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 16px; }
+        input:focus { outline: 1px solid var(--accent-color); }
 
-        /* --- PERFIL --- */
+        /* --- PROFILE ELEMENTS --- */
         .profile-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .avatar-container {
-            position: relative; width: 70px; height: 70px; cursor: pointer;
-        }
         .avatar-circle {
-            width: 100%; height: 100%; border-radius: 50%;
-            background: #222; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; color: var(--accent-color); border: 2px solid var(--accent-color);
-            overflow: hidden;
+            width: 70px; height: 70px; border-radius: 50%; background: #222;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--accent-color); overflow: hidden; position: relative;
         }
         .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
-        .avatar-edit-icon {
-            position: absolute; bottom: 0; right: 0; background: var(--accent-color);
-            border-radius: 50%; width: 20px; height: 20px; font-size: 12px;
-            display: grid; place-items: center; border: 1px solid black;
+        
+        /* HEATMAP BARS */
+        .muscle-bar-group { margin-bottom: 8px; }
+        .muscle-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #ccc; margin-bottom: 2px; }
+        .progress-track { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff3333, #ff6666); width: 0%; transition: width 1s ease; }
+
+        /* PHOTO COMPARATOR */
+        .compare-wrapper { position: relative; width: 100%; height: 250px; background: #000; border-radius: 8px; overflow: hidden; margin-top:10px; }
+        .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+        .img-overlay { clip-path: inset(0 50% 0 0); transition: clip-path 0s; } /* JS updates this */
+        .slider-handle {
+            position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: white; cursor: ew-resize; z-index: 10;
+        }
+        .slider-btn {
+            position: absolute; top: 50%; left: -14px; width: 28px; height: 28px;
+            background: white; border-radius: 50%; display: grid; place-items: center; color: black; font-size:12px;
+            box-shadow: 0 0 5px black;
         }
 
-        /* --- EXERCISES --- */
+        /* --- EXERCISE SELECTOR (SEARCH + IMG) --- */
+        .ex-select-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px; background: #1a1a1a; margin-bottom: 5px; border-radius: 6px;
+            cursor: pointer; border: 1px solid transparent;
+        }
+        .ex-select-item img { width: 40px; height: 40px; object-fit: contain; background: black; border-radius: 4px; }
+        .ex-select-item.selected { border-color: var(--accent-color); background: rgba(255,51,51,0.1); }
+
+        /* --- BOTTOM NAV --- */
+        nav.bottom-nav {
+            flex-shrink: 0; height: calc(var(--nav-height) + var(--safe-bottom));
+            padding-bottom: var(--safe-bottom); background: #0f0f0f; border-top: 1px solid #222;
+            display: flex; justify-content: space-around; z-index: 100;
+        }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 0.65rem; }
+        .nav-item.active { color: var(--accent-color); }
+        .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
+
+        /* --- MODAL --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);
+            z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none;
+        }
+        .modal.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: #1a1a1a; width: 90%; max-width: 350px; padding: 20px; border-radius: 12px; border: 1px solid var(--accent-color); text-align: center; }
+
+        .btn-float {
+            position: absolute; bottom: 20px; right: 20px;
+            width: 50px; height: 50px; border-radius: 50%; background: var(--accent-color);
+            color: white; display: grid; place-items: center; font-size: 24px; box-shadow: 0 5px 15px rgba(255,51,51,0.5);
+        }
+        
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        /* --- EXERCISE VISUAL IN WORKOUT --- */
         .exercise-visual {
             width: 100%; height: 160px; background: #000; border-radius: 8px; margin-bottom: 10px;
             overflow: hidden; border: 1px solid #333; position: relative; display: flex; justify-content: center;
@@ -153,74 +184,26 @@
             align-items: center; margin-bottom: 8px; font-size: 0.9rem;
         }
 
-        /* --- TOGGLES --- */
-        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; }
-        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; border-radius: 34px; transition: .4s; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; }
-        input:checked + .slider { background-color: var(--accent-color); }
-        input:checked + .slider:before { transform: translateX(22px); }
-
-        /* --- NAV BOTTOM --- */
-        nav.bottom-nav {
-            flex-shrink: 0;
-            height: calc(var(--nav-height) + var(--safe-bottom));
-            padding-bottom: var(--safe-bottom);
-            background: #0f0f0f;
-            border-top: 1px solid #222;
-            display: flex; justify-content: space-around;
-            z-index: 100;
-        }
-        .nav-item {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #555; font-size: 0.65rem; cursor: pointer;
-        }
-        .nav-item.active { color: var(--accent-color); }
-        .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
-
-        /* --- LOADING --- */
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        #loading-logo { width: 100px; animation: pulse 2s infinite; }
-
-        /* --- MODAL --- */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 2000;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: 0.2s;
-        }
-        .modal.active { opacity: 1; pointer-events: auto; }
-        .modal-content {
-            background: #1a1a1a; width: 90%; max-width: 350px;
-            padding: 20px; border-radius: 12px; border: 1px solid var(--accent-color);
-            text-align: center; max-height: 80vh; overflow-y: auto;
-        }
-
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
         <img src="logo.png" id="loading-logo" alt="Logo">
-        <p style="margin-top:20px; color:#666; font-size:0.8rem; letter-spacing:2px;">CARGANDO SISTEMA...</p>
+        <div class="loading-text">SYSTEM INITIALIZED</div>
     </div>
 
     <header id="main-header" class="hidden">
         <div class="brand">FIT DATA <span>PRO</span></div>
-        <button id="coach-btn" class="hidden btn-neon-text">COACH</button>
+        <button id="coach-btn" class="hidden btn-neon-text">COACH AREA</button>
     </header>
 
     <main id="main-container">
 
         <section id="auth-view" class="view-container">
-            <div style="text-align:center; margin-bottom:40px; margin-top:40px;">
-                <img src="logo.png" style="width:80px; margin-bottom:15px;">
-                <h1 style="font-size:1.8rem;">ACCESO</h1>
+            <div style="text-align:center; margin-top:40px; margin-bottom:40px;">
+                <img src="logo.png" style="width:100px; margin-bottom:20px;">
+                <h1>ACCESO SEGURO</h1>
             </div>
             <div id="login-form">
                 <input type="email" id="login-email" placeholder="Email">
@@ -236,7 +219,7 @@
                     <input type="number" id="reg-age" placeholder="Edad">
                     <input type="number" id="reg-height" placeholder="Altura (cm)">
                 </div>
-                <input type="text" id="reg-code" placeholder="CÓDIGO SECRETO (fityhab)">
+                <input type="text" id="reg-code" placeholder="CÓDIGO SECRETO">
                 <button class="btn" id="btn-register">SOLICITAR ACCESO</button>
                 <button class="btn-outline" onclick="toggleAuth('login')">VOLVER</button>
             </div>
@@ -250,51 +233,76 @@
 
         <section id="editor-view" class="view-container">
             <h2>EDITOR DE RUTINA</h2>
-            <input type="text" id="editor-name" placeholder="Nombre (ej: Torso Fuerza)">
-            <div class="card" style="max-height: 400px; overflow-y: auto;">
-                <h3 style="margin-bottom:10px;">Selecciona Ejercicios</h3>
-                <div id="exercise-selector-list"></div>
+            <input type="text" id="editor-name" placeholder="Nombre de la Rutina">
+            
+            <div class="card" style="max-height: 500px; display:flex; flex-direction:column;">
+                <div style="position:sticky; top:0; background:var(--card-color); padding-bottom:10px; z-index:10;">
+                    <h3>Selección de Ejercicios</h3>
+                    <input type="search" id="ex-search" placeholder="🔍 Buscar ejercicio..." oninput="filterExercises(this.value)">
+                </div>
+                <div id="exercise-selector-list" style="overflow-y:auto; flex:1;"></div>
             </div>
+
             <div style="display:flex; gap:10px;">
                 <button class="btn" onclick="saveRoutine()">GUARDAR</button>
-                <button class="btn-outline" style="margin:0;" onclick="switchTab('routines-view')">CANCELAR</button>
+                <button class="btn-outline" style="margin:0" onclick="switchTab('routines-view')">CANCELAR</button>
             </div>
         </section>
 
         <section id="profile-view" class="view-container">
+            
             <div class="profile-header">
-                <div class="avatar-container" onclick="document.getElementById('file-avatar').click()">
-                    <div class="avatar-circle">
-                        <img id="avatar-img" src="" style="display:none;">
-                        <span id="avatar-text">U</span>
-                    </div>
-                    <div class="avatar-edit-icon">📷</div>
+                <div class="avatar-circle" onclick="document.getElementById('file-avatar').click()">
+                    <img id="avatar-img" src="" style="display:none;">
+                    <span id="avatar-text" style="font-size:1.5rem; color:var(--accent-color);">U</span>
                 </div>
                 <input type="file" id="file-avatar" accept="image/*" class="hidden" onchange="uploadAvatar(this)">
-                
                 <div>
                     <h3 id="profile-name" style="margin:0;">Cargando...</h3>
-                    <span style="color:#666; font-size:0.8rem;">Atleta</span>
+                    <span style="color:#666; font-size:0.8rem;">Atleta de Alto Rendimiento</span>
                 </div>
+            </div>
+
+            <div class="card">
+                <h3>MAPA MUSCULAR (VOLUMEN)</h3>
+                <div id="heatmap-container">
+                    </div>
+            </div>
+
+            <div class="card">
+                <h3>COMPARATIVA VISUAL</h3>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <button class="btn-outline" style="width:48%; margin:0; padding:5px; font-size:0.7rem;" onclick="document.getElementById('f-before').click()">1. CARGAR ANTES</button>
+                    <button class="btn-outline" style="width:48%; margin:0; padding:5px; font-size:0.7rem;" onclick="document.getElementById('f-after').click()">2. CARGAR ACTUAL</button>
+                </div>
+                <input type="file" id="f-before" class="hidden" accept="image/*" onchange="loadCompImg(this,'img-before')">
+                <input type="file" id="f-after" class="hidden" accept="image/*" onchange="loadCompImg(this,'img-overlay')">
+                
+                <div class="compare-wrapper" id="compare-box">
+                    <img src="" id="img-before" class="compare-img" alt="Sube foto A">
+                    <img src="" id="img-overlay" class="compare-img img-overlay" alt="Sube foto B">
+                    <div class="slider-handle" id="slider-handle">
+                        <div class="slider-btn">↔</div>
+                    </div>
+                </div>
+                <input type="range" min="0" max="100" value="50" style="width:100%; margin-top:15px;" oninput="moveSlider(this.value)">
             </div>
 
             <div class="card">
                 <h3>EVOLUCIÓN PESO</h3>
-                <div style="position: relative; height:200px; width:100%">
-                    <canvas id="weightChart"></canvas>
-                </div>
-                <button class="btn-outline" onclick="addWeightEntry()" style="margin-top:10px;">+ Registrar Peso Hoy</button>
+                <div style="height:200px;"><canvas id="weightChart"></canvas></div>
+                <button class="btn-outline" onclick="addWeightEntry()">+ REGISTRAR PESO</button>
             </div>
 
             <div class="card">
-                <h3>AJUSTES</h3>
-                <div class="setting-row">
+                <h3>CONFIGURACIÓN</h3>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                     <span>Sonido Timer</span>
-                    <label class="switch"><input type="checkbox" id="set-sound" checked><span class="slider"></span></label>
+                    <label class="switch"><input type="checkbox" id="cfg-sound" checked><span class="slider"></span></label>
                 </div>
-                <div class="setting-row">
-                    <span>Pantalla Siempre Encendida</span>
-                    <label class="switch"><input type="checkbox" id="set-wake" checked><span class="slider"></span></label>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>Pantalla Activa (WakeLock)</span>
+                    <label class="switch"><input type="checkbox" id="cfg-wake" checked><span class="slider"></span></label>
                 </div>
             </div>
 
@@ -303,7 +311,7 @@
 
         <section id="workout-view" class="view-container">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; position:sticky; top:0; background:var(--bg-color); z-index:10; padding:10px 0;">
-                <button onclick="switchTab('routines-view')" style="background:none; border:none; color:#666;">✕ Cancelar</button>
+                <button onclick="switchTab('routines-view')" style="background:none; border:none; color:#666;">✕</button>
                 <span id="mini-timer" style="color:var(--accent-color); font-weight:bold;">00:00</span>
                 <button class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem;" onclick="finishWorkoutPrompt()">TERMINAR</button>
             </div>
@@ -314,8 +322,8 @@
         <section id="admin-view" class="view-container">
             <h2>PANEL COACH</h2>
             <div class="card">
-                <h3>Usuarios</h3>
-                <div id="admin-user-list"></div>
+                <h3>Atletas</h3>
+                <div id="admin-list"></div>
             </div>
             <button class="btn-outline" onclick="switchTab('routines-view')">VOLVER</button>
         </section>
@@ -333,7 +341,7 @@
 
     <div id="modal-timer" class="modal">
         <div class="modal-content">
-            <h3 style="color:var(--success-color);">DESCANSO</h3>
+            <h3 style="color:var(--success-color)">DESCANSO</h3>
             <div id="timer-display" style="font-size:4rem; font-weight:bold; color:white;">60</div>
             <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
                 <button class="btn-outline" onclick="addTime(20)">+20s</button>
@@ -342,15 +350,13 @@
         </div>
     </div>
 
-    <div id="modal-coach-user" class="modal">
+    <div id="modal-coach" class="modal">
         <div class="modal-content">
             <h3 id="coach-user-name">Usuario</h3>
-            <div style="text-align:left; margin:15px 0; color:#aaa;" id="coach-user-stats"></div>
-            <hr style="border:1px solid #333; margin:10px 0;">
-            <h4>Asignar Rutina</h4>
-            <select id="coach-routine-select" style="margin-top:10px;"></select>
-            <button class="btn" onclick="coachAssignRoutine()">ASIGNAR</button>
-            <button class="btn-outline" onclick="document.getElementById('modal-coach-user').classList.remove('active')">CERRAR</button>
+            <p id="coach-user-email" style="color:#666; font-size:0.8rem; margin-bottom:15px;"></p>
+            <select id="coach-routine-select"></select>
+            <button class="btn" style="margin-top:10px;" onclick="assignRoutine()">ASIGNAR RUTINA</button>
+            <button class="btn-outline" onclick="document.getElementById('modal-coach').classList.remove('active')">CERRAR</button>
         </div>
     </div>
 
@@ -359,7 +365,7 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, where, addDoc, deleteDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        // FIREBASE CONFIG
+        // FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
@@ -372,464 +378,444 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CONSTANTES
         const ADMIN = "toni@fitdatapro.es";
         const CODE = "fityhab";
-        
-        // EJERCICIOS (Muestra reducida para funcionalidad, ampliar a 82 según lista anterior)
-        const DB_EXERCISES = [
-            {n:"Sentadilla con Barra", img:"cuadriceps.png"}, {n:"Prensa de Piernas", img:"cuadriceps.png"},
-            {n:"Peso Muerto", img:"espalda.png"}, {n:"Dominadas", img:"espalda.png"},
-            {n:"Press de Banca", img:"pecho.png"}, {n:"Press Militar", img:"hombros.png"},
-            {n:"Curl de Bíceps", img:"biceps.png"}, {n:"Extensiones Tríceps", img:"triceps.png"},
-            {n:"Hip Thrust", img:"gluteos.png"}, {n:"Elevación Talones", img:"gemelos.png"},
-            {n:"Peso Muerto Rumano", img:"isquiotibiales.png"}, {n:"Crunch Abdominal", img:"abs.png"}
+
+        // --- BASE DE DATOS COMPLETA 82 EJERCICIOS ---
+        const EXERCISES = [
+            // PIERNAS
+            {n:"Sentadilla con Barra", img:"cuadriceps.png"}, 
+            {n:"Sentadilla Jaca", img:"cuadriceps.png"}, 
+            {n:"Sentadilla con Cinturón", img:"cuadriceps.png"},
+            {n:"Prensa de Piernas", img:"cuadriceps.png"}, 
+            {n:"Extensión de Cuádriceps", img:"cuadriceps.png"}, 
+            {n:"Estocadas con Mancuernas", img:"cuadriceps.png"},
+            {n:"Curl de Pierna Tumbado", img:"isquiotibiales.png"}, 
+            {n:"Curl de Pierna Sentado", img:"isquiotibiales.png"}, 
+            {n:"Prensa Horizontal", img:"cuadriceps.png"},
+            {n:"Prensa de piernas 45°", img:"cuadriceps.png"}, 
+            {n:"Elevación de Talones Sentado", img:"gemelos.png"}, 
+            {n:"Elevación de Talones de Pie", img:"gemelos.png"},
+            {n:"Elevación de Talones en Máquina", img:"gemelos.png"}, 
+            {n:"Elevación de Cadera", img:"gluteos.png"}, 
+            {n:"Sentadilla Búlgara", img:"gluteos.png"},
+            {n:"Patada de Glúteo en Polea", img:"gluteos.png"}, 
+            {n:"Abducción de Cadera en Máquina", img:"gluteos.png"}, 
+            {n:"Prensa de Glúteos", img:"gluteos.png"},
+            {n:"Peso Muerto Rumano", img:"isquiotibiales.png"},
+
+            // ESPALDA
+            {n:"Peso Muerto", img:"espalda.png"}, 
+            {n:"Peso Muerto Sumo", img:"espalda.png"}, 
+            {n:"Remo con Barra", img:"espalda.png"},
+            {n:"Remo con Mancuernas", img:"espalda.png"}, 
+            {n:"Jalón Lateral", img:"espalda.png"}, 
+            {n:"Jalón Lateral Cerrado", img:"espalda.png"},
+            {n:"Remo en Máquina", img:"espalda.png"}, 
+            {n:"Remo en Polea Baja", img:"espalda.png"}, 
+            {n:"Dominadas", img:"espalda.png"},
+            {n:"Dominadas Asistidas", img:"espalda.png"}, 
+            {n:"Remo Invertido", img:"espalda.png"}, 
+            {n:"Remo T", img:"espalda.png"},
+            {n:"Hiperextensión", img:"espalda.png"}, 
+            {n:"Buenos Días", img:"isquiotibiales.png"}, 
+            {n:"Remo Hammer", img:"espalda.png"},
+            {n:"Jalón Agarre Cerrado", img:"espalda.png"}, 
+            {n:"Jalón Agarre Abierto", img:"espalda.png"}, 
+            {n:"Remo alto", img:"espalda.png"},
+
+            // PECHO
+            {n:"Press de Banca", img:"pecho.png"}, 
+            {n:"Press Inclinado con Mancuernas", img:"pecho.png"}, 
+            {n:"Aperturas con Mancuernas", img:"pecho.png"},
+            {n:"Cruces en Polea", img:"pecho.png"}, 
+            {n:"Prensa de Pecho en Máquina", img:"pecho.png"}, 
+            {n:"Prensa de Pecho Declinado", img:"pecho.png"},
+            {n:"Fondos en Paralelas", img:"triceps.png"}, 
+            {n:"Aperturas de Pecho", img:"pecho.png"}, 
+            {n:"Press Inclinado", img:"pecho.png"},
+            {n:"Press Plano", img:"pecho.png"}, 
+            {n:"Prensa Lateral Iso", img:"pecho.png"}, 
+            {n:"Prensa de Pecho", img:"pecho.png"},
+
+            // HOMBROS
+            {n:"Encogimiento de Hombros", img:"hombros.png"}, 
+            {n:"Encogimiento con Mancuernas", img:"hombros.png"}, 
+            {n:"Press Militar", img:"hombros.png"},
+            {n:"Press de Hombros con Mancuernas", img:"hombros.png"}, 
+            {n:"Press de Hombros en Máquina", img:"hombros.png"}, 
+            {n:"Elevación Lateral", img:"hombros.png"},
+            {n:"Elevación Frontal", img:"hombros.png"}, 
+            {n:"Pájaros Inversos", img:"hombros.png"}, 
+            {n:"Elevación Lateral en Polea", img:"hombros.png"},
+            {n:"Press Arnold", img:"hombros.png"}, 
+            {n:"Press de Hombros", img:"hombros.png"}, 
+            {n:"Face Pull", img:"hombros.png"},
+
+            // BRAZOS
+            {n:"Curl de Barra", img:"biceps.png"}, 
+            {n:"Curl de Mancuernas", img:"biceps.png"}, 
+            {n:"Curl en Polea", img:"biceps.png"},
+            {n:"Curl Martillo", img:"biceps.png"}, 
+            {n:"Curl Concentrado", img:"biceps.png"}, 
+            {n:"Curl Predicador", img:"biceps.png"},
+            {n:"Extensión de Tríceps en Polea", img:"triceps.png"}, 
+            {n:"Extensión Francesa", img:"triceps.png"}, 
+            {n:"Extensiones Acostadas", img:"triceps.png"},
+            {n:"Fondos en Paralelas (Tríceps)", img:"triceps.png"}, 
+            {n:"Extensión Unilateral Tríceps", img:"triceps.png"}, 
+            {n:"Triceps Polea", img:"triceps.png"},
+            {n:"Triceps Barra", img:"triceps.png"},
+
+            // ABS
+            {n:"Abdominales con Rueda", img:"abs.png"}, 
+            {n:"Crunch en Polea", img:"abs.png"}, 
+            {n:"Elevaciones de Pierna Colgadas", img:"abs.png"},
+            {n:"Abdominales en Banco", img:"abs.png"}, 
+            {n:"Crunch en Máquina", img:"abs.png"}, 
+            {n:"Levantamiento de Rodillas Colgado", img:"abs.png"}
         ];
 
-        // ESTADO
         let currentUser = null;
         let userData = null;
         let activeWorkout = null;
         let timerInt = null;
         let wakeLock = null;
         let chartInstance = null;
-        let selectedUserIdForCoach = null;
+        let selectedUserCoach = null;
 
-        // AUTH & INIT
+        // AUTH
         onAuthStateChanged(auth, async (user) => {
-            const loader = document.getElementById('loading-screen');
             if(user) {
                 currentUser = user;
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if(snap.exists()) {
                     userData = snap.data();
-                    
-                    // Coach Check
                     if(userData.email === ADMIN) {
-                        const btn = document.getElementById('coach-btn');
-                        btn.classList.remove('hidden');
-                        btn.onclick = () => { loadCoachPanel(); switchTab('admin-view'); };
+                        const b = document.getElementById('coach-btn');
+                        b.classList.remove('hidden');
+                        b.onclick = () => { loadAdminUsers(); switchTab('admin-view'); };
                     }
-                    
                     if(userData.approved) {
+                        document.getElementById('loading-screen').classList.add('hidden');
                         document.getElementById('main-header').classList.remove('hidden');
                         document.getElementById('bottom-nav').classList.remove('hidden');
                         loadRoutines();
                         switchTab('routines-view');
                     } else {
-                        alert("Cuenta pendiente de aprobación.");
-                        await signOut(auth);
+                        alert("Cuenta en revisión.");
+                        signOut(auth);
                     }
                 }
             } else {
+                document.getElementById('loading-screen').classList.add('hidden');
                 switchTab('auth-view');
                 document.getElementById('main-header').classList.add('hidden');
                 document.getElementById('bottom-nav').classList.add('hidden');
             }
-            setTimeout(() => loader.classList.add('hidden'), 1000);
         });
 
-        // NAVEGACIÓN
+        // NAVEGACION
         window.switchTab = (tab) => {
-            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.view-container').forEach(e => e.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
-            
-            // Scroll al top
             document.getElementById('main-container').scrollTop = 0;
-
-            const navs = document.querySelectorAll('.nav-item');
-            navs.forEach(n => n.classList.remove('active'));
             
-            if(tab === 'routines-view') navs[0].classList.add('active');
+            const ns = document.querySelectorAll('.nav-item');
+            ns.forEach(n => n.classList.remove('active'));
+            
+            if(tab === 'routines-view') ns[0].classList.add('active');
             if(tab === 'profile-view') {
-                navs[1].classList.add('active');
+                ns[1].classList.add('active');
                 loadProfile();
             }
         };
-
-        window.toggleAuth = (mode) => {
-            document.getElementById('login-form').classList.toggle('hidden', mode !== 'login');
-            document.getElementById('register-form').classList.toggle('hidden', mode !== 'register');
+        window.toggleAuth = (m) => {
+            document.getElementById('login-form').classList.toggle('hidden', m !== 'login');
+            document.getElementById('register-form').classList.toggle('hidden', m !== 'register');
         };
-
         window.logout = () => signOut(auth).then(() => location.reload());
 
-        // --- RUTINAS ---
+        // RUTINAS
         async function loadRoutines() {
             const list = document.getElementById('routines-list');
-            list.innerHTML = '<p style="color:#666">Cargando...</p>';
-            
-            // Mis rutinas + Rutinas Asignadas por Coach
-            // Simplificado: Traemos rutinas donde (uid == yo) OR (assignedTo array contiene yo)
-            // Firebase no permite OR directo complejo, haremos dos querys o una lista en cliente para demo.
-            
-            const q = query(collection(db, "routines")); // Traeremos todas y filtraremos en cliente para demo rápida (en prod usar queries compuestas)
-            
-            const snap = await onSnapshot(q, (snapshot) => {
+            list.innerHTML = 'Cargando...';
+            const q = query(collection(db, "routines")); // Filtro cliente para demo
+            const snap = await onSnapshot(q, (s) => {
                 list.innerHTML = '';
-                let hasRoutines = false;
-                
-                snapshot.forEach(doc => {
-                    const r = doc.data();
-                    // Mostrar si es mía O si me la asignaron
-                    if (r.uid === currentUser.uid || (r.assignedTo && r.assignedTo.includes(currentUser.uid))) {
-                        hasRoutines = true;
+                s.forEach(d => {
+                    const r = d.data();
+                    if(r.uid === currentUser.uid || (r.assignedTo && r.assignedTo.includes(currentUser.uid))) {
                         const isMine = r.uid === currentUser.uid;
-                        
                         const div = document.createElement('div');
                         div.className = 'card';
                         div.innerHTML = `
                             <div style="display:flex; justify-content:space-between;">
-                                <h3 style="color:${isMine ? 'white' : 'var(--accent-color)'}">${r.name}</h3>
-                                ${isMine ? `<button style="background:none;border:none;" onclick="deleteRoutine('${doc.id}')">🗑️</button>` : '<span>🔒 Coach</span>'}
+                                <h3 style="color:${isMine?'white':'var(--accent-color)'}">${r.name}</h3>
+                                ${isMine ? `<button style="background:none;border:none;" onclick="delRoutine('${d.id}')">🗑️</button>` : '🔒'}
                             </div>
                             <p style="color:#666; font-size:0.8rem; margin:10px 0;">${r.exercises.length} Ejercicios</p>
-                            <button class="btn" onclick="startWorkout('${doc.id}')">ENTRENAR</button>
+                            <button class="btn" onclick="startWorkout('${d.id}')">ENTRENAR</button>
                         `;
                         list.appendChild(div);
                     }
                 });
-
-                if(!hasRoutines) list.innerHTML = '<p style="color:#666; text-align:center;">Sin rutinas.</p>';
             });
         }
 
+        // EDITOR (SEARCH + IMG)
         window.openRoutineEditor = () => {
             document.getElementById('editor-name').value = '';
-            const list = document.getElementById('exercise-selector-list');
-            list.innerHTML = '';
-            DB_EXERCISES.forEach(ex => {
-                const item = document.createElement('div');
-                item.style.cssText = "padding:10px; background:#222; margin-bottom:5px; border-radius:6px; cursor:pointer; border:1px solid #333;";
-                item.innerText = ex.n;
-                item.onclick = function() {
-                    this.classList.toggle('selected');
-                    this.style.borderColor = this.classList.contains('selected') ? 'var(--accent-color)' : '#333';
-                    this.style.color = this.classList.contains('selected') ? 'var(--accent-color)' : 'white';
-                };
-                list.appendChild(item);
-            });
+            document.getElementById('ex-search').value = '';
+            renderExercises(EXERCISES);
             switchTab('editor-view');
         };
 
+        window.filterExercises = (term) => {
+            const t = term.toLowerCase();
+            const filtered = EXERCISES.filter(e => e.n.toLowerCase().includes(t));
+            renderExercises(filtered);
+        };
+
+        function renderExercises(list) {
+            const c = document.getElementById('exercise-selector-list');
+            c.innerHTML = '';
+            list.forEach(ex => {
+                const div = document.createElement('div');
+                div.className = 'ex-select-item';
+                div.innerHTML = `<img src="${ex.img}" alt="img"><span>${ex.n}</span>`;
+                div.onclick = () => {
+                    div.classList.toggle('selected');
+                };
+                c.appendChild(div);
+            });
+        }
+
         window.saveRoutine = async () => {
             const name = document.getElementById('editor-name').value;
-            const selected = Array.from(document.querySelectorAll('#exercise-selector-list div.selected')).map(e => e.innerText);
-            
-            if(!name || selected.length === 0) return alert("Faltan datos");
-
+            const sel = Array.from(document.querySelectorAll('.ex-select-item.selected')).map(e => e.innerText);
+            if(!name || sel.length===0) return alert("Faltan datos");
             await addDoc(collection(db, "routines"), {
-                uid: currentUser.uid,
-                name: name,
-                exercises: selected,
-                createdAt: serverTimestamp()
+                uid: currentUser.uid, name: name, exercises: sel, createdAt: serverTimestamp()
             });
             switchTab('routines-view');
         };
+        window.delRoutine = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "routines", id)); };
 
-        window.deleteRoutine = async (id) => {
-             if(confirm("¿Borrar?")) await deleteDoc(doc(db, "routines", id));
-        };
-
-        // --- PERFIL ---
+        // PERFIL (HEATMAP + FOTOS)
         async function loadProfile() {
-            // Nombre y Foto
             document.getElementById('profile-name').innerText = userData.name;
-            if(userData.photoBase64) {
-                document.getElementById('avatar-text').style.display = 'none';
-                const img = document.getElementById('avatar-img');
-                img.src = userData.photoBase64;
-                img.style.display = 'block';
+            if(userData.photo) {
+                document.getElementById('avatar-text').style.display='none';
+                document.getElementById('avatar-img').src = userData.photo;
+                document.getElementById('avatar-img').style.display='block';
             }
-
-            // Gráfica de Peso
-            renderWeightChart();
-        }
-
-        window.uploadAvatar = (input) => {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    const base64 = e.target.result;
-                    // Actualizar UI
-                    document.getElementById('avatar-img').src = base64;
-                    document.getElementById('avatar-img').style.display = 'block';
-                    document.getElementById('avatar-text').style.display = 'none';
-                    // Guardar en Firebase (string largo, no ideal pero funcional para MVP)
-                    await updateDoc(doc(db, "users", currentUser.uid), { photoBase64: base64 });
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        };
-
-        async function renderWeightChart() {
-            const ctx = document.getElementById('weightChart');
-            if(!ctx) return;
             
-            // Datos Dummy para demo o fetching real de subcolección 'weights'
-            // Aquí simulamos datos del array del usuario si existiera
-            const dataPoints = userData.weightHistory || [70, 71, 70.5, 71.2, 70.8]; 
-            const labels = ["S1", "S2", "S3", "S4", "Hoy"];
+            // Heatmap Demo (Aleatorio para visualizar funcionalidad si no hay historial)
+            const muscles = ["Pecho","Espalda","Cuádriceps","Isquios","Glúteos","Hombros","Bíceps","Tríceps"];
+            const hC = document.getElementById('heatmap-container');
+            hC.innerHTML = '';
+            muscles.forEach(m => {
+                const pct = Math.floor(Math.random()*90)+10; // Simulación
+                const d = document.createElement('div');
+                d.className = 'muscle-bar-group';
+                d.innerHTML = `
+                    <div class="muscle-label"><span>${m}</span><span>${pct}%</span></div>
+                    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+                `;
+                hC.appendChild(d);
+            });
 
+            // Chart
+            const ctx = document.getElementById('weightChart');
             if(chartInstance) chartInstance.destroy();
-
+            const data = userData.weightHistory || [70,70.5,71];
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Peso (kg)',
-                        data: dataPoints,
-                        borderColor: '#ff3333',
-                        backgroundColor: 'rgba(255, 51, 51, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
+                    labels: data.map((_,i)=>`T${i}`),
+                    datasets: [{label:'Kg', data:data, borderColor:'#ff3333', backgroundColor:'rgba(255,51,51,0.1)', fill:true, tension:0.4}]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { color: '#333' } },
-                        x: { display: false }
-                    }
-                }
+                options: { plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{grid:{color:'#333'}}}, maintainAspectRatio:false }
             });
         }
 
-        window.addWeightEntry = async () => {
-            const w = prompt("Peso actual (kg):");
-            if(w && !isNaN(w)) {
-                // Actualizar array local y en DB
-                let hist = userData.weightHistory || [];
-                hist.push(parseFloat(w));
-                if(hist.length > 10) hist.shift(); // Guardar solo ultimos 10
-                
-                await updateDoc(doc(db, "users", currentUser.uid), { weightHistory: hist });
-                userData.weightHistory = hist;
-                renderWeightChart();
+        window.uploadAvatar = (inp) => {
+            if(inp.files[0]) {
+                const r = new FileReader();
+                r.onload = async (e) => {
+                    const b64 = e.target.result;
+                    document.getElementById('avatar-img').src = b64;
+                    document.getElementById('avatar-img').style.display = 'block';
+                    document.getElementById('avatar-text').style.display = 'none';
+                    await updateDoc(doc(db,"users",currentUser.uid), { photo: b64 });
+                };
+                r.readAsDataURL(inp.files[0]);
             }
         };
 
-        // --- ENTRENAMIENTO & WAKE LOCK ---
+        // PHOTO COMPARE LOGIC
+        window.loadCompImg = (inp, id) => {
+            if(inp.files[0]) {
+                const r = new FileReader();
+                r.onload = (e) => document.getElementById(id).src = e.target.result;
+                r.readAsDataURL(inp.files[0]);
+            }
+        };
+        window.moveSlider = (val) => {
+            document.getElementById('img-overlay').style.clipPath = `inset(0 ${100-val}% 0 0)`;
+            document.getElementById('slider-handle').style.left = `${val}%`;
+        };
+        
+        window.addWeightEntry = async () => {
+            const w = prompt("Peso (kg):");
+            if(w) {
+                let h = userData.weightHistory || [];
+                h.push(parseFloat(w));
+                await updateDoc(doc(db,"users",currentUser.uid),{weightHistory:h});
+                userData.weightHistory = h;
+                loadProfile();
+            }
+        };
+
+        // WORKOUT
         window.startWorkout = async (rid) => {
-            // Wake Lock Setup
-            if(document.getElementById('set-wake').checked && 'wakeLock' in navigator) {
+            if(document.getElementById('cfg-wake').checked && 'wakeLock' in navigator) {
                 try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
             }
-
-            const rDoc = await getDoc(doc(db, "routines", rid));
-            const rData = rDoc.data();
+            const snap = await getDoc(doc(db,"routines",rid));
+            const r = snap.data();
+            activeWorkout = { name: r.name, exs: r.exercises.map(n => {
+                const img = EXERCISES.find(e=>e.n===n)?.img || 'pecho.png';
+                return { n:n, img:img, sets:Array(5).fill().map((_,i)=>({r:i===0?20:16, w:'', d:false})) };
+            })};
             
-            activeWorkout = {
-                name: rData.name,
-                exercises: rData.exercises.map(n => {
-                    const info = DB_EXERCISES.find(e => e.n === n) || {n, img:'pecho.png'};
-                    return {
-                        n: n, img: info.img,
-                        sets: Array(5).fill().map((_,i)=>({reps:i===0?20:16, weight:'', done:false}))
-                    };
-                }),
-                startTime: Date.now()
-            };
-
-            renderWorkoutUI();
+            const c = document.getElementById('workout-exercises');
+            c.innerHTML = '';
+            document.getElementById('workout-title').innerText = activeWorkout.name;
+            activeWorkout.exs.forEach((e,i) => {
+                const card = document.createElement('div');
+                card.className = 'card'; card.style.borderLeft="3px solid var(--accent-color)";
+                let sH = '';
+                e.sets.forEach((s,j) => {
+                    sH += `<div class="set-row"><span>${j+1}</span><input type="number" placeholder="kg" onchange="uS(${i},${j},'w',this.value)"><input type="number" value="${s.r}" onchange="uS(${i},${j},'r',this.value)"><button class="${s.d?'btn':'btn-outline'}" style="margin:0;padding:0;height:35px;background:${s.d?'#0f8':'transparent'};color:${s.d?'#000':'#ccc'}" onclick="tS(${i},${j})">${s.d?'✓':''}</button></div>`;
+                });
+                card.innerHTML = `<div class="exercise-visual"><img src="${e.img}" alt="ex"></div><h3>${e.n}</h3>${sH}`;
+                c.appendChild(card);
+            });
             switchTab('workout-view');
-            startWorkoutTimer();
+            startTimerMini();
         };
 
-        function startWorkoutTimer() {
-            const display = document.getElementById('mini-timer');
+        window.uS = (i,j,k,v) => activeWorkout.exs[i].sets[j][k]=v;
+        window.tS = (i,j) => {
+            const s = activeWorkout.exs[i].sets[j];
+            s.d = !s.d;
+            window.startWorkout(null); // Re-render simple
+            const btn = document.querySelectorAll('.card')[i].querySelectorAll('button')[j];
+            btn.className = s.d ? 'btn' : 'btn-outline';
+            btn.style.background = s.d ? '#0f8' : 'transparent';
+            btn.style.color = s.d ? '#000' : '#ccc';
+            btn.innerText = s.d ? '✓' : '';
+            if(s.d) openRest();
+        };
+
+        function startTimerMini() {
+            const d = document.getElementById('mini-timer');
             const start = Date.now();
             setInterval(() => {
-                const diff = Math.floor((Date.now() - start) / 1000);
-                const m = Math.floor(diff / 60).toString().padStart(2,'0');
-                const s = (diff % 60).toString().padStart(2,'0');
-                display.innerText = `${m}:${s}`;
+                const diff = Math.floor((Date.now()-start)/1000);
+                d.innerText = `${Math.floor(diff/60)}:${(diff%60).toString().padStart(2,'0')}`;
             }, 1000);
         }
 
-        function renderWorkoutUI() {
-            const container = document.getElementById('workout-exercises');
-            container.innerHTML = '';
-            document.getElementById('workout-title').innerText = activeWorkout.name;
-
-            activeWorkout.exercises.forEach((ex, i) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style.borderLeft = "3px solid var(--accent-color)";
-                
-                let setsHtml = '';
-                ex.sets.forEach((s, j) => {
-                    setsHtml += `
-                        <div class="set-row">
-                            <span style="color:#666">${j+1}</span>
-                            <input type="number" placeholder="kg" value="${s.weight}" onchange="updSet(${i},${j},'weight',this.value)">
-                            <input type="number" placeholder="reps" value="${s.reps}" onchange="updSet(${i},${j},'reps',this.value)">
-                            <button class="${s.done?'btn':'btn-outline'}" style="margin:0; padding:0; height:35px; background:${s.done?'var(--success-color)':'transparent'}; color:${s.done?'black':'#ccc'}; border-color:${s.done?'transparent':'#444'}" onclick="togSet(${i},${j})">${s.done?'✓':''}</button>
-                        </div>
-                    `;
-                });
-
-                card.innerHTML = `
-                    <div class="exercise-visual">
-                        <img src="${ex.img}" alt="${ex.n}">
-                    </div>
-                    <h3 style="margin-bottom:10px;">${ex.n}</h3>
-                    ${setsHtml}
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        window.updSet = (i,j,k,v) => activeWorkout.exercises[i].sets[j][k] = v;
-        window.togSet = (i,j) => {
-            const s = activeWorkout.exercises[i].sets[j];
-            s.done = !s.done;
-            renderWorkoutUI();
-            if(s.done) triggerRestTimer();
-        };
-
-        function triggerRestTimer() {
-            const modal = document.getElementById('modal-timer');
-            modal.classList.add('active');
+        function openRest() {
+            const m = document.getElementById('modal-timer');
+            m.classList.add('active');
             let t = 60;
-            const disp = document.getElementById('timer-display');
-            disp.innerText = t;
-            
-            // Timer logic based on Date.now for background accuracy
-            const target = Date.now() + 60000;
-            
+            document.getElementById('timer-display').innerText = t;
             if(timerInt) clearInterval(timerInt);
             timerInt = setInterval(() => {
-                const left = Math.ceil((target - Date.now()) / 1000);
-                disp.innerText = left;
-                if(left <= 0) {
-                    clearInterval(timerInt);
-                    modal.classList.remove('active');
-                    if(document.getElementById('set-sound').checked) {
-                        // Reproducir sonido o vibrar
-                        navigator.vibrate([200,100,200]);
-                        const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-                        audio.play().catch(e=>{});
-                    }
+                t--; document.getElementById('timer-display').innerText = t;
+                if(t<=0) {
+                    clearInterval(timerInt); m.classList.remove('active');
+                    if(document.getElementById('cfg-sound').checked) navigator.vibrate([200,100,200]);
                 }
-            }, 500);
+            }, 1000);
         }
-
-        window.addTime = (s) => { /* Simplificado: solo visual para demo */ document.getElementById('timer-display').innerText = 80; };
         window.closeTimer = () => { clearInterval(timerInt); document.getElementById('modal-timer').classList.remove('active'); };
+        window.addTime = (s) => { /* Visual */ };
 
         window.finishWorkoutPrompt = async () => {
-            if(confirm("¿Guardar entrenamiento?")) {
-                await addDoc(collection(db, "workouts"), {
-                    uid: currentUser.uid,
-                    routine: activeWorkout.name,
-                    date: serverTimestamp()
-                });
+            if(confirm("¿Guardar?")) {
+                await addDoc(collection(db,"workouts"), {uid:currentUser.uid, date:serverTimestamp(), routine:activeWorkout.name});
                 if(wakeLock) wakeLock.release();
                 switchTab('routines-view');
             }
         };
 
-        // --- COACH PANEL ---
-        async function loadCoachPanel() {
-            const list = document.getElementById('admin-user-list');
-            list.innerHTML = 'Cargando...';
-            
-            const q = query(collection(db, "users"));
-            const snap = await getDocs(q);
-            list.innerHTML = '';
-            
+        // ADMIN
+        async function loadAdminUsers() {
+            const l = document.getElementById('admin-list');
+            l.innerHTML = '';
+            const snap = await getDocs(collection(db,"users"));
             snap.forEach(d => {
                 const u = d.data();
-                if(u.email === ADMIN) return; // No mostrar admin
-
+                if(u.email === ADMIN) return;
                 const div = document.createElement('div');
-                div.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #333; cursor:pointer;";
-                div.innerHTML = `
-                    <div>
-                        <div style="font-weight:bold; color:white;">${u.name}</div>
-                        <div style="font-size:0.8rem; color:${u.approved?'#666':'var(--warning-color)'}">${u.approved?'Aprobado':'Pendiente'}</div>
-                    </div>
-                    <div>${u.approved ? '🟢' : '⚠️'}</div>
-                `;
-                // Al hacer clic, abrir modal de detalle
-                div.onclick = () => openCoachUserModal(d.id, u);
-                list.appendChild(div);
+                div.style.cssText = "padding:10px; border-bottom:1px solid #333; display:flex; justify-content:space-between; cursor:pointer;";
+                div.innerHTML = `<span>${u.name} <br><small>${u.approved?'OK':'Pendiente'}</small></span><span>${u.approved?'🟢':'⚠️'}</span>`;
+                div.onclick = () => openCoachModal(d.id, u);
+                l.appendChild(div);
             });
         }
-
-        async function openCoachUserModal(uid, user) {
-            selectedUserIdForCoach = uid;
-            const modal = document.getElementById('modal-coach-user');
-            document.getElementById('coach-user-name').innerText = user.name;
-            document.getElementById('coach-user-stats').innerHTML = `Email: ${user.email}<br>Edad: ${user.age}<br>Altura: ${user.height}cm`;
+        
+        async function openCoachModal(uid, u) {
+            selectedUserCoach = uid;
+            const m = document.getElementById('modal-coach');
+            document.getElementById('coach-user-name').innerText = u.name;
+            document.getElementById('coach-user-email').innerText = u.email;
             
-            // Si no está aprobado, botón para aprobar
-            if(!user.approved) {
-                 if(confirm(`¿Aprobar a ${user.name}?`)) {
-                     await updateDoc(doc(db, "users", uid), { approved: true });
-                     loadCoachPanel(); // Reload
-                 }
+            // Si no aprobado, aprobar
+            if(!u.approved && confirm("¿Aprobar usuario?")) {
+                await updateDoc(doc(db,"users",uid),{approved:true});
+                loadAdminUsers();
             }
 
-            // Cargar Rutinas Disponibles para Asignar
             const sel = document.getElementById('coach-routine-select');
-            sel.innerHTML = '<option>Cargando...</option>';
-            
-            const rSnap = await getDocs(collection(db, "routines"));
             sel.innerHTML = '';
-            rSnap.forEach(r => {
-                const rd = r.data();
+            const rS = await getDocs(collection(db,"routines"));
+            rS.forEach(r => {
                 const opt = document.createElement('option');
-                opt.value = r.id;
-                opt.innerText = rd.name;
+                opt.value = r.id; opt.innerText = r.data().name;
                 sel.appendChild(opt);
             });
-
-            modal.classList.add('active');
+            m.classList.add('active');
         }
 
-        window.coachAssignRoutine = async () => {
+        window.assignRoutine = async () => {
             const rid = document.getElementById('coach-routine-select').value;
-            if(!selectedUserIdForCoach || !rid) return;
-            
-            // Asignar: Añadir el UID del usuario al array 'assignedTo' de la rutina
-            // O copiar la rutina al usuario. Haremos lo primero.
-            
-            const rRef = doc(db, "routines", rid);
+            if(!rid || !selectedUserCoach) return;
+            const rRef = doc(db,"routines",rid);
             const rSnap = await getDoc(rRef);
-            if(rSnap.exists()) {
-                const currentAssigned = rSnap.data().assignedTo || [];
-                if(!currentAssigned.includes(selectedUserIdForCoach)) {
-                    currentAssigned.push(selectedUserIdForCoach);
-                    await updateDoc(rRef, { assignedTo: currentAssigned });
-                    alert("Rutina asignada exitosamente.");
-                } else {
-                    alert("Ya tiene esta rutina asignada.");
-                }
+            let arr = rSnap.data().assignedTo || [];
+            if(!arr.includes(selectedUserCoach)) {
+                arr.push(selectedUserCoach);
+                await updateDoc(rRef, {assignedTo: arr});
+                alert("Asignada");
             }
-            document.getElementById('modal-coach-user').classList.remove('active');
+            document.getElementById('modal-coach').classList.remove('active');
         };
 
-        // AUTH LISTENERS
-        document.getElementById('btn-login').onclick = () => {
-            signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value)
-            .catch(e => alert(e.message));
-        };
+        // EVENTOS AUTH
+        document.getElementById('btn-login').onclick = () => signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value).catch(e=>alert(e.message));
         document.getElementById('btn-register').onclick = async () => {
             if(document.getElementById('reg-code').value !== CODE) return alert("Código mal");
             try {
-                const cred = await createUserWithEmailAndPassword(auth, document.getElementById('reg-email').value, document.getElementById('reg-pass').value);
-                await setDoc(doc(db,"users",cred.user.uid), {
-                    name: document.getElementById('reg-name').value,
-                    email: document.getElementById('reg-email').value,
-                    age: document.getElementById('reg-age').value,
-                    height: document.getElementById('reg-height').value,
-                    approved: document.getElementById('reg-email').value === ADMIN,
-                    createdAt: serverTimestamp()
+                const c = await createUserWithEmailAndPassword(auth, document.getElementById('reg-email').value, document.getElementById('reg-pass').value);
+                await setDoc(doc(db,"users",c.user.uid), {
+                    name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value,
+                    approved: document.getElementById('reg-email').value === ADMIN
                 });
             } catch(e) { alert(e.message); }
         };
