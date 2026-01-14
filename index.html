@@ -66,8 +66,8 @@
         .btn-primary { background:var(--accent); color:white; box-shadow:0 0 15px var(--accent-glow); }
         .btn-secondary { background:rgba(255,255,255,0.1); border:1px solid #444; color:white; }
         .btn-success { background:var(--success); color:black; font-weight:800; }
-        .btn-icon { background:transparent; border:none; color:#888; font-size:1.2rem; cursor:pointer; padding: 5px;}
-        .btn-icon:hover { color:white; }
+        .btn-icon { background:transparent; border:none; color:#bbb; font-size:1.2rem; cursor:pointer; padding: 5px; border-radius: 5px; border: 1px solid #333;}
+        .btn-icon:hover { color:white; border-color: #666; }
 
         .input { width:100%; padding:14px; margin-bottom:12px; background:#222; border:1px solid #444; color:white; border-radius:10px; font-size:1rem; }
         .input:focus { border-color:var(--accent); background:#2a2a2a; }
@@ -84,7 +84,6 @@
             background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #333; 
         }
         .set-row.done { border-color:var(--success); background:rgba(34, 221, 136, 0.05); }
-        
         .prev-val { position:absolute; top:-8px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#888; background:#222; padding:0 6px; border-radius:4px; border:1px solid #444; z-index:5; pointer-events:none; }
 
         .check-btn { width:32px; height:32px; border-radius:50%; border:2px solid #555; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; transition:0.2s; }
@@ -128,7 +127,9 @@
 
         /* ADMIN LIST */
         .user-row { display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-light); border-radius:10px; margin-bottom:10px; border-left:3px solid #444; }
-        
+        .stagnant { border-left-color: var(--warning) !important; background: rgba(255, 170, 0, 0.05); }
+        .stat-badge { background: #333; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: var(--muted); margin-top: 4px; display: inline-block; }
+
         /* LOGO */
         .loading-logo { width:140px; height:140px; margin-bottom:20px; border-radius:30px; animation:heartbeat 2.5s infinite ease-in-out; box-shadow:0 0 50px rgba(255,68,68,0.3); }
         @keyframes heartbeat { 0% {transform:scale(1);} 50% {transform:scale(1.08);} 100% {transform:scale(1);} }
@@ -350,16 +351,16 @@
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between;">
                 <h2 id="adm-ath-name">Atleta</h2>
-                <button onclick="document.getElementById('modal-athlete').classList.add('hidden')" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
+                <button onclick="closeAdminModal()" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
             </div>
             
-            <div class="card">
-                <h3>Asignar Objetivos</h3>
+            <div class="card" style="border-left-color: var(--success);">
+                <h3>🥗 Plan Nutricional</h3>
                 <div style="display:flex; gap:10px;">
                     <div><small>Kcal Objetivo</small><input id="adm-set-kcal" type="number" class="input"></div>
                     <div><small>Agua (L) Objetivo</small><input id="adm-set-water" type="number" class="input"></div>
                 </div>
-                <button onclick="adminSaveTargets()" class="btn btn-primary">Guardar Objetivos</button>
+                <button onclick="adminSaveTargets()" class="btn btn-primary" style="margin-top:10px;">Guardar Plan</button>
             </div>
 
             <div class="card">
@@ -408,7 +409,7 @@
     <div id="modal-note" class="modal hidden">
         <div class="modal-content">
             <h3>Nota del Ejercicio</h3>
-            <textarea id="note-text" class="input" rows="4" placeholder="Ej: Sillín al 6, molestias..."></textarea>
+            <textarea id="note-text" class="input" rows="4" placeholder="Ej: Sillín al 6..."></textarea>
             <div style="display:flex; gap:10px;">
                 <button onclick="saveNote()" class="btn btn-primary">Guardar</button>
                 <button onclick="document.getElementById('modal-note').classList.add('hidden')" class="btn btn-secondary">Cancelar</button>
@@ -419,7 +420,7 @@
     <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
 
     <script>
-        // --- 1. FIREBASE CONFIG ---
+        // --- 1. FIREBASE CONFIG (PON TUS CLAVES AQUÍ) ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
@@ -448,7 +449,7 @@
         let adminWeightChart = null;
         let currentAdminUser = null;
         let currentNoteExId = null;
-        let editingRoutineId = null; // Para saber si estamos creando o editando
+        let editingRoutineId = null;
 
         // --- 3. GENERADOR SVG ---
         function getMuscleSvg(muscle) {
@@ -480,7 +481,6 @@
             </svg>`);
         }
 
-        // GENERADOR DE HEATMAP
         function renderHeatmap(stats) {
             const container = document.getElementById('heatmap-render');
             if (!container) return;
@@ -602,6 +602,7 @@
                 db.collection('users').doc(u.uid).onSnapshot(doc => {
                     if(doc.exists) {
                         userData = doc.data();
+                        
                         if(userData.email.toLowerCase() === ADMIN_EMAIL) {
                             listenToAllUsers();
                         }
@@ -659,7 +660,6 @@
             document.getElementById('u-name').innerText = userData.username.split(' ')[0];
             document.getElementById('u-goal').innerText = userData.settings.goal || 'Objetivo no fijado';
             
-            // Nutrición
             if(userData.targets && (userData.targets.kcal > 0 || userData.targets.water > 0)) {
                 document.getElementById('nutrition-panel').classList.remove('hidden');
                 document.getElementById('target-kcal').innerText = userData.targets.kcal || '-';
@@ -670,7 +670,6 @@
 
             if(userData.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
             
-            // Cargar Config
             document.getElementById('cfg-goal').value = userData.settings.goal || 'Mantenimiento';
             document.getElementById('cfg-rest').value = userData.settings.rest || 60;
             document.getElementById('cfg-screen').checked = userData.settings.screen;
@@ -727,7 +726,7 @@
             showToast("Registro guardado");
         }
 
-        // 8. AUTOGUARDADO & WORKOUT CORE
+        // 8. ENTRENAMIENTO
         function saveWorkoutToStorage() {
             if (activeRoutine) {
                 localStorage.setItem('fitdata_wo', JSON.stringify({routine: activeRoutine, start: woStartTime}));
@@ -750,7 +749,6 @@
         async function startWo(id) {
             const doc = await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).get();
             const r = doc.data(); 
-            // 5 Series por defecto
             const preparedExercises = r.exercises.map(ex => ({
                 ...ex,
                 series: Array(5).fill().map((_, i) => ({ weight: '', reps: i===0?20:16, completed: false }))
@@ -769,29 +767,35 @@
             document.getElementById('wo-title').innerText = activeRoutine.name;
             const c = document.getElementById('wo-container'); c.innerHTML='';
 
-            const hSnap = await db.collection('users').doc(currentUser.uid).collection('history')
-                .where('routineId','==',activeRoutine.id).orderBy('date','desc').limit(1).get();
-            const last = !hSnap.empty ? hSnap.docs[0].data() : null;
+            let lastWorkout = null;
+            try {
+                const hSnap = await db.collection('users').doc(currentUser.uid).collection('history')
+                    .where('routineId','==',activeRoutine.id).orderBy('date','desc').limit(1).get();
+                if(!hSnap.empty) lastWorkout = hSnap.docs[0].data();
+            } catch(e) { console.log("No history found"); }
 
             activeRoutine.exercises.forEach((ex, idx) => {
                 let rows = '';
                 ex.series.forEach((s, i) => {
-                    const prev = last?.exercises[idx]?.series[i]?.weight || '-';
+                    const prev = lastWorkout?.exercises?.[idx]?.series?.[i]?.weight || '-';
                     const rowClass = s.completed ? 'set-row done' : 'set-row';
                     const checkClass = s.completed ? 'check-btn checked' : 'check-btn';
                     
                     rows += `
                     <div class="${rowClass}" id="row-${idx}-${i}">
                         <div style="text-align:center; color:#888;">${i+1}</div>
-                        <input type="number" class="input reps" value="${s.reps}" onchange="updateSet(${idx},${i},'reps',this.value)" style="margin:0; text-align:center; height:35px;">
+                        <input type="number" class="input reps" value="${s.reps}" onchange="updateSet(${idx},${i},'reps',this.value)" style="margin:0; text-align:center; height:35px; background:#333;">
                         <div style="position:relative;">
                             <span class="prev-val">${prev}kg</span>
-                            <input type="number" class="input weight" value="${s.weight}" onchange="updateSet(${idx},${i},'weight',this.value)" placeholder="kg" style="margin:0; text-align:center; height:35px;">
+                            <input type="number" class="input weight" value="${s.weight}" onchange="updateSet(${idx},${i},'weight',this.value)" placeholder="kg" style="margin:0; text-align:center; height:35px; background:#333;">
                         </div>
                         <div class="${checkClass}" onclick="checkSet(this, ${idx}, ${i})">✓</div>
                     </div>`;
                 });
-                c.innerHTML += `<div class="card">
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <img src="${ex.image}" class="ex-img">
@@ -799,8 +803,8 @@
                         </div>
                         <button onclick="openNote(${idx})" class="btn-icon">📝</button>
                     </div>
-                    ${rows}
-                </div>`;
+                    ${rows}`;
+                c.appendChild(card);
             });
 
             if(woTimerInt) clearInterval(woTimerInt);
@@ -979,9 +983,9 @@
                         <div><b>${u.username}</b><br><small style="color:#888">${u.email}</small>
                         <br><span class="stat-badge">${u.settings?.goal || '-'}</span></div>
                         <div style="text-align:right;">
+                            <button onclick="assignRout('${d.id}')" class="btn-secondary" style="font-size:0.8rem; padding:4px;">📋 Rutina</button>
                             ${u.approved ? `<button onclick="viewUserAdmin('${d.id}')" class="btn-icon">👁️</button>` : 
                             `<button onclick="approve('${d.id}')" class="btn-success" style="padding:4px 8px; width:auto; font-size:0.8rem;">OK</button>`}
-                            <button onclick="assignRout('${d.id}')" style="background:#333; border:none; padding:5px; margin-right:5px;">📋</button>
                             <button onclick="delUser('${d.id}')" style="background:none; border:none; color:#666;">❌</button>
                         </div>
                     </div>`;
@@ -1024,6 +1028,10 @@
             pSnap.forEach(d => { gallery.innerHTML += `<div class="photo-item"><img src="${d.data().img}" style="width:100%;"></div>`; });
         }
 
+        function closeAdminModal() {
+            document.getElementById('modal-athlete').classList.add('hidden');
+        }
+
         async function adminSaveTargets() {
             const k = document.getElementById('adm-set-kcal').value;
             const w = document.getElementById('adm-set-water').value;
@@ -1043,8 +1051,6 @@
         }
 
         // --- UTILS ---
-        
-        // MODIFICADO: AHORA RESETEAMOS EL ID AL ABRIR NUEVA RUTINA
         function openRoutineModal() { 
             editingRoutineId = null; 
             document.getElementById('modal-routine-title').innerText = "Nueva Rutina";
@@ -1054,7 +1060,6 @@
             document.getElementById('modal-create').classList.remove('hidden'); 
         }
 
-        // NUEVA FUNCIÓN: EDITAR RUTINA
         async function editRout(id) {
             const doc = await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).get();
             const r = doc.data();
@@ -1062,7 +1067,7 @@
             editingRoutineId = id;
             document.getElementById('modal-routine-title').innerText = "Editar Rutina";
             document.getElementById('new-rout-name').value = r.name;
-            selectedExs = r.exercises.map(e => e.id); // Extraemos los IDs de los ejercicios guardados
+            selectedExs = r.exercises.map(e => e.id);
             
             renderExSelector();
             document.getElementById('modal-create').classList.remove('hidden');
@@ -1088,19 +1093,16 @@
             const name = document.getElementById('new-rout-name').value;
             if(!name || selectedExs.length === 0) return showToast("Faltan datos");
             
-            // MAPEO SEGURO
             const exs = selectedExs.map(id => exercisesDB.find(e => e.id === id)).filter(e => e !== undefined);
             
             if(exs.length === 0) return showToast("Error al procesar ejercicios");
 
             if(editingRoutineId) {
-                // MODO EDICIÓN (UPDATE)
                 await db.collection('users').doc(currentUser.uid).collection('routines').doc(editingRoutineId).update({
                     name, exercises: exs
                 });
                 showToast("Rutina actualizada");
             } else {
-                // MODO CREACIÓN (ADD)
                 await db.collection('users').doc(currentUser.uid).collection('routines').add({
                     name, exercises: exs, createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -1108,10 +1110,11 @@
             }
             
             document.getElementById('modal-create').classList.add('hidden');
-            editingRoutineId = null; // Limpiar ID
+            editingRoutineId = null;
         }
 
         async function delRout(id) { if(confirm("¿Borrar?")) await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).delete(); }
     </script>
 </body>
 </html>
+
