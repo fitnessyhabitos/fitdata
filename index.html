@@ -375,22 +375,26 @@
         // --- 1. CONFIGURACIÓN FIREBASE (PEGA TUS CLAVES AQUÍ) ---
         // ******************************************************
         // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// --- 1. CONFIGURACIÓN FIREBASE CORREGIDA ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
+            authDomain: "fitdata-7a86b.firebaseapp.com",
+            projectId: "fitdata-7a86b",
+            storageBucket: "fitdata-7a86b.firebasestorage.app",
+            messagingSenderId: "949628013924",
+            appId: "1:949628013924:web:86278ae2c2bafb384d7e71"
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
-  authDomain: "fitdata-7a86b.firebaseapp.com",
-  projectId: "fitdata-7a86b",
-  storageBucket: "fitdata-7a86b.firebasestorage.app",
-  messagingSenderId: "949628013924",
-  appId: "1:949628013924:web:86278ae2c2bafb384d7e71"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+        // Inicialización (Sintaxis Compat)
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log("Firebase inicializado correctamente");
+        } catch(e) {
+            console.error("Error al iniciar Firebase:", e);
+            alert("Error de conexión: Revisa la consola (F12)");
+        }
+        
+        const auth = firebase.auth();
+        const db = firebase.firestore();
         };
         // ******************************************************
         
@@ -1080,4 +1084,5 @@ const app = initializeApp(firebaseConfig);
         }
     </script>
 </body>
+
 </html>
