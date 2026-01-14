@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a0a">
     <title>Fit Data by Toni</title>
     
     <link rel="apple-touch-icon" href="favicon.png">
@@ -17,7 +18,6 @@
     
     <style>
         :root {
-            /* CORPORATIVO PREMIUM */
             --bg: #0a0a0a; 
             --card: #1a1a1a; 
             --card-light: #222;
@@ -41,7 +41,6 @@
             user-select: none; 
         }
         
-        /* UI HELPERS */
         .hidden { display:none !important; }
         .container { max-width:600px; margin:0 auto; padding:20px; padding-top:15px; }
         .text-accent { color:var(--accent); }
@@ -49,7 +48,7 @@
         .text-center { text-align: center; }
         h1, h2, h3 { font-weight:800; letter-spacing:-0.5px; margin-bottom:10px; }
 
-        /* HEADER FIJO SEGURO */
+        /* HEADER FIJO */
         .navbar-top {
             position: sticky; top: 0; z-index: 100;
             background: rgba(20, 20, 20, 0.98);
@@ -67,12 +66,13 @@
         .btn-primary { background:var(--accent); color:white; box-shadow:0 0 15px var(--accent-glow); }
         .btn-secondary { background:rgba(255,255,255,0.1); border:1px solid #444; color:white; }
         .btn-success { background:var(--success); color:black; font-weight:800; }
-        .btn-icon { background:transparent; border:none; color:white; font-size:1.4rem; cursor:pointer; }
+        .btn-icon { background:transparent; border:none; color:#888; font-size:1.2rem; cursor:pointer; padding: 5px;}
+        .btn-icon:hover { color:white; }
 
         .input { width:100%; padding:14px; margin-bottom:12px; background:#222; border:1px solid #444; color:white; border-radius:10px; font-size:1rem; }
         .input:focus { border-color:var(--accent); background:#2a2a2a; }
 
-        /* CARDS & LISTS */
+        /* CARDS */
         .card { background:var(--card); padding:20px; border-radius:16px; margin-bottom:15px; border:1px solid #2a2a2a; border-left:4px solid var(--accent); position:relative; }
         
         /* EXERCISE IMAGE (SVG) */
@@ -85,7 +85,6 @@
         }
         .set-row.done { border-color:var(--success); background:rgba(34, 221, 136, 0.05); }
         
-        /* Shadow Data (Peso Anterior) */
         .prev-val { position:absolute; top:-8px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#888; background:#222; padding:0 6px; border-radius:4px; border:1px solid #444; z-index:5; pointer-events:none; }
 
         .check-btn { width:32px; height:32px; border-radius:50%; border:2px solid #555; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; transition:0.2s; }
@@ -110,7 +109,7 @@
         .stat-val { font-size:1.4rem; font-weight:800; color:white; display:block; }
         .stat-lbl { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
 
-        /* MODALS & OVERLAYS */
+        /* MODALS */
         .screen { display:none; opacity:0; transition:opacity 0.3s; }
         .screen.active { display:block; opacity:1; }
         
@@ -331,13 +330,13 @@
         </div>
     </div>
 
-    <div id="workout-ui" class="screen" style="z-index:2000; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); overflow-y:auto;">
+    <div id="workout-ui" class="screen" style="z-index:1500; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); overflow-y:auto; padding-bottom:100px;">
         <div class="navbar-top">
             <button onclick="exitWorkout()" style="width:auto; background:none; border:none; color:white; font-size:1.5rem;">←</button>
             <div id="wo-title" style="font-weight:bold; color:var(--accent);">Rutina</div>
             <div id="wo-timer" style="font-family:monospace; border:1px solid var(--accent); padding:2px 8px; border-radius:6px; color:var(--accent);">00:00</div>
         </div>
-        <div id="wo-container" class="container" style="padding-bottom:120px;"></div>
+        <div id="wo-container" class="container"></div>
         <div style="position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.9); padding:15px; border-top:1px solid #333; padding-bottom:calc(15px + var(--safe-bottom));">
             <button onclick="finishPrompt()" class="btn btn-success" style="margin:0;">FINALIZAR ENTRENAMIENTO</button>
         </div>
@@ -353,6 +352,7 @@
                 <h2 id="adm-ath-name">Atleta</h2>
                 <button onclick="document.getElementById('modal-athlete').classList.add('hidden')" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
             </div>
+            
             <div class="card">
                 <h3>Asignar Objetivos</h3>
                 <div style="display:flex; gap:10px;">
@@ -361,26 +361,29 @@
                 </div>
                 <button onclick="adminSaveTargets()" class="btn btn-primary">Guardar Objetivos</button>
             </div>
+
             <div class="card">
-                <h3>Datos</h3>
+                <h3>Datos & Stats</h3>
                 <p>Edad: <span id="adm-ath-age">-</span> | Altura: <span id="adm-ath-height">-</span></p>
                 <div class="stats-grid" style="margin-top:10px;">
                     <div class="stat-box"><span id="adm-ath-kg" class="stat-val">0</span><small>KG</small></div>
                     <div class="stat-box"><span id="adm-ath-sets" class="stat-val">0</span><small>SERIES</small></div>
                 </div>
             </div>
+
             <div class="card">
                 <h3>Gráfica Peso</h3>
                 <canvas id="adminWeightChart" style="max-height:150px;"></canvas>
             </div>
-            <h3>Fotos</h3>
+
+            <h3>Fotos Recientes</h3>
             <div id="admin-gallery" style="display:grid; grid-template-columns:1fr 1fr; gap:5px;"></div>
         </div>
     </div>
 
     <div id="modal-create" class="modal hidden">
         <div class="modal-content">
-            <h3>Nueva Rutina</h3>
+            <h3 id="modal-routine-title">Nueva Rutina</h3>
             <input id="new-rout-name" class="input" placeholder="Nombre (Ej: Pierna A)">
             <input id="search-ex" class="input" placeholder="🔍 Buscar..." onkeyup="renderExSelector()">
             <div id="ex-list" style="max-height:300px; overflow-y:auto; margin-bottom:15px; border:1px solid #333; border-radius:8px; padding:5px;"></div>
@@ -416,7 +419,7 @@
     <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
 
     <script>
-        // --- 1. FIREBASE CONFIG (PON TUS CLAVES AQUÍ) ---
+        // --- 1. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
@@ -445,30 +448,28 @@
         let adminWeightChart = null;
         let currentAdminUser = null;
         let currentNoteExId = null;
+        let editingRoutineId = null; // Para saber si estamos creando o editando
 
-        // --- 3. GENERADOR SVG (ESTILO ICONO SILUETA) ---
+        // --- 3. GENERADOR SVG ---
         function getMuscleSvg(muscle) {
             const m = muscle.toLowerCase();
             let silhouette = "";
             let highlight = "";
 
-            // RUTAS SILUETAS SIMPLIFICADAS Y SÓLIDAS
             const torsoPath = "M 50,10 L 70,15 L 75,30 L 65,75 L 67,90 L 33,90 L 35,75 L 25,30 L 30,15 Z"; 
             const legsPath = "M 25,5 L 75,5 L 80,30 L 85,90 L 55,90 L 50,45 L 45,90 L 15,90 L 20,30 Z";
 
             if (m.includes('pierna') || m.includes('glute') || m.includes('femoral') || m.includes('gemelo') || m.includes('abductor')) {
-                // Tren Inferior
                 silhouette = `<path d="${legsPath}" fill="#000000"/>`;
                 highlight = `<path d="${legsPath}" fill="#FF0000" stroke="none"/>`; 
             } else {
-                // Tren Superior
                 silhouette = `<path d="${torsoPath}" fill="#000000"/>`;
                 if (m.includes('pecho')) highlight = `<rect x="35" y="30" width="30" height="15" fill="#FF0000"/>`;
                 else if (m.includes('hombro')) highlight = `<circle cx="25" cy="25" r="8" fill="#FF0000"/><circle cx="75" cy="25" r="8" fill="#FF0000"/>`;
                 else if (m.includes('biceps') || m.includes('brazo')) highlight = `<rect x="15" y="40" width="10" height="20" fill="#FF0000"/><rect x="75" y="40" width="10" height="20" fill="#FF0000"/>`;
                 else if (m.includes('espalda')) highlight = `<path d="M 30,25 L 70,25 L 60,60 L 40,60 Z" fill="#FF0000"/>`;
                 else if (m.includes('abs')) highlight = `<rect x="40" y="50" width="20" height="25" fill="#FF0000"/>`;
-                else if (m.includes('triceps')) highlight = `<rect x="10" y="40" width="8" height="20" fill="#FF0000"/><rect x="82" y="40" width="8" height="20" fill="#FF0000"/>`;
+                else if (m.includes('triceps') || m.includes('tríceps')) highlight = `<rect x="10" y="40" width="8" height="20" fill="#FF0000"/><rect x="82" y="40" width="8" height="20" fill="#FF0000"/>`;
             }
 
             return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
@@ -479,7 +480,7 @@
             </svg>`);
         }
 
-        // GENERADOR HEATMAP (PERFIL)
+        // GENERADOR DE HEATMAP
         function renderHeatmap(stats) {
             const container = document.getElementById('heatmap-render');
             if (!container) return;
@@ -502,7 +503,7 @@
             </svg>`;
         }
 
-        // 4. BASE DE DATOS COMPLETA (82 EJERCICIOS)
+        // 4. BASE DE DATOS
         const rawExercisesDB = [
             { id: 1, name: 'Sentadilla con Barra', muscle: 'Piernas', emoji: '🏋️' },
             { id: 2, name: 'Sentadilla Jaca', muscle: 'Piernas', emoji: '⚙️' },
@@ -601,7 +602,9 @@
                 db.collection('users').doc(u.uid).onSnapshot(doc => {
                     if(doc.exists) {
                         userData = doc.data();
-                        if(userData.email.toLowerCase() === ADMIN_EMAIL) listenToAllUsers();
+                        if(userData.email.toLowerCase() === ADMIN_EMAIL) {
+                            listenToAllUsers();
+                        }
                         
                         if(userData.approved || userData.email.toLowerCase() === ADMIN_EMAIL) {
                             currentUser = u;
@@ -609,7 +612,7 @@
                                 document.getElementById('loading').classList.remove('active');
                                 initApp();
                                 loadWorkoutFromStorage(); 
-                            }, 2000);
+                            }, 2500);
                         } else {
                             document.getElementById('loading').classList.remove('active');
                             showToast("Pendiente de Aprobación"); showScreen('login');
@@ -656,19 +659,28 @@
             document.getElementById('u-name').innerText = userData.username.split(' ')[0];
             document.getElementById('u-goal').innerText = userData.settings.goal || 'Objetivo no fijado';
             
+            // Nutrición
             if(userData.targets && (userData.targets.kcal > 0 || userData.targets.water > 0)) {
                 document.getElementById('nutrition-panel').classList.remove('hidden');
                 document.getElementById('target-kcal').innerText = userData.targets.kcal || '-';
                 document.getElementById('target-water').innerText = userData.targets.water || '-';
+            } else {
+                document.getElementById('nutrition-panel').classList.add('hidden');
             }
 
             if(userData.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
             
+            // Cargar Config
             document.getElementById('cfg-goal').value = userData.settings.goal || 'Mantenimiento';
             document.getElementById('cfg-rest').value = userData.settings.rest || 60;
             document.getElementById('cfg-screen').checked = userData.settings.screen;
             document.getElementById('cfg-sound').checked = userData.settings.sound;
             document.getElementById('cfg-alarm-day').value = userData.settings.alarmDay || -1;
+            
+            if(userData.settings.alarmDay && userData.settings.alarmDay != -1) {
+                const today = new Date().getDay();
+                if(today == userData.settings.alarmDay) showToast("📷 ¡Hoy toca foto de revisión!");
+            }
 
             loadRoutines(); loadProfile();
         }
@@ -682,7 +694,7 @@
             if(vid.includes('config')) document.querySelector('.nav-item:nth-child(3)').classList.add('active');
         }
 
-        // 7. RUTINAS
+        // 7. DASHBOARD & ROUTINES
         async function loadRoutines() {
             const l = document.getElementById('routines-list'); 
             db.collection('users').doc(currentUser.uid).collection('routines').orderBy('createdAt','desc').onSnapshot(s => {
@@ -693,7 +705,12 @@
                     const icons = r.exercises.slice(0,5).map(e=>`<img src="${e.image}" style="width:30px; height:30px; margin-right:5px; border-radius:4px;">`).join('');
                     const div = document.createElement('div'); div.className='card';
                     div.innerHTML = `
-                        <div style="display:flex; justify-content:space-between;"><h3>${r.name}</h3><button onclick="delRout('${d.id}')" style="background:none; border:none; color:#666;">🗑️</button></div>
+                        <div style="display:flex; justify-content:space-between;"><h3>${r.name}</h3>
+                        <div>
+                            <button onclick="editRout('${d.id}')" class="btn-icon">✏️</button>
+                            <button onclick="delRout('${d.id}')" class="btn-icon">🗑️</button>
+                        </div>
+                        </div>
                         <div style="margin:10px 0;">${icons}</div>
                         <button onclick="startWo('${d.id}')" class="btn btn-primary">ENTRENAR</button>`;
                     l.appendChild(div);
@@ -710,7 +727,7 @@
             showToast("Registro guardado");
         }
 
-        // 8. ENTRENAMIENTO
+        // 8. AUTOGUARDADO & WORKOUT CORE
         function saveWorkoutToStorage() {
             if (activeRoutine) {
                 localStorage.setItem('fitdata_wo', JSON.stringify({routine: activeRoutine, start: woStartTime}));
@@ -733,6 +750,7 @@
         async function startWo(id) {
             const doc = await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).get();
             const r = doc.data(); 
+            // 5 Series por defecto
             const preparedExercises = r.exercises.map(ex => ({
                 ...ex,
                 series: Array(5).fill().map((_, i) => ({ weight: '', reps: i===0?20:16, completed: false }))
@@ -751,37 +769,29 @@
             document.getElementById('wo-title').innerText = activeRoutine.name;
             const c = document.getElementById('wo-container'); c.innerHTML='';
 
-            // Obtener pesos anteriores
-            let lastWorkout = null;
-            try {
-                const hSnap = await db.collection('users').doc(currentUser.uid).collection('history')
-                    .where('routineId','==',activeRoutine.id).orderBy('date','desc').limit(1).get();
-                if(!hSnap.empty) lastWorkout = hSnap.docs[0].data();
-            } catch(e) { console.log("No history found"); }
+            const hSnap = await db.collection('users').doc(currentUser.uid).collection('history')
+                .where('routineId','==',activeRoutine.id).orderBy('date','desc').limit(1).get();
+            const last = !hSnap.empty ? hSnap.docs[0].data() : null;
 
             activeRoutine.exercises.forEach((ex, idx) => {
                 let rows = '';
                 ex.series.forEach((s, i) => {
-                    const prev = lastWorkout?.exercises?.[idx]?.series?.[i]?.weight || '-';
+                    const prev = last?.exercises[idx]?.series[i]?.weight || '-';
                     const rowClass = s.completed ? 'set-row done' : 'set-row';
                     const checkClass = s.completed ? 'check-btn checked' : 'check-btn';
                     
                     rows += `
                     <div class="${rowClass}" id="row-${idx}-${i}">
                         <div style="text-align:center; color:#888;">${i+1}</div>
-                        <input type="number" class="input" value="${s.reps}" onchange="updateSet(${idx},${i},'reps',this.value)" style="margin:0; text-align:center; height:35px; background:#333;">
+                        <input type="number" class="input reps" value="${s.reps}" onchange="updateSet(${idx},${i},'reps',this.value)" style="margin:0; text-align:center; height:35px;">
                         <div style="position:relative;">
                             <span class="prev-val">${prev}kg</span>
-                            <input type="number" class="input" value="${s.weight}" onchange="updateSet(${idx},${i},'weight',this.value)" placeholder="kg" style="margin:0; text-align:center; height:35px; background:#333;">
+                            <input type="number" class="input weight" value="${s.weight}" onchange="updateSet(${idx},${i},'weight',this.value)" placeholder="kg" style="margin:0; text-align:center; height:35px;">
                         </div>
                         <div class="${checkClass}" onclick="checkSet(this, ${idx}, ${i})">✓</div>
                     </div>`;
                 });
-                
-                // USAR createElement PARA EVITAR ERRORES DE PARSEO
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
+                c.innerHTML += `<div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <img src="${ex.image}" class="ex-img">
@@ -789,8 +799,8 @@
                         </div>
                         <button onclick="openNote(${idx})" class="btn-icon">📝</button>
                     </div>
-                    ${rows}`;
-                c.appendChild(card);
+                    ${rows}
+                </div>`;
             });
 
             if(woTimerInt) clearInterval(woTimerInt);
@@ -887,7 +897,7 @@
             document.getElementById('modal-note').classList.add('hidden');
         }
 
-        // 9. PERFIL
+        // 9. PROFILE & STATS
         function loadProfile() {
             const s = userData.stats || {kg:0, workouts:0, sets:0, reps:0, heatmap:{}};
             document.getElementById('stat-kg').innerText = (s.kg/1000).toFixed(1) + 't';
@@ -966,10 +976,12 @@
                     const u = d.data();
                     const item = `
                     <div class="user-row">
-                        <div><b>${u.username}</b><br><small style="color:#888">${u.email}</small></div>
+                        <div><b>${u.username}</b><br><small style="color:#888">${u.email}</small>
+                        <br><span class="stat-badge">${u.settings?.goal || '-'}</span></div>
                         <div style="text-align:right;">
                             ${u.approved ? `<button onclick="viewUserAdmin('${d.id}')" class="btn-icon">👁️</button>` : 
                             `<button onclick="approve('${d.id}')" class="btn-success" style="padding:4px 8px; width:auto; font-size:0.8rem;">OK</button>`}
+                            <button onclick="assignRout('${d.id}')" style="background:#333; border:none; padding:5px; margin-right:5px;">📋</button>
                             <button onclick="delUser('${d.id}')" style="background:none; border:none; color:#666;">❌</button>
                         </div>
                     </div>`;
@@ -1022,10 +1034,40 @@
 
         async function approve(id) { await db.collection('users').doc(id).update({approved:true}); }
         async function delUser(id) { if(confirm("Borrar?")) await db.collection('users').doc(id).delete(); }
+        async function assignRout(uid) {
+            if(confirm("¿Asignar rutina básica?")) {
+                const exs = exercisesDB.slice(0,5); 
+                await db.collection('users').doc(uid).collection('routines').add({name:"Rutina Coach", exercises:exs, createdAt:new Date()});
+                showToast("Rutina enviada");
+            }
+        }
 
         // --- UTILS ---
-        function openRoutineModal() { selectedExs=[]; document.getElementById('new-rout-name').value=''; renderExSelector(); document.getElementById('modal-create').classList.remove('hidden'); }
         
+        // MODIFICADO: AHORA RESETEAMOS EL ID AL ABRIR NUEVA RUTINA
+        function openRoutineModal() { 
+            editingRoutineId = null; 
+            document.getElementById('modal-routine-title').innerText = "Nueva Rutina";
+            selectedExs=[]; 
+            document.getElementById('new-rout-name').value=''; 
+            renderExSelector(); 
+            document.getElementById('modal-create').classList.remove('hidden'); 
+        }
+
+        // NUEVA FUNCIÓN: EDITAR RUTINA
+        async function editRout(id) {
+            const doc = await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).get();
+            const r = doc.data();
+            
+            editingRoutineId = id;
+            document.getElementById('modal-routine-title').innerText = "Editar Rutina";
+            document.getElementById('new-rout-name').value = r.name;
+            selectedExs = r.exercises.map(e => e.id); // Extraemos los IDs de los ejercicios guardados
+            
+            renderExSelector();
+            document.getElementById('modal-create').classList.remove('hidden');
+        }
+
         function renderExSelector() {
             const f = document.getElementById('search-ex').value.toLowerCase();
             const c = document.getElementById('ex-list'); c.innerHTML='';
@@ -1051,11 +1093,22 @@
             
             if(exs.length === 0) return showToast("Error al procesar ejercicios");
 
-            await db.collection('users').doc(currentUser.uid).collection('routines').add({
-                name, exercises: exs, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            if(editingRoutineId) {
+                // MODO EDICIÓN (UPDATE)
+                await db.collection('users').doc(currentUser.uid).collection('routines').doc(editingRoutineId).update({
+                    name, exercises: exs
+                });
+                showToast("Rutina actualizada");
+            } else {
+                // MODO CREACIÓN (ADD)
+                await db.collection('users').doc(currentUser.uid).collection('routines').add({
+                    name, exercises: exs, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showToast("Rutina creada");
+            }
+            
             document.getElementById('modal-create').classList.add('hidden');
-            showToast("Rutina guardada");
+            editingRoutineId = null; // Limpiar ID
         }
 
         async function delRout(id) { if(confirm("¿Borrar?")) await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).delete(); }
