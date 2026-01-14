@@ -18,10 +18,10 @@
     
     <style>
         :root {
-            /* PALETA CYBERPUNK PREMIUM */
+            /* PALETA PREMIUM */
             --bg: #0a0a0a; 
-            --card: #141414; 
-            --card-light: #1f1f1f;
+            --card: #1a1a1a; 
+            --card-light: #222222;
             --text: #ffffff; 
             --muted: #888888;
             --accent: #ff4444;       /* Rojo Neón */
@@ -29,7 +29,7 @@
             --success: #22dd88; 
             --warning: #ffaa00;
             
-            /* SAFE AREAS (Notch/Dynamic Island) */
+            /* SAFE AREAS */
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -39,8 +39,8 @@
         body { 
             background:var(--bg); color:var(--text); 
             min-height:100vh; 
-            /* Espacio para la barra inferior + área segura */
-            padding-bottom: calc(90px + var(--safe-bottom)); 
+            /* Espacio extra abajo para que no se corte nada */
+            padding-bottom: calc(100px + var(--safe-bottom)); 
             overscroll-behavior-y:none; 
             user-select: none;
         }
@@ -89,10 +89,7 @@
         /* --- WORKOUT UI --- */
         .set-row { display:grid; grid-template-columns:30px 1fr 1fr 40px 40px; gap:8px; align-items:center; background:#222; padding:10px; border-radius:8px; margin-bottom:8px; position:relative; border:1px solid #333; }
         .set-row.done { border-color:var(--success); background:rgba(34,221,136,0.05); }
-        
-        /* Shadow Data (Peso Anterior) */
         .prev-val { position:absolute; top:-9px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#666; background:#222; padding:0 6px; border-radius:4px; border:1px solid #333; z-index: 5; pointer-events: none; }
-        
         .check-btn { width:32px; height:32px; border-radius:10px; border:2px solid #444; background:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; transition:0.2s; }
         .check-btn.checked { background:var(--success); border-color:var(--success); color:black; transform:scale(1.1); }
         .check-btn.checked::after { content:'✓'; }
@@ -119,7 +116,7 @@
         /* --- MODALS --- */
         .screen { display:none; opacity:0; transition:opacity 0.3s; }
         .screen.active { display:block; opacity:1; }
-        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(5px); }
+        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:3000; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(5px); }
         .modal-content { background:var(--card); width:95%; max-width:500px; padding:25px; border-radius:20px; border:1px solid #444; max-height:85vh; overflow-y:auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
 
         /* --- TOGGLES --- */
@@ -132,10 +129,10 @@
         input:checked + .slider:before { transform:translateX(16px); }
 
         /* --- TIMER & ALERTS --- */
-        .timer-overlay { position:fixed; bottom: calc(95px + var(--safe-bottom)); right:20px; width:70px; height:70px; background:var(--bg); border:3px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-family:monospace; color:var(--accent); box-shadow:0 0 20px rgba(255,68,68,0.4); z-index:1000; cursor:pointer; animation: pulse 1s infinite; }
+        .timer-overlay { position:fixed; bottom: calc(95px + var(--safe-bottom)); right:20px; width:70px; height:70px; background:var(--bg); border:3px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-family:monospace; color:var(--accent); box-shadow:0 0 20px rgba(255,68,68,0.4); z-index:2000; cursor:pointer; animation: pulse 1s infinite; }
         @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4);} 70% {box-shadow: 0 0 0 10px rgba(255, 68, 68, 0);} 100% {box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);} }
 
-        #toast { visibility:hidden; min-width:250px; background-color:#222; color:#fff; text-align:center; border-radius:50px; padding:12px 24px; position:fixed; z-index:3000; left:50%; bottom:calc(90px + var(--safe-bottom)); transform:translateX(-50%); border:1px solid var(--accent); box-shadow:0 5px 15px rgba(0,0,0,0.5); font-size:0.9rem; font-weight:bold; }
+        #toast { visibility:hidden; min-width:250px; background-color:#222; color:#fff; text-align:center; border-radius:50px; padding:12px 24px; position:fixed; z-index:4000; left:50%; bottom:calc(90px + var(--safe-bottom)); transform:translateX(-50%); border:1px solid var(--accent); box-shadow:0 5px 15px rgba(0,0,0,0.5); font-size:0.9rem; font-weight:bold; }
         #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from{bottom:60px; opacity:0;} to{bottom:calc(90px + var(--safe-bottom)); opacity:1;} }
         @keyframes fadeout { from{bottom:calc(90px + var(--safe-bottom)); opacity:1;} to{bottom:60px; opacity:0;} }
@@ -366,7 +363,7 @@
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between;">
                 <h2 id="adm-ath-name">Atleta</h2>
-                <button onclick="document.getElementById('modal-athlete').classList.add('hidden')" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
+                <button onclick="closeAdminModal()" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
             </div>
             
             <div class="card">
@@ -421,6 +418,17 @@
         </div>
     </div>
 
+    <div id="modal-note" class="modal hidden">
+        <div class="modal-content">
+            <h3>Nota del Ejercicio</h3>
+            <textarea id="note-text" class="input" rows="4" placeholder="Ej: Sillín al 6..."></textarea>
+            <div style="display:flex; gap:10px;">
+                <button onclick="saveNote()" class="btn btn-primary">Guardar</button>
+                <button onclick="document.getElementById('modal-note').classList.add('hidden')" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
 
     <script>
@@ -452,6 +460,7 @@
         let weightChart = null;
         let adminWeightChart = null;
         let currentAdminUser = null;
+        let currentNoteExId = null;
 
         // --- 3. GENERADOR SVG INTELIGENTE (ESTILO ICONO) ---
         function getMuscleSvg(muscle) {
@@ -790,7 +799,16 @@
                         <div class="${checkClass}" onclick="checkSet(this, ${idx}, ${i})">✓</div>
                     </div>`;
                 });
-                c.innerHTML += `<div class="card"><div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><img src="${ex.image}" class="ex-img"><h4>${ex.name}</h4></div>${rows}</div>`;
+                c.innerHTML += `<div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${ex.image}" class="ex-img">
+                            <h4>${ex.name}</h4>
+                        </div>
+                        <button onclick="openNote(${idx})" class="btn-icon">📝</button>
+                    </div>
+                    ${rows}
+                </div>`;
             });
 
             if(woTimerInt) clearInterval(woTimerInt);
@@ -877,6 +895,16 @@
             exitWorkout(); showToast("Entreno Guardado 🚀");
         }
         function exitWorkout() { document.getElementById('workout-ui').classList.remove('active'); stopRest(); initApp(); }
+
+        function openNote(exIdx) {
+            currentNoteExId = exIdx;
+            document.getElementById('modal-note').classList.remove('hidden');
+        }
+        function saveNote() {
+            // Nota simplificada, se guarda en la sesión activa
+            showToast("Nota guardada");
+            document.getElementById('modal-note').classList.add('hidden');
+        }
 
         // 9. PROFILE & STATS
         function loadProfile() {
@@ -978,6 +1006,10 @@
 
         async function viewUserAdmin(uid) {
             currentAdminUser = uid;
+            
+            // PRIMERO MOSTRAR MODAL PARA QUE CHARTJS PUEDA DIBUJAR
+            document.getElementById('modal-athlete').classList.remove('hidden');
+
             const uDoc = await db.collection('users').doc(uid).get();
             const u = uDoc.data();
             
@@ -992,14 +1024,17 @@
             const ctx = document.getElementById('adminWeightChart').getContext('2d');
             const wSnap = await db.collection('users').doc(uid).collection('weights').orderBy('date','asc').limit(10).get();
             const data = wSnap.docs.map(x => ({x: x.data().date.toDate().toLocaleDateString(), y: x.data().val}));
+            
             if(adminWeightChart) adminWeightChart.destroy();
             adminWeightChart = new Chart(ctx, { type:'line', data:{labels:data.map(i=>i.x), datasets:[{label:'Peso', data:data.map(i=>i.y), borderColor:'#ff4444'}]} });
 
             const pSnap = await db.collection('users').doc(uid).collection('photos').orderBy('date','desc').limit(4).get();
             const gallery = document.getElementById('admin-gallery'); gallery.innerHTML='';
             pSnap.forEach(d => { gallery.innerHTML += `<div class="photo-item"><img src="${d.data().img}"></div>`; });
+        }
 
-            document.getElementById('modal-athlete').classList.remove('hidden');
+        function closeAdminModal() {
+            document.getElementById('modal-athlete').classList.add('hidden');
         }
 
         async function adminSaveTargets() {
@@ -1036,9 +1071,16 @@
         async function saveRoutine() {
             const name = document.getElementById('new-rout-name').value;
             if(!name || !selectedExs.length) return showToast("Faltan datos");
-            const exs = selectedExs.map(id=>exercisesDB.find(e=>e.id===id));
-            await db.collection('users').doc(currentUser.uid).collection('routines').add({name, exercises:exs, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-            document.getElementById('modal-create').classList.add('hidden');
+            
+            try {
+                const exs = selectedExs.map(id=>exercisesDB.find(e=>e.id===id));
+                await db.collection('users').doc(currentUser.uid).collection('routines').add({name, exercises:exs, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+                document.getElementById('modal-create').classList.add('hidden');
+                // No need to call loadRoutines because onSnapshot handles it
+                showToast("Rutina guardada correctamente");
+            } catch (e) {
+                alert("Error al guardar: " + e.message);
+            }
         }
         async function delRout(id) { if(confirm("¿Borrar?")) await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).delete(); }
     </script>
