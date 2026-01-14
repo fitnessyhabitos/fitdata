@@ -8,8 +8,8 @@
     <meta name="theme-color" content="#0a0a0a">
     <title>Fit Data by Toni</title>
     
-    <link rel="apple-touch-icon" href="favicon.png">
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" type="image/png" href="logo.png">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -18,66 +18,89 @@
     
     <style>
         :root {
-            /* PALETA CYBERPUNK PREMIUM */
             --bg: #0a0a0a; 
-            --card: #141414; 
-            --card-light: #1f1f1f;
+            --card: #1a1a1a; 
+            --card-light: #222;
             --text: #ffffff; 
-            --muted: #888; 
-            --accent: #ff4444; 
-            --accent-glow: rgba(255, 68, 68, 0.2);
+            --muted: #888888;
+            --accent: #ff4444;       
+            --accent-glow: rgba(255, 68, 68, 0.25);
             --success: #22dd88; 
             --warning: #ffaa00;
-            --safe-top: env(safe-area-inset-top); 
+            --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
         
         * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color:transparent; outline:none; }
-        body { background:var(--bg); color:var(--text); min-height:100vh; padding-bottom:calc(100px + var(--safe-bottom)); user-select:none; }
+        
+        body { 
+            background:var(--bg); color:var(--text); 
+            min-height:100vh; 
+            padding-bottom: calc(100px + var(--safe-bottom)); 
+            overscroll-behavior-y:none; 
+            user-select: none; 
+        }
         
         .hidden { display:none !important; }
         .container { max-width:600px; margin:0 auto; padding:20px; padding-top:15px; }
         .text-accent { color:var(--accent); }
         .text-muted { color:var(--muted); font-size:0.8rem; }
-        
-        /* HEADER */
-        .navbar-top { position:sticky; top:0; z-index:100; background:rgba(20,20,20,0.95); backdrop-filter:blur(15px); border-bottom:1px solid #333; padding:15px 20px; padding-top:calc(15px + var(--safe-top)); display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 20px rgba(0,0,0,0.5); }
+        .text-center { text-align: center; }
+        h1, h2, h3 { font-weight:800; letter-spacing:-0.5px; margin-bottom:10px; }
 
-        /* UI ELEMENTS */
+        /* HEADER FIJO */
+        .navbar-top {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(20, 20, 20, 0.98);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid #333;
+            padding: 15px 20px;
+            padding-top: calc(20px + var(--safe-top)); 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        /* INPUTS & BOTONES */
         .btn { width:100%; padding:14px; border:none; border-radius:12px; font-weight:700; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; transition:0.2s; }
-        .btn:active { transform:scale(0.97); }
+        .btn:active { transform:scale(0.98); }
         .btn-primary { background:var(--accent); color:white; box-shadow:0 0 15px var(--accent-glow); }
         .btn-secondary { background:rgba(255,255,255,0.1); border:1px solid #444; color:white; }
         .btn-success { background:var(--success); color:black; font-weight:800; }
-        .btn-icon { background:transparent; border:none; color:#bbb; font-size:1.2rem; cursor:pointer; padding:5px; border-radius:5px; border:1px solid #333; min-width:40px; }
-        
+        .btn-icon { background:transparent; border:none; color:#bbb; font-size:1.2rem; cursor:pointer; padding: 5px; border-radius: 5px; border: 1px solid #333; min-width: 40px;}
+        .btn-icon:hover { color:white; border-color: #666; background: #333; }
+
         .input { width:100%; padding:14px; margin-bottom:12px; background:#222; border:1px solid #444; color:white; border-radius:10px; font-size:1rem; }
         .input:focus { border-color:var(--accent); background:#2a2a2a; }
-        
+
+        /* CARDS */
         .card { background:var(--card); padding:20px; border-radius:16px; margin-bottom:15px; border:1px solid #2a2a2a; border-left:4px solid var(--accent); position:relative; }
         
-        /* SVG GENERATED IMAGE */
-        .ex-img { width:65px; height:65px; background:white; border:2px solid var(--accent); border-radius:12px; padding:2px; object-fit:contain; flex-shrink:0; }
+        /* EXERCISE IMAGE (SVG GENERATED) */
+        .ex-img { width: 65px; height: 65px; background: white; border: 2px solid var(--accent); border-radius: 12px; padding: 2px; object-fit: contain; flex-shrink: 0; }
 
-        /* WORKOUT */
-        .set-row { display:grid; grid-template-columns:30px 1fr 1fr 40px 40px; gap:8px; align-items:center; background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #333; }
-        .set-row.done { border-color:var(--success); background:rgba(34,221,136,0.05); }
-        .prev-val { position:absolute; top:-8px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#888; background:#222; padding:0 6px; border-radius:4px; border:1px solid #444; pointer-events:none; }
+        /* WORKOUT ROWS */
+        .set-row { 
+            display:grid; grid-template-columns:30px 1fr 1fr 40px 40px; gap:8px; align-items:center; 
+            background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #333; 
+        }
+        .set-row.done { border-color:var(--success); background:rgba(34, 221, 136, 0.05); }
+        .prev-val { position:absolute; top:-8px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#888; background:#222; padding:0 6px; border-radius:4px; border:1px solid #444; z-index:5; pointer-events:none; }
+
         .check-btn { width:32px; height:32px; border-radius:50%; border:2px solid #555; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; transition:0.2s; }
         .check-btn.checked { background:var(--success); border-color:var(--success); color:black; transform:scale(1.1); }
         .check-btn.checked::after { content:'✓'; }
 
-        /* NAV */
-        .nav-bottom { position:fixed; bottom:0; left:0; width:100%; background:rgba(20,20,20,0.98); border-top:1px solid #333; display:flex; justify-content:space-around; padding:12px 0; padding-bottom:calc(15px + var(--safe-bottom)); z-index:100; backdrop-filter:blur(10px); }
+        /* NAV BOTTOM */
+        .nav-bottom { 
+            position:fixed; bottom:0; left:0; width:100%; 
+            background:rgba(20,20,20,0.98); border-top:1px solid #333; 
+            display:flex; justify-content:space-around; padding:12px 0; 
+            padding-bottom: calc(15px + var(--safe-bottom)); 
+            z-index:100; backdrop-filter: blur(10px);
+        }
         .nav-item { color:#666; background:none; border:none; font-size:0.65rem; display:flex; flex-direction:column; align-items:center; width:20%; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; transition:0.3s; }
         .nav-item.active { color:var(--accent); transform:translateY(-3px); text-shadow:0 0 10px var(--accent-glow); }
         .nav-item i { font-size:1.4rem; margin-bottom:4px; font-style:normal; }
-
-        /* STATS */
-        .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
-        .stat-box { background:var(--card-light); padding:15px; border-radius:12px; text-align:center; border:1px solid #333; }
-        .stat-val { font-size:1.4rem; font-weight:800; color:white; display:block; }
-        .stat-lbl { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
 
         /* MODALS */
         .screen { display:none; opacity:0; transition:opacity 0.3s; }
@@ -85,6 +108,29 @@
         .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px); }
         .modal-content { background:var(--card); width:95%; max-width:500px; padding:25px; border-radius:20px; border:1px solid #444; max-height:85vh; overflow-y:auto; box-shadow:0 10px 40px rgba(0,0,0,0.8); }
 
+        /* TIMER FLOAT */
+        .timer-float { position:fixed; bottom:calc(100px + var(--safe-bottom)); right:20px; width:70px; height:70px; background:var(--bg); border:3px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-family:monospace; color:var(--accent); box-shadow:0 0 20px var(--accent-glow); z-index:2000; cursor:pointer; animation:pulse 1s infinite; }
+        @keyframes pulse { 0% {box-shadow:0 0 0 0 rgba(255,68,68,0.4);} 70% {box-shadow:0 0 0 10px rgba(255,68,68,0);} 100% {box-shadow:0 0 0 0 rgba(255,68,68,0);} }
+
+        /* TOAST */
+        #toast { visibility:hidden; min-width:250px; background-color:#222; color:#fff; text-align:center; border-radius:50px; padding:12px 24px; position:fixed; z-index:6000; left:50%; bottom:calc(100px + var(--safe-bottom)); transform:translateX(-50%); border:1px solid var(--accent); box-shadow:0 5px 20px rgba(0,0,0,0.6); font-size:0.9rem; font-weight:bold; }
+        #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from{bottom:60px; opacity:0;} to{bottom:calc(100px + var(--safe-bottom)); opacity:1;} }
+        @keyframes fadeout { from{bottom:calc(100px + var(--safe-bottom)); opacity:1;} to{bottom:60px; opacity:0;} }
+
+        /* ADMIN LIST */
+        .user-row { display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-light); border-radius:10px; margin-bottom:10px; border-left:3px solid #444; }
+        .stagnant { border-left-color: var(--warning) !important; background: rgba(255, 170, 0, 0.05); }
+        .stat-badge { background: #333; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: var(--muted); margin-top: 4px; display: inline-block; }
+        
+        /* LOGO */
+        .loading-logo { width:140px; height:140px; margin-bottom:20px; border-radius:30px; animation:heartbeat 2.5s infinite ease-in-out; box-shadow:0 0 50px rgba(255,68,68,0.3); }
+        @keyframes heartbeat { 0% {transform:scale(1);} 50% {transform:scale(1.08);} 100% {transform:scale(1);} }
+
+        /* HEATMAP CONTAINERS */
+        .heatmap-wrapper { display: flex; justify-content: center; gap: 20px; height: 350px; }
+        .body-svg { height: 100%; width: auto; filter: drop-shadow(0 0 5px rgba(255,68,68,0.2)); }
+        
         /* TOGGLES */
         .toggle-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #222; }
         .switch { position:relative; display:inline-block; width:40px; height:24px; }
@@ -93,21 +139,6 @@
         .slider:before { position:absolute; content:""; height:16px; width:16px; left:4px; bottom:4px; background-color:white; transition:.4s; border-radius:50%; }
         input:checked + .slider { background-color:var(--accent); }
         input:checked + .slider:before { transform:translateX(16px); }
-
-        /* EXTRA */
-        .timer-float { position:fixed; bottom:calc(100px + var(--safe-bottom)); right:20px; width:70px; height:70px; background:var(--bg); border:3px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-family:monospace; color:var(--accent); box-shadow:0 0 20px var(--accent-glow); z-index:2000; cursor:pointer; animation:pulse 1s infinite; }
-        @keyframes pulse { 0% {box-shadow:0 0 0 0 rgba(255,68,68,0.4);} 70% {box-shadow:0 0 0 10px rgba(255,68,68,0);} 100% {box-shadow:0 0 0 0 rgba(255,68,68,0);} }
-        #toast { visibility:hidden; min-width:250px; background-color:#222; color:#fff; text-align:center; border-radius:50px; padding:12px 24px; position:fixed; z-index:6000; left:50%; bottom:calc(100px + var(--safe-bottom)); transform:translateX(-50%); border:1px solid var(--accent); box-shadow:0 5px 20px rgba(0,0,0,0.6); font-size:0.9rem; font-weight:bold; }
-        #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from{bottom:60px; opacity:0;} to{bottom:calc(100px + var(--safe-bottom)); opacity:1;} }
-        @keyframes fadeout { from{bottom:calc(100px + var(--safe-bottom)); opacity:1;} to{bottom:60px; opacity:0;} }
-        
-        .user-row { display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-light); border-radius:10px; margin-bottom:10px; border-left:3px solid #444; }
-        .stagnant { border-left-color: var(--warning) !important; background: rgba(255, 170, 0, 0.05); }
-        .stat-badge { background: #333; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: var(--muted); margin-top: 4px; display: inline-block; }
-        
-        .loading-logo { width:140px; height:140px; margin-bottom:20px; border-radius:30px; animation:heartbeat 2.5s infinite ease-in-out; box-shadow:0 0 50px rgba(255,68,68,0.3); }
-        @keyframes heartbeat { 0% {transform:scale(1);} 50% {transform:scale(1.08);} 100% {transform:scale(1);} }
     </style>
 </head>
 <body>
@@ -115,21 +146,21 @@
     <div id="toast">Notificación</div>
 
     <div id="loading" class="screen active" style="text-align:center; padding-top:30vh; background:#000; z-index:9999;">
-        <img src="favicon.png" class="loading-logo" onerror="this.src='https://via.placeholder.com/150/ff4444/000000?text=FD'">
+        <img src="logo.png" class="loading-logo">
         <h1 style="color:var(--accent); font-size:3.5rem; margin:0; letter-spacing:-2px;">FIT DATA</h1>
         <p style="color:var(--muted); margin-top:10px; font-size:1.1rem; letter-spacing:1px;">COACH INTELLIGENCE</p>
     </div>
 
     <div id="login" class="screen">
         <div class="container" style="padding-top:60px; text-align:center;">
-            <img src="favicon.png" style="width:100px; border-radius:20px; margin-bottom:20px; box-shadow:0 0 20px rgba(255,68,68,0.2);">
+            <img src="logo.png" style="width:100px; border-radius:20px; margin-bottom:20px; box-shadow:0 0 20px rgba(255,68,68,0.2);">
             <h1 style="color:var(--accent); font-size:3rem; margin-bottom:10px;">FIT DATA</h1>
             <p style="color:var(--muted); margin-bottom:40px;">Acceso Atletas</p>
             <div class="card" style="border:none; background:transparent;">
                 <input id="log-email" class="input" type="email" placeholder="Email">
                 <input id="log-pass" class="input" type="password" placeholder="Contraseña">
                 <button onclick="doLogin()" class="btn btn-primary">INICIAR SESIÓN</button>
-                <p onclick="toRegister()" style="margin-top:20px; color:var(--muted); cursor:pointer;">Solicitar Acceso</p>
+                <p onclick="toRegister()" style="margin-top:20px; color:var(--muted); cursor:pointer; font-size:0.9rem;">Solicitar Acceso</p>
             </div>
         </div>
     </div>
@@ -143,7 +174,7 @@
                 <input id="reg-height" type="number" class="input" placeholder="Altura (cm)">
                 <input id="reg-email" class="input" type="email" placeholder="Email">
                 <input id="reg-pass" class="input" type="password" placeholder="Contraseña">
-                <label class="text-accent" style="font-weight:bold; font-size:0.75rem;">CÓDIGO SECRETO</label>
+                <label class="text-accent" style="font-weight:bold; font-size:0.75rem; margin-left:5px;">CÓDIGO SECRETO</label>
                 <input id="reg-code" class="input" style="text-align:center; border-color:var(--accent); letter-spacing:4px; font-weight:bold;">
                 <button onclick="doRegister()" class="btn btn-primary">SOLICITAR ACCESO</button>
                 <button onclick="toLogin()" class="btn btn-secondary">Cancelar</button>
@@ -157,7 +188,7 @@
             <div class="navbar-top">
                 <div>
                     <h2 id="u-name" style="margin:0; font-size:1.5rem;">Hola</h2>
-                    <span id="u-goal" style="color:var(--muted); font-size:0.75rem; text-transform:uppercase;">Objetivo no fijado</span>
+                    <span id="u-goal" style="color:var(--muted); font-size:0.75rem; text-transform:uppercase;">Cargando...</span>
                 </div>
                 <button id="admin-btn" onclick="nav('view-admin')" class="btn-icon hidden">👑</button>
             </div>
@@ -165,30 +196,6 @@
             <div class="container">
                 <div id="stagnation-alert" class="card hidden" style="background:rgba(255,170,0,0.1); border-color:var(--warning); padding:12px;">
                     ⚠️ <strong style="color:var(--warning)">Alerta Coach:</strong> Sin actividad > 14 días.
-                </div>
-
-                <div id="nutrition-panel" class="card hidden" style="border-left-color:var(--success);">
-                    <h3>Objetivo Diario</h3>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <div style="flex:1; background:#222; padding:10px; border-radius:10px; text-align:center;">
-                            <span style="font-size:1.5rem;">🔥</span>
-                            <div id="target-kcal" style="font-weight:bold; font-size:1.2rem; color:white;">-</div>
-                            <small class="text-muted">Kcal</small>
-                        </div>
-                        <div style="flex:1; background:#222; padding:10px; border-radius:10px; text-align:center;">
-                            <span style="font-size:1.5rem;">💧</span>
-                            <div id="target-water" style="font-weight:bold; font-size:1.2rem; color:white;">-</div>
-                            <small class="text-muted">Litros</small>
-                        </div>
-                    </div>
-                    <div style="margin-top:15px; border-top:1px solid #333; padding-top:10px;">
-                        <small class="text-muted">Registro de hoy:</small>
-                        <div style="display:flex; gap:10px; margin-top:5px;">
-                            <input id="user-kcal" type="number" class="input" placeholder="Ingerido (Kcal)" style="margin:0;">
-                            <input id="user-water" type="number" class="input" placeholder="Bebido (L)" style="margin:0;">
-                        </div>
-                        <button onclick="saveDailyNutrition()" class="btn btn-secondary" style="margin-top:10px; width:100%;">Guardar Registro</button>
-                    </div>
                 </div>
 
                 <div style="display:flex; gap:10px; margin-bottom:20px;">
@@ -203,9 +210,11 @@
         <div id="view-profile" class="view hidden">
             <div class="navbar-top"><h2>Rendimiento</h2></div>
             <div class="container">
-                <div class="card" style="text-align:center;">
+                
+                <div class="card" style="text-align:center; overflow-x: auto;">
                     <h3>Mapa de Trabajo</h3>
-                    <div id="heatmap-render"></div>
+                    <p class="text-muted" style="font-size:0.8rem;">Intensidad acumulada</p>
+                    <div id="heatmap-render" class="heatmap-wrapper"></div>
                 </div>
 
                 <div class="stats-grid">
@@ -232,6 +241,7 @@
                         </label>
                     </div>
                     <p class="text-muted" style="margin:10px 0; font-size:0.8rem; background:#222; padding:8px; border-radius:6px;">💡 Usa siempre la misma luz, misma ropa y mismo ángulo.</p>
+                    
                     <div style="display:flex; gap:5px; margin-bottom:15px;">
                         <div id="comp-before" style="flex:1; aspect-ratio:3/4; border:1px dashed #444; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;"><small>Inicio</small></div>
                         <div id="comp-now" style="flex:1; aspect-ratio:3/4; border:1px dashed #444; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;"><small>Actual</small></div>
@@ -259,7 +269,11 @@
                             <select id="cfg-alarm-day" class="input" style="width:auto; margin:0;" onchange="saveConfig()">
                                 <option value="-1">Off</option>
                                 <option value="1">Lun</option>
+                                <option value="2">Mar</option>
+                                <option value="3">Mié</option>
+                                <option value="4">Jue</option>
                                 <option value="5">Vie</option>
+                                <option value="6">Sáb</option>
                                 <option value="0">Dom</option>
                             </select>
                             <input type="time" id="cfg-alarm-time" class="input" style="width:auto; margin:0;" onchange="saveConfig()">
@@ -330,15 +344,6 @@
                 <button onclick="closeAdminModal()" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
             </div>
             
-            <div class="card" style="border-left-color: var(--success);">
-                <h3>🥗 Plan Nutricional</h3>
-                <div style="display:flex; gap:10px;">
-                    <div><small>Kcal Objetivo</small><input id="adm-set-kcal" type="number" class="input"></div>
-                    <div><small>Agua (L) Objetivo</small><input id="adm-set-water" type="number" class="input"></div>
-                </div>
-                <button onclick="adminSaveTargets()" class="btn btn-primary" style="margin-top:10px;">Guardar Plan</button>
-            </div>
-
             <div class="card">
                 <h3>Datos & Stats</h3>
                 <p>Edad: <span id="adm-ath-age">-</span> | Altura: <span id="adm-ath-height">-</span></p>
@@ -355,6 +360,15 @@
 
             <h3>Fotos Recientes</h3>
             <div id="admin-gallery" style="display:grid; grid-template-columns:1fr 1fr; gap:5px;"></div>
+        </div>
+    </div>
+
+    <div id="modal-alert" class="modal hidden">
+        <div class="modal-content">
+            <h3>Enviar Alerta</h3>
+            <input id="alert-msg" class="input" placeholder="Escribe el mensaje...">
+            <button onclick="sendAdminAlert()" class="btn btn-primary">Enviar</button>
+            <button onclick="document.getElementById('modal-alert').classList.add('hidden')" class="btn btn-secondary">Cancelar</button>
         </div>
     </div>
 
@@ -394,36 +408,17 @@
         </div>
     </div>
 
-    <div id="modal-alert" class="modal hidden">
-        <div class="modal-content">
-            <h3>Enviar Alerta</h3>
-            <input id="alert-msg" class="input" placeholder="Escribe el mensaje...">
-            <button onclick="sendAdminAlert()" class="btn btn-primary">Enviar</button>
-            <button onclick="document.getElementById('modal-alert').classList.add('hidden')" class="btn btn-secondary">Cancelar</button>
-        </div>
-    </div>
-
     <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
 
     <script>
         // --- 1. FIREBASE CONFIG ---
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
-  authDomain: "fitdata-7a86b.firebaseapp.com",
-  projectId: "fitdata-7a86b",
-  storageBucket: "fitdata-7a86b.firebasestorage.app",
-  messagingSenderId: "949628013924",
-  appId: "1:949628013924:web:86278ae2c2bafb384d7e71"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
+            authDomain: "fitdata-7a86b.firebaseapp.com",
+            projectId: "fitdata-7a86b",
+            storageBucket: "fitdata-7a86b.firebasestorage.app",
+            messagingSenderId: "949628013924",
+            appId: "1:949628013924:web:86278ae2c2bafb384d7e71"
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -448,78 +443,111 @@ const app = initializeApp(firebaseConfig);
         let currentNoteExId = null;
         let editingRoutineId = null;
 
-        // --- 3. GENERADOR SVG ---
-        function getMuscleSvg(muscle) {
-            const m = muscle.toLowerCase();
-            let silhouette = "";
-            let highlight = "";
-
-            const frontBody = "M50,5 C55,5 60,10 60,15 L65,18 L70,35 L60,60 L62,80 L65,115 L55,115 L52,85 L48,85 L45,115 L35,115 L38,80 L40,60 L30,35 L35,18 L40,15 C40,10 45,5 50,5";
-            const backBody = "M50,5 C55,5 60,10 60,15 L68,18 L75,35 L65,60 L62,80 L65,115 L55,115 L52,85 L48,85 L45,115 L35,115 L38,80 L35,60 L25,35 L32,18 L40,15 C40,10 45,5 50,5";
+        // --- 3. DICCIONARIO DE PATHS ANATÓMICOS (Estilo MertenD) ---
+        const MUSCLE_PATHS = {
+            frontBody: "M75,20 C85,20 95,25 95,35 L95,45 L105,50 L115,45 L115,130 L105,130 L100,100 L95,130 L120,130 L125,50 L140,40 L145,130 L135,130 L130,150 L140,250 L120,250 L115,170 L105,170 L100,250 L80,250 L90,150 L85,130 L75,130 L80,40 L95,50 L120,130 L95,130 L90,100 L85,130 L75,130 L75,45 L85,50 L75,45 L75,35 C75,25 85,20 95,20", // Aproximación silueta base
+            chest: "M85,50 L135,50 L130,75 L90,75 Z",
+            abs: "M95,75 L125,75 L122,120 L98,120 Z",
+            shouldersF: "M70,40 L85,40 L82,55 L68,52 Z M135,40 L150,40 L152,52 L138,55 Z",
+            biceps: "M68,55 L60,85 L75,85 L80,55 Z M152,55 L160,85 L145,85 L140,55 Z",
+            forearms: "M60,85 L50,115 L65,115 L72,85 Z M160,85 L170,115 L155,115 L148,85 Z",
+            quads: "M85,130 L75,200 L95,200 L100,130 Z M135,130 L145,200 L125,200 L120,130 Z",
+            calvesF: "M78,205 L72,240 L85,240 L88,205 Z M142,205 L148,240 L135,240 L132,205 Z",
             
-            let view = `<path d="${frontBody}" fill="#000"/>`; 
+            traps: "M90,35 L130,35 L120,50 L100,50 Z",
+            lats: "M85,50 L135,50 L125,90 L95,90 Z",
+            lowerBack: "M98,90 L122,90 L120,110 L100,110 Z",
+            shouldersB: "M70,40 L85,40 L82,55 L68,52 Z M135,40 L150,40 L152,52 L138,55 Z",
+            triceps: "M68,55 L60,85 L75,85 L80,55 Z M152,55 L160,85 L145,85 L140,55 Z",
+            glutes: "M85,110 L135,110 L130,140 L90,140 Z",
+            hams: "M85,140 L75,200 L95,200 L100,140 Z M135,140 L145,200 L125,200 L120,140 Z",
+            calvesB: "M78,205 L72,240 L85,240 L88,205 Z M142,205 L148,240 L135,240 L132,205 Z"
+        };
 
-            if (m.includes('pecho')) {
-                highlight = `<path d="M38,22 L62,22 L60,35 L40,35 Z" fill="#ff4444"/>`;
-            } else if (m.includes('espalda')) {
-                view = `<path d="${backBody}" fill="#000"/>`;
-                highlight = `<path d="M35,20 L65,20 L58,50 L42,50 Z" fill="#ff4444"/>`;
-            } else if (m.includes('pierna') || m.includes('femoral') || m.includes('glute')) {
-                if(m.includes('femoral') || m.includes('glute')) {
-                     view = `<path d="${backBody}" fill="#000"/>`;
-                     highlight = `<path d="M35,60 L30,110 L45,110 L48,80 L52,80 L55,110 L70,110 L65,60 Z" fill="#ff4444"/>`;
-                } else {
-                     highlight = `<path d="M38,60 L35,115 L45,115 L48,85 L52,85 L55,115 L65,115 L62,60 Z" fill="#ff4444"/>`;
-                }
-            } else if (m.includes('hombro')) {
-                highlight = `<circle cx="30" cy="22" r="5" fill="#ff4444"/><circle cx="70" cy="22" r="5" fill="#ff4444"/>`;
-            } else if (m.includes('biceps') || m.includes('brazo')) {
-                 highlight = `<path d="M28,35 L22,55 L32,55 Z" fill="#ff4444"/><path d="M72,35 L78,55 L68,55 Z" fill="#ff4444"/>`;
-            } else if (m.includes('triceps') || m.includes('tríceps')) {
-                 view = `<path d="${backBody}" fill="#000"/>`;
-                 highlight = `<path d="M25,30 L20,50 L30,50 Z" fill="#ff4444"/><path d="M75,30 L80,50 L70,50 Z" fill="#ff4444"/>`;
-            } else if (m.includes('abs')) {
-                 highlight = `<rect x="42" y="38" width="16" height="20" fill="#ff4444"/>`;
-            }
+        // --- GENERADOR SVG ANATOMICO ---
+        function renderAnatomySVG(highlights = [], opacity = 1) {
+            // Siluetas Base simplificadas para visualización rápida sin dependencias
+            const bodyFront = `
+                <g transform="translate(20,10) scale(0.8)">
+                    <path d="M70,20 Q110,20 150,20 L160,50 L170,120 L160,130 L150,110 L140,130 L130,220 L120,280 L100,280 L90,220 L80,130 L70,110 L60,130 L50,120 L60,50 Z" fill="#222" stroke="#333" stroke-width="2"/>
+                    ${highlights.includes('pecho') ? `<path d="M80,50 L140,50 L130,80 L90,80 Z" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                    ${highlights.includes('abs') ? `<rect x="95" y="80" width="30" height="50" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                    ${highlights.includes('hombro') ? `<circle cx="65" cy="45" r="10" fill="#ff4444" fill-opacity="${opacity}"/><circle cx="155" cy="45" r="10" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                    ${highlights.includes('biceps') ? `<path d="M60,60 L50,90 L70,90 Z M160,60 L170,90 L150,90 Z" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                    ${highlights.includes('quads') ? `<path d="M80,130 L70,200 L100,200 L105,130 Z M140,130 L150,200 L120,200 L115,130 Z" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                </g>`;
 
-            return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
-              <rect x="2" y="2" width="96" height="116" rx="10" fill="#ffffff" stroke="#ff4444" stroke-width="4"/>
-              ${view}
-              ${highlight}
-            </svg>`);
+            const bodyBack = `
+                <g transform="translate(140,10) scale(0.8)">
+                    <path d="M70,20 Q110,20 150,20 L160,50 L170,120 L160,130 L150,110 L140,130 L130,220 L120,280 L100,280 L90,220 L80,130 L70,110 L60,130 L50,120 L60,50 Z" fill="#222" stroke="#333" stroke-width="2"/>
+                    ${highlights.includes('espalda') ? `<path d="M80,40 L140,40 L120,90 L100,90 Z" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                    ${highlights.includes('triceps') ? `<path d="M55,60 L45,90 L65,90 Z M165,60 L175,90 L155,90 Z" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                    ${highlights.includes('glute') ? `<rect x="85" y="110" width="50" height="30" rx="10" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                    ${highlights.includes('femoral') ? `<path d="M85,140 L80,200 L100,200 L105,140 Z M135,140 L140,200 L120,200 L115,140 Z" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                    ${highlights.includes('gemelo') ? `<path d="M80,210 L75,250 L95,250 L90,210 Z M140,210 L145,250 L125,250 L130,210 Z" fill="#ff4444" fill-opacity="${opacity}"/>` : ''}
+                </g>`;
+
+            return `
+            <svg viewBox="0 0 300 250" style="width:100%; height:auto;">
+                ${bodyFront}
+                ${bodyBack}
+            </svg>`;
         }
 
+        function getMuscleSvg(muscle) {
+            const m = muscle.toLowerCase();
+            let key = '';
+            if(m.includes('pecho')) key = 'pecho';
+            else if(m.includes('espalda')) key = 'espalda';
+            else if(m.includes('hombro')) key = 'hombro';
+            else if(m.includes('biceps') || m.includes('bíceps')) key = 'biceps';
+            else if(m.includes('triceps') || m.includes('tríceps')) key = 'triceps';
+            else if(m.includes('abs')) key = 'abs';
+            else if(m.includes('cuadriceps') || m.includes('pierna')) key = 'quads'; // General pierna -> quads front
+            else if(m.includes('femoral')) key = 'femoral';
+            else if(m.includes('glute') || m.includes('glúteo')) key = 'glute';
+            else if(m.includes('gemelo')) key = 'gemelo';
+            
+            // Generate single view for icon
+            const svgContent = renderAnatomySVG([key], 1);
+            return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgContent);
+        }
+
+        // GENERADOR DE HEATMAP COMPLETO
         function renderHeatmap(stats) {
             const container = document.getElementById('heatmap-render');
             if (!container) return;
+            
+            // Build active muscles list based on stats
+            // We need to pass opacity PER muscle group, but simpler svg generator above takes global opacity.
+            // Let's make a custom detailed one for the profile.
+            
             const getOp = (key) => Math.min(0.2 + ((stats[key]||0) / 50), 1);
             
+            // Advanced Heatmap Render
             container.innerHTML = `
-            <svg viewBox="0 0 200 120" style="height:100%; display:block; margin:0 auto;">
-                <g transform="translate(0,0)">
-                    <path d="M50,5 C55,5 60,10 60,15 L65,18 L70,35 L60,60 L62,80 L65,115 L55,115 L52,85 L48,85 L45,115 L35,115 L38,80 L40,60 L30,35 L35,18 L40,15 C40,10 45,5 50,5" fill="#222" />
-                    <path d="M38,22 L62,22 L60,35 L40,35 Z" fill="#ff4444" fill-opacity="${getOp('Pecho')}"/>
-                    <rect x="42" y="38" width="16" height="25" fill="#ff4444" fill-opacity="${getOp('Abs')}"/>
-                    <path d="M30,35 L20,60 L35,60 Z" fill="#ff4444" fill-opacity="${getOp('Bíceps')}"/>
-                    <path d="M70,35 L80,60 L65,60 Z" fill="#ff4444" fill-opacity="${getOp('Bíceps')}"/>
-                    <path d="M40,65 L35,95 L48,95 L48,65 Z" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
-                    <path d="M60,65 L65,95 L52,95 L52,65 Z" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
+            <svg viewBox="0 0 300 250" style="width:100%; height:auto; filter: drop-shadow(0 0 5px rgba(255,68,68,0.3));">
+                <g transform="translate(20,10) scale(0.8)">
+                    <path d="M70,20 Q110,20 150,20 L160,50 L170,120 L160,130 L150,110 L140,130 L130,220 L120,280 L100,280 L90,220 L80,130 L70,110 L60,130 L50,120 L60,50 Z" fill="#222" stroke="#444" stroke-width="1"/>
+                    <path d="M80,50 L140,50 L130,80 L90,80 Z" fill="#ff4444" fill-opacity="${getOp('Pecho')}"/>
+                    <rect x="95" y="80" width="30" height="50" fill="#ff4444" fill-opacity="${getOp('Abs')}"/>
+                    <circle cx="65" cy="45" r="10" fill="#ff4444" fill-opacity="${getOp('Hombros')}"/>
+                    <circle cx="155" cy="45" r="10" fill="#ff4444" fill-opacity="${getOp('Hombros')}"/>
+                    <path d="M60,60 L50,90 L70,90 Z M160,60 L170,90 L150,90 Z" fill="#ff4444" fill-opacity="${getOp('Bíceps')}"/>
+                    <path d="M80,130 L70,200 L100,200 L105,130 Z M140,130 L150,200 L120,200 L115,130 Z" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
                 </g>
-                <g transform="translate(100,0)">
-                    <path d="M50,5 C55,5 60,10 60,15 L68,18 L75,35 L65,60 L62,80 L65,115 L55,115 L52,85 L48,85 L45,115 L35,115 L38,80 L35,60 L25,35 L32,18 L40,15 C40,10 45,5 50,5" fill="#222" />
-                    <path d="M35,20 L65,20 L58,50 L42,50 Z" fill="#ff4444" fill-opacity="${getOp('Espalda')}"/>
-                    <path d="M25,35 L20,55 L32,55 Z" fill="#ff4444" fill-opacity="${getOp('Tríceps')}"/>
-                    <path d="M75,35 L80,55 L68,55 Z" fill="#ff4444" fill-opacity="${getOp('Tríceps')}"/>
-                    <circle cx="42" cy="65" r="7" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
-                    <circle cx="58" cy="65" r="7" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
-                    <rect x="38" y="75" width="8" height="15" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
-                    <rect x="54" y="75" width="8" height="15" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
+                <g transform="translate(140,10) scale(0.8)">
+                    <path d="M70,20 Q110,20 150,20 L160,50 L170,120 L160,130 L150,110 L140,130 L130,220 L120,280 L100,280 L90,220 L80,130 L70,110 L60,130 L50,120 L60,50 Z" fill="#222" stroke="#444" stroke-width="1"/>
+                    <path d="M80,40 L140,40 L120,90 L100,90 Z" fill="#ff4444" fill-opacity="${getOp('Espalda')}"/>
+                    <path d="M55,60 L45,90 L65,90 Z M165,60 L175,90 L155,90 Z" fill="#ff4444" fill-opacity="${getOp('Tríceps')}"/>
+                    <rect x="85" y="110" width="50" height="30" rx="10" fill="#ff4444" fill-opacity="${getOp('Glute')}"/>
+                    <path d="M85,140 L80,200 L100,200 L105,140 Z M135,140 L140,200 L120,200 L115,140 Z" fill="#ff4444" fill-opacity="${getOp('Femoral')}"/>
+                    <path d="M80,210 L75,250 L95,250 L90,210 Z M140,210 L145,250 L125,250 L130,210 Z" fill="#ff4444" fill-opacity="${getOp('Gemelo')}"/>
                 </g>
             </svg>`;
         }
 
-        // 4. BASE DE DATOS
+        // 4. BASE DE DATOS COMPLETA
         const rawExercisesDB = [
             { id: 1, name: 'Sentadilla con Barra', muscle: 'Piernas', emoji: '🏋️' },
             { id: 2, name: 'Sentadilla Jaca', muscle: 'Piernas', emoji: '⚙️' },
@@ -619,9 +647,7 @@ const app = initializeApp(firebaseConfig);
                     if(doc.exists) {
                         userData = doc.data();
                         
-                        // Check alarmas al inicio
                         checkAlarms();
-                        // Check notificaciones admin
                         checkAdminAlerts();
 
                         if(userData.email.toLowerCase() === ADMIN_EMAIL) {
@@ -651,65 +677,7 @@ const app = initializeApp(firebaseConfig);
         function toRegister() { showScreen('register'); }
         function toLogin() { showScreen('login'); }
         
-        async function doLogin() {
-            const btn = document.querySelector('#login .btn-primary');
-            const email = document.getElementById('log-email').value;
-            const pass = document.getElementById('log-pass').value;
-
-            // Validación básica
-            if(!email || !pass) {
-                alert("⚠️ Por favor, escribe tu email y contraseña.");
-                return;
-            }
-
-            // Feedback visual
-            const originalText = btn.innerText;
-            btn.innerText = "Conectando...";
-            btn.style.opacity = "0.7";
-            btn.disabled = true;
-
-            // TEMPORIZADOR DE SEGURIDAD (5 segundos)
-            const timeout = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error("TIMEOUT")), 5000)
-            );
-
-            try {
-                // Intentamos loguear compitiendo contra el reloj
-                console.log("Intentando conectar con: " + email);
-                
-                // Carrera: ¿Quién gana? ¿El login o el temporizador de 5s?
-                await Promise.race([
-                    auth.signInWithEmailAndPassword(email, pass),
-                    timeout
-                ]);
-                
-                console.log("¡Éxito!");
-                // No hacemos nada, el listener onAuthStateChanged redirigirá solo
-
-            } catch(e) {
-                // RESTAURAR BOTÓN
-                btn.innerText = originalText;
-                btn.style.opacity = "1";
-                btn.disabled = false;
-
-                // DIAGNÓSTICO DEL ERROR
-                console.error("Error Login:", e);
-
-                if (e.message === "TIMEOUT") {
-                    alert("❌ ERROR DE CONEXIÓN:\nEl servidor no responde.\n\nPOSIBLES CAUSAS:\n1. Las claves (API KEY) en el código son incorrectas.\n2. No has habilitado 'Email/Contraseña' en Firebase > Authentication.\n3. Tu firewall bloquea la conexión.");
-                } else if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
-                    alert("❌ Credenciales incorrectas.\nRevisa el email y la contraseña.");
-                } else if (e.code === 'auth/invalid-email') {
-                    alert("❌ El formato del email no es válido.");
-                } else if (e.code === 'auth/network-request-failed') {
-                    alert("❌ Error de Red.\nComprueba tu internet.");
-                } else if (e.code === 'auth/operation-not-allowed') {
-                    alert("❌ ERROR DE CONFIGURACIÓN:\nDebes ir a la Consola de Firebase -> Authentication -> Sign-in method y habilitar 'Correo electrónico/Contraseña'.");
-                } else {
-                    alert("❌ Error desconocido:\n" + e.message);
-                }
-            }
-        }
+        async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('log-email').value, document.getElementById('log-pass').value); } catch(e) { showToast(e.message); } }
         
         async function doRegister() {
             if(document.getElementById('reg-code').value !== SECRET_CODE) return showToast("Código incorrecto");
@@ -725,7 +693,6 @@ const app = initializeApp(firebaseConfig);
                     role: isAdmin?'admin':'user', approved: isAdmin, 
                     settings:{rest:60, screen:true, sound:true, goal:'Mantenimiento', alarmDay: -1},
                     stats:{kg:0, workouts:0, sets:0, reps:0, heatmap:{}},
-                    targets:{kcal:0, water:0},
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 showToast(isAdmin?"Hola Jefe":"Solicitud Enviada");
@@ -741,13 +708,11 @@ const app = initializeApp(firebaseConfig);
             const todayStr = now.toDateString();
             const lastCheck = localStorage.getItem('last_photo_alarm');
             
-            // Comprobar Hora
             const alarmTime = userData.settings.alarmTime; // "14:30"
             if(alarmTime) {
                 const [h, m] = alarmTime.split(':');
                 const nowMins = now.getHours()*60 + now.getMinutes();
                 const alarmMins = parseInt(h)*60 + parseInt(m);
-                // Si es el día y la hora ya pasó
                 if(today == userData.settings.alarmDay && nowMins >= alarmMins && lastCheck !== todayStr) {
                     alert("📸 RECORDATORIO: ¡Hoy toca subir foto de revisión!");
                     localStorage.setItem('last_photo_alarm', todayStr);
@@ -769,14 +734,6 @@ const app = initializeApp(firebaseConfig);
             document.getElementById('u-name').innerText = userData.username.split(' ')[0];
             document.getElementById('u-goal').innerText = userData.settings.goal || 'Objetivo no fijado';
             
-            if(userData.targets && (userData.targets.kcal > 0 || userData.targets.water > 0)) {
-                document.getElementById('nutrition-panel').classList.remove('hidden');
-                document.getElementById('target-kcal').innerText = userData.targets.kcal || '-';
-                document.getElementById('target-water').innerText = userData.targets.water || '-';
-            } else {
-                document.getElementById('nutrition-panel').classList.add('hidden');
-            }
-
             if(userData.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
             
             document.getElementById('cfg-goal').value = userData.settings.goal || 'Mantenimiento';
@@ -820,15 +777,6 @@ const app = initializeApp(firebaseConfig);
                     l.appendChild(div);
                 });
             });
-        }
-
-        async function saveDailyNutrition() {
-            const k = document.getElementById('user-kcal').value;
-            const w = document.getElementById('user-water').value;
-            await db.collection('users').doc(currentUser.uid).collection('nutrition').add({
-                kcal: k, water: w, date: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            showToast("Registro guardado");
         }
 
         // 8. AUTOGUARDADO & WORKOUT CORE
@@ -1115,8 +1063,7 @@ const app = initializeApp(firebaseConfig);
             const u = uDoc.data();
             
             document.getElementById('adm-ath-name').innerText = u.username;
-            document.getElementById('adm-set-kcal').value = u.targets?.kcal || '';
-            document.getElementById('adm-set-water').value = u.targets?.water || '';
+            
             document.getElementById('adm-ath-age').innerText = u.age || '-';
             document.getElementById('adm-ath-height').innerText = u.height || '-';
             document.getElementById('adm-ath-kg').innerText = (u.stats?.kg/1000).toFixed(1) + 't';
@@ -1135,14 +1082,6 @@ const app = initializeApp(firebaseConfig);
         }
 
         function closeAdminModal() { document.getElementById('modal-athlete').classList.add('hidden'); }
-
-        async function adminSaveTargets() {
-            const k = document.getElementById('adm-set-kcal').value;
-            const w = document.getElementById('adm-set-water').value;
-            await db.collection('users').doc(currentAdminUser).update({ 'targets.kcal': k, 'targets.water': w });
-            showToast("Objetivos actualizados");
-            document.getElementById('modal-athlete').classList.add('hidden');
-        }
 
         // ALERTAS ADMIN
         function sendAlert(uid) {
@@ -1204,7 +1143,7 @@ const app = initializeApp(firebaseConfig);
             exercisesDB.filter(e=>e.name.toLowerCase().includes(f)).forEach(e => {
                 const d = document.createElement('div');
                 d.style.cssText = `display:flex; align-items:center; gap:10px; padding:8px; border-bottom:1px solid #333; cursor:pointer; ${selectedExs.includes(e.id)?'background:rgba(255,68,68,0.2)':''}`;
-                d.innerHTML = `<img src="${e.image}" style="width:40px; background:white; border-radius:4px; object-fit:cover;"><div><b>${e.name}</b><br><small style="color:#888">${e.muscle}</small></div>`;
+                d.innerHTML = `<img src="${e.image}" style="width:40px; background:white; border-radius:4px; object-fit:contain;"><div><b>${e.name}</b><br><small style="color:#888">${e.muscle}</small></div>`;
                 d.onclick = ()=>{ 
                     if(selectedExs.includes(e.id)) selectedExs=selectedExs.filter(x=>x!==e.id); 
                     else selectedExs.push(e.id); 
