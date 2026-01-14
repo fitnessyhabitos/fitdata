@@ -75,7 +75,7 @@
         /* CARDS */
         .card { background:var(--card); padding:20px; border-radius:16px; margin-bottom:15px; border:1px solid #2a2a2a; border-left:4px solid var(--accent); position:relative; }
         
-        /* EXERCISE IMAGE (SVG) */
+        /* EXERCISE IMAGE (SVG PRO) */
         .ex-img { width: 60px; height: 60px; background: white; border: 3px solid var(--accent); border-radius: 12px; padding: 0; object-fit: contain; flex-shrink: 0; }
 
         /* WORKOUT ROWS */
@@ -84,6 +84,7 @@
             background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #333; 
         }
         .set-row.done { border-color:var(--success); background:rgba(34, 221, 136, 0.05); }
+        
         .prev-val { position:absolute; top:-8px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#888; background:#222; padding:0 6px; border-radius:4px; border:1px solid #444; z-index:5; pointer-events:none; }
 
         .check-btn { width:32px; height:32px; border-radius:50%; border:2px solid #555; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; transition:0.2s; }
@@ -231,7 +232,7 @@
                 <div class="card" style="text-align:center;">
                     <h3>Mapa de Trabajo</h3>
                     <p class="text-muted" style="font-size:0.8rem;">Volumen acumulado</p>
-                    <div id="heatmap-render" class="heatmap-container"></div>
+                    <div id="heatmap-render" class="heatmap-container" style="height:250px; display:flex; justify-content:center;"></div>
                 </div>
 
                 <div class="stats-grid">
@@ -354,13 +355,22 @@
                 <button onclick="closeAdminModal()" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
             </div>
             
-            <div class="card" style="border-left-color: var(--success);">
-                <h3>🥗 Plan Nutricional</h3>
+            <div class="card">
+                <h3>Asignar Objetivos</h3>
                 <div style="display:flex; gap:10px;">
                     <div><small>Kcal Objetivo</small><input id="adm-set-kcal" type="number" class="input"></div>
                     <div><small>Agua (L) Objetivo</small><input id="adm-set-water" type="number" class="input"></div>
                 </div>
-                <button onclick="adminSaveTargets()" class="btn btn-primary" style="margin-top:10px;">Guardar Plan</button>
+                <div style="margin-top:10px;">
+                    <small>Día Alarma Fotos (0=Dom, 1=Lun...)</small>
+                    <select id="adm-set-alarm" class="input">
+                        <option value="-1">Off</option>
+                        <option value="1">Lunes</option>
+                        <option value="5">Viernes</option>
+                        <option value="0">Domingo</option>
+                    </select>
+                </div>
+                <button onclick="adminSaveTargets()" class="btn btn-primary" style="margin-top:10px;">Guardar Cambios</button>
             </div>
 
             <div class="card">
@@ -385,6 +395,8 @@
     <div id="modal-create" class="modal hidden">
         <div class="modal-content">
             <h3 id="modal-routine-title">Nueva Rutina</h3>
+            <p id="routine-target-msg" class="text-muted hidden">Asignando a: <span id="target-user-name"></span></p>
+            
             <input id="new-rout-name" class="input" placeholder="Nombre (Ej: Pierna A)">
             <input id="search-ex" class="input" placeholder="🔍 Buscar..." onkeyup="renderExSelector()">
             <div id="ex-list" style="max-height:300px; overflow-y:auto; margin-bottom:15px; border:1px solid #333; border-radius:8px; padding:5px;"></div>
@@ -420,7 +432,7 @@
     <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
 
     <script>
-        // --- 1. FIREBASE CONFIG (PON TUS CLAVES AQUÍ) ---
+        // --- 1. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
@@ -447,40 +459,45 @@
         let wakeLock = null;
         let weightChart = null;
         let adminWeightChart = null;
-        let currentAdminUser = null;
+        let currentAdminUser = null; // ID del usuario que el admin está viendo
+        let adminAssignTarget = null; // ID del usuario al que vamos a asignar rutina
         let currentNoteExId = null;
         let editingRoutineId = null;
 
-        // --- 3. GENERADOR SVG ---
+        // --- 3. GENERADOR SVG PRO (SILUETA SÓLIDA NEGRA + MÚSCULO ROJO) ---
         function getMuscleSvg(muscle) {
             const m = muscle.toLowerCase();
             let silhouette = "";
             let highlight = "";
 
-            const torsoPath = "M 50,10 L 70,15 L 75,30 L 65,75 L 67,90 L 33,90 L 35,75 L 25,30 L 30,15 Z"; 
-            const legsPath = "M 25,5 L 75,5 L 80,30 L 85,90 L 55,90 L 50,45 L 45,90 L 15,90 L 20,30 Z";
+            // TREN SUPERIOR (De cintura para arriba - Silueta Negra)
+            const upperBody = `M20,90 L20,80 C20,80 10,40 10,30 C10,20 30,10 50,10 C70,10 90,20 90,30 C90,40 80,80 80,80 L80,90 L20,90 Z`;
+            // TREN INFERIOR (De cintura para abajo - Silueta Negra)
+            const lowerBody = `M20,10 L80,10 L85,30 L90,90 L65,90 L60,50 L50,40 L40,50 L35,90 L10,90 L15,30 Z`;
 
             if (m.includes('pierna') || m.includes('glute') || m.includes('femoral') || m.includes('gemelo') || m.includes('abductor')) {
-                silhouette = `<path d="${legsPath}" fill="#000000"/>`;
-                highlight = `<path d="${legsPath}" fill="#FF0000" stroke="none"/>`; 
+                silhouette = `<path d="${lowerBody}" fill="#000000"/>`;
+                highlight = `<path d="${lowerBody}" fill="#FF0000" stroke="none"/>`; 
             } else {
-                silhouette = `<path d="${torsoPath}" fill="#000000"/>`;
-                if (m.includes('pecho')) highlight = `<rect x="35" y="30" width="30" height="15" fill="#FF0000"/>`;
-                else if (m.includes('hombro')) highlight = `<circle cx="25" cy="25" r="8" fill="#FF0000"/><circle cx="75" cy="25" r="8" fill="#FF0000"/>`;
-                else if (m.includes('biceps') || m.includes('brazo')) highlight = `<rect x="15" y="40" width="10" height="20" fill="#FF0000"/><rect x="75" y="40" width="10" height="20" fill="#FF0000"/>`;
-                else if (m.includes('espalda')) highlight = `<path d="M 30,25 L 70,25 L 60,60 L 40,60 Z" fill="#FF0000"/>`;
-                else if (m.includes('abs')) highlight = `<rect x="40" y="50" width="20" height="25" fill="#FF0000"/>`;
-                else if (m.includes('triceps') || m.includes('tríceps')) highlight = `<rect x="10" y="40" width="8" height="20" fill="#FF0000"/><rect x="82" y="40" width="8" height="20" fill="#FF0000"/>`;
+                silhouette = `<path d="${upperBody}" fill="#000000"/>`;
+                
+                if (m.includes('pecho')) highlight = `<rect x="30" y="30" width="40" height="15" rx="5" fill="#FF0000"/>`;
+                else if (m.includes('hombro')) highlight = `<circle cx="20" cy="30" r="10" fill="#FF0000"/><circle cx="80" cy="30" r="10" fill="#FF0000"/>`;
+                else if (m.includes('biceps') || m.includes('brazo')) highlight = `<rect x="10" y="40" width="12" height="20" fill="#FF0000"/><rect x="78" y="40" width="12" height="20" fill="#FF0000"/>`;
+                else if (m.includes('espalda')) highlight = `<path d="M30,20 L70,20 L60,70 L40,70 Z" fill="#FF0000"/>`;
+                else if (m.includes('abs')) highlight = `<rect x="40" y="50" width="20" height="30" fill="#FF0000"/>`;
+                else if (m.includes('triceps')) highlight = `<rect x="5" y="40" width="10" height="20" fill="#FF0000"/><rect x="85" y="40" width="10" height="20" fill="#FF0000"/>`;
             }
 
             return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-              <rect x="2" y="2" width="96" height="96" rx="18" fill="#ffffff" stroke="#FF0000" stroke-width="6"/>
+              <rect x="2" y="2" width="96" height="96" rx="15" fill="#ffffff" stroke="#FF0000" stroke-width="6"/>
               ${silhouette}
               ${highlight}
             </svg>`);
         }
 
+        // GENERADOR DE HEATMAP
         function renderHeatmap(stats) {
             const container = document.getElementById('heatmap-render');
             if (!container) return;
@@ -488,18 +505,10 @@
             
             container.innerHTML = `
             <svg viewBox="0 0 100 120" style="height:100%; display:block; margin:0 auto;">
-                <g fill="#333">
-                    <circle cx="50" cy="15" r="8" />
-                    <path d="M30,25 L70,25 L65,70 L35,70 Z" />
-                    <path d="M25,28 L15,55 L25,60 L32,30 Z" />
-                    <path d="M75,28 L85,55 L75,60 L68,30 Z" />
-                    <path d="M35,70 L30,110 L45,110 L48,80 L52,80 L55,110 L70,110 L65,70 Z" />
-                </g>
-                <path d="M35,30 L65,30 L63,45 L37,45 Z" fill="#ff4444" fill-opacity="${getOp('Pecho')}"/>
+                <path d="M50,5 C55,5 60,10 60,15 C60,20 55,23 50,23 C45,23 40,20 40,15 C40,10 45,5 50,5 M30,25 L70,25 L65,70 L35,70 Z M35,72 L32,115 L45,115 L48,80 L52,80 L55,115 L68,115 L65,72 Z" fill="#333"/>
+                <path d="M35,28 L65,28 L63,45 L37,45 Z" fill="#ff4444" fill-opacity="${getOp('Pecho')}"/>
                 <path d="M40,48 L60,48 L58,68 L42,68 Z" fill="#ff4444" fill-opacity="${getOp('Abs')}"/>
-                <path d="M25,28 L15,55 L25,60 L32,30 Z" fill="#ff4444" fill-opacity="${getOp('Bíceps')}"/>
-                <path d="M75,28 L85,55 L75,60 L68,30 Z" fill="#ff4444" fill-opacity="${getOp('Bíceps')}"/>
-                <path d="M35,70 L30,110 L45,110 L48,80 L52,80 L55,110 L70,110 L65,70 Z" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
+                <path d="M35,72 L32,110 L45,110 L48,80 L52,80 L55,110 L68,110 L65,72 Z" fill="#ff4444" fill-opacity="${getOp('Piernas')}"/>
             </svg>`;
         }
 
@@ -602,10 +611,7 @@
                 db.collection('users').doc(u.uid).onSnapshot(doc => {
                     if(doc.exists) {
                         userData = doc.data();
-                        
-                        if(userData.email.toLowerCase() === ADMIN_EMAIL) {
-                            listenToAllUsers();
-                        }
+                        if(userData.email.toLowerCase() === ADMIN_EMAIL) listenToAllUsers();
                         
                         if(userData.approved || userData.email.toLowerCase() === ADMIN_EMAIL) {
                             currentUser = u;
@@ -613,7 +619,7 @@
                                 document.getElementById('loading').classList.remove('active');
                                 initApp();
                                 loadWorkoutFromStorage(); 
-                            }, 2500);
+                            }, 2000);
                         } else {
                             document.getElementById('loading').classList.remove('active');
                             showToast("Pendiente de Aprobación"); showScreen('login');
@@ -664,8 +670,6 @@
                 document.getElementById('nutrition-panel').classList.remove('hidden');
                 document.getElementById('target-kcal').innerText = userData.targets.kcal || '-';
                 document.getElementById('target-water').innerText = userData.targets.water || '-';
-            } else {
-                document.getElementById('nutrition-panel').classList.add('hidden');
             }
 
             if(userData.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
@@ -726,7 +730,7 @@
             showToast("Registro guardado");
         }
 
-        // 8. ENTRENAMIENTO
+        // 8. AUTOGUARDADO & WORKOUT CORE
         function saveWorkoutToStorage() {
             if (activeRoutine) {
                 localStorage.setItem('fitdata_wo', JSON.stringify({routine: activeRoutine, start: woStartTime}));
@@ -983,8 +987,9 @@
                         <div><b>${u.username}</b><br><small style="color:#888">${u.email}</small>
                         <br><span class="stat-badge">${u.settings?.goal || '-'}</span></div>
                         <div style="text-align:right;">
-                            <button onclick="assignRout('${d.id}')" class="btn-secondary" style="font-size:0.8rem; padding:4px;">📋 Rutina</button>
-                            ${u.approved ? `<button onclick="viewUserAdmin('${d.id}')" class="btn-icon">👁️</button>` : 
+                            ${u.approved ? 
+                            `<button onclick="assignRout('${d.id}', '${u.username}')" class="btn-icon">📋</button>
+                             <button onclick="viewUserAdmin('${d.id}')" class="btn-icon">👁️</button>` : 
                             `<button onclick="approve('${d.id}')" class="btn-success" style="padding:4px 8px; width:auto; font-size:0.8rem;">OK</button>`}
                             <button onclick="delUser('${d.id}')" style="background:none; border:none; color:#666;">❌</button>
                         </div>
@@ -1011,6 +1016,8 @@
             document.getElementById('adm-ath-name').innerText = u.username;
             document.getElementById('adm-set-kcal').value = u.targets?.kcal || '';
             document.getElementById('adm-set-water').value = u.targets?.water || '';
+            document.getElementById('adm-set-alarm').value = u.settings?.alarmDay || -1;
+            
             document.getElementById('adm-ath-age').innerText = u.age || '-';
             document.getElementById('adm-ath-height').innerText = u.height || '-';
             document.getElementById('adm-ath-kg').innerText = (u.stats?.kg/1000).toFixed(1) + 't';
@@ -1035,25 +1042,39 @@
         async function adminSaveTargets() {
             const k = document.getElementById('adm-set-kcal').value;
             const w = document.getElementById('adm-set-water').value;
-            await db.collection('users').doc(currentAdminUser).update({ 'targets.kcal': k, 'targets.water': w });
+            const a = document.getElementById('adm-set-alarm').value;
+            
+            await db.collection('users').doc(currentAdminUser).update({ 
+                'targets.kcal': k, 
+                'targets.water': w,
+                'settings.alarmDay': a
+            });
             showToast("Objetivos actualizados");
             document.getElementById('modal-athlete').classList.add('hidden');
         }
 
         async function approve(id) { await db.collection('users').doc(id).update({approved:true}); }
         async function delUser(id) { if(confirm("Borrar?")) await db.collection('users').doc(id).delete(); }
-        async function assignRout(uid) {
-            if(confirm("¿Asignar rutina básica?")) {
-                const exs = exercisesDB.slice(0,5); 
-                await db.collection('users').doc(uid).collection('routines').add({name:"Rutina Coach", exercises:exs, createdAt:new Date()});
-                showToast("Rutina enviada");
-            }
+        
+        function assignRout(uid, uname) {
+            adminAssignTarget = uid;
+            document.getElementById('modal-routine-title').innerText = "Asignar a " + uname;
+            document.getElementById('routine-target-msg').classList.remove('hidden');
+            document.getElementById('target-user-name').innerText = uname;
+            
+            selectedExs = [];
+            document.getElementById('new-rout-name').value = '';
+            renderExSelector();
+            document.getElementById('modal-create').classList.remove('hidden');
         }
 
         // --- UTILS ---
         function openRoutineModal() { 
             editingRoutineId = null; 
+            adminAssignTarget = null;
             document.getElementById('modal-routine-title').innerText = "Nueva Rutina";
+            document.getElementById('routine-target-msg').classList.add('hidden');
+            
             selectedExs=[]; 
             document.getElementById('new-rout-name').value=''; 
             renderExSelector(); 
@@ -1097,12 +1118,22 @@
             
             if(exs.length === 0) return showToast("Error al procesar ejercicios");
 
-            if(editingRoutineId) {
+            // Si es asignación de Admin a usuario
+            if(adminAssignTarget) {
+                await db.collection('users').doc(adminAssignTarget).collection('routines').add({
+                    name, exercises: exs, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showToast("Rutina asignada al cliente");
+            } 
+            // Si es edición propia
+            else if(editingRoutineId) {
                 await db.collection('users').doc(currentUser.uid).collection('routines').doc(editingRoutineId).update({
                     name, exercises: exs
                 });
                 showToast("Rutina actualizada");
-            } else {
+            } 
+            // Si es creación propia
+            else {
                 await db.collection('users').doc(currentUser.uid).collection('routines').add({
                     name, exercises: exs, createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -1111,10 +1142,12 @@
             
             document.getElementById('modal-create').classList.add('hidden');
             editingRoutineId = null;
+            adminAssignTarget = null;
         }
 
         async function delRout(id) { if(confirm("¿Borrar?")) await db.collection('users').doc(currentUser.uid).collection('routines').doc(id).delete(); }
     </script>
 </body>
 </html>
+
 
