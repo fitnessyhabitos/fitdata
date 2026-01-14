@@ -22,7 +22,7 @@
             --input-bg: #1f1f1f;
             --text-color: #ffffff;
             --text-dim: #888888;
-            --accent-color: #ff3333; /* Rojo Neón */
+            --accent-color: #ff3333;
             --accent-dim: rgba(255, 51, 51, 0.2);
             --accent-glow: 0 0 12px rgba(255, 51, 51, 0.5);
             --success-color: #00ff88;
@@ -61,7 +61,6 @@
             box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
         }
 
-        /* LOADING */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -153,7 +152,7 @@
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal.active { opacity: 1; pointer-events: auto; }
-        /* MODAL COACH EXPANDIDO */
+        
         .modal-content { 
             background: #1a1a1a; width: 90%; max-width: 400px; padding: 25px; 
             border-radius: 15px; border: 1px solid var(--accent-color); text-align: center;
@@ -173,13 +172,12 @@
         .slider-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; cursor: ew-resize; z-index: 10; }
         .slider-btn { position: absolute; top: 50%; left: -15px; width: 30px; height: 30px; background: white; border-radius: 50%; display: grid; place-items: center; color: black; box-shadow: 0 0 10px black; }
 
-        /* RPE BUTTONS */
         .rpe-btn { width: 100%; margin-bottom: 10px; border: none; padding: 15px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         .rpe-easy { background: #2e7d32; }
         .rpe-hard { background: #f57f17; color: black; }
         .rpe-max { background: #c62828; }
         
-        .admin-user-row { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .admin-user-row { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .btn-danger { background: #500; border: 1px solid #800; color: #fcc; margin-top: 15px; }
 
     </style>
@@ -345,7 +343,7 @@
         <section id="admin-view" class="view-container">
             <h2>PANEL COACH</h2>
             <div class="card">
-                <h3>Lista de Atletas</h3>
+                <h3>Atletas</h3>
                 <div id="admin-list"></div>
             </div>
             <button class="btn-outline" onclick="switchTab('routines-view')">VOLVER</button>
@@ -832,7 +830,6 @@
                 const u=d.data(); if(u.email===ADMIN)return;
                 const div=document.createElement('div');
                 div.className = "admin-user-row";
-                // --- BOTÓN EXPLÍCITO PARA GESTIONAR ---
                 div.innerHTML=`<div><strong>${u.name}</strong><br><small>${u.approved?'🟢':'⏳'} ${u.email}</small></div><button class="btn-outline btn-small" style="width:auto;">⚙️ VER FICHA</button>`;
                 div.onclick=()=>openCoachModal(d.id,u); 
                 l.appendChild(div);
@@ -842,55 +839,61 @@
         async function openCoachModal(uid,u) {
             selectedUserCoach=uid;
             const m=document.getElementById('modal-coach');
+            m.classList.add('active'); // ABRIR AL INSTANTE
+            
             document.getElementById('coach-user-name').innerText=u.name;
             document.getElementById('coach-user-email').innerText=u.email;
             
-            // Stats Summary
-            const st = u.stats || {};
-            document.getElementById('coach-stats-text').innerText = `${st.workouts||0} Entrenos | ${(st.totalKg/1000||0).toFixed(1)}t Carga | ${u.age} Años`;
+            try {
+                // Stats Summary (Safe access)
+                const st = u.stats || {};
+                const age = u.age || '?';
+                document.getElementById('coach-stats-text').innerText = `${st.workouts||0} Entrenos | ${(st.totalKg/1000||0).toFixed(1)}t Carga | ${age} Años`;
 
-            // Chart
-            if(coachChart) coachChart.destroy();
-            const ctx = document.getElementById('coachWeightChart');
-            const wData = u.weightHistory || [];
-            coachChart = new Chart(ctx, { type:'line', data:{ labels:wData.map((_,i)=>i+1), datasets:[{label:'Kg', data:wData, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}}});
+                // Chart
+                if(coachChart) coachChart.destroy();
+                const ctx = document.getElementById('coachWeightChart');
+                const wData = u.weightHistory || [];
+                coachChart = new Chart(ctx, { type:'line', data:{ labels:wData.map((_,i)=>i+1), datasets:[{label:'Kg', data:wData, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}}});
 
-            // History List
-            const hList = document.getElementById('coach-history-list');
-            hList.innerHTML = 'Cargando...';
-            const q = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(5));
-            const wSnap = await getDocs(q);
-            hList.innerHTML = '';
-            if(wSnap.empty) hList.innerHTML='Sin datos.';
-            wSnap.forEach(w=>{
-                const d = w.data();
-                const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
-                hList.innerHTML += `<div style="border-bottom:1px solid #333; padding:5px;">${date} - ${d.routine} <span style="float:right; color:${d.rpe==='Fallo'?'#d32f2f':'#388e3c'}">${d.rpe||'?'}</span></div>`;
-            });
+                // History List
+                const hList = document.getElementById('coach-history-list');
+                hList.innerHTML = 'Cargando historial...';
+                const q = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(5));
+                const wSnap = await getDocs(q);
+                hList.innerHTML = '';
+                if(wSnap.empty) hList.innerHTML='Sin datos recientes.';
+                wSnap.forEach(w=>{
+                    const d = w.data();
+                    const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
+                    const rpeColor = d.rpe==='Fallo'?'#d32f2f':(d.rpe==='Duro'?'#f57f17':'#388e3c');
+                    hList.innerHTML += `<div style="border-bottom:1px solid #333; padding:5px; font-size:0.75rem;">${date} - ${d.routine} <span style="float:right; font-weight:bold; color:${rpeColor}">${d.rpe||'?'}</span></div>`;
+                });
 
-            if(!u.approved && confirm("¿Aprobar?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
+                if(!u.approved && confirm("¿Aprobar acceso a este atleta?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
+                
+                const sel=document.getElementById('coach-routine-select'); sel.innerHTML='';
+                const rS=await getDocs(collection(db,"routines")); 
+                rS.forEach(r=>{ const o=document.createElement('option'); o.value=r.id; o.innerText=r.data().name; sel.appendChild(o); });
             
-            const sel=document.getElementById('coach-routine-select'); sel.innerHTML='';
-            const rS=await getDocs(collection(db,"routines")); 
-            rS.forEach(r=>{ const o=document.createElement('option'); o.value=r.id; o.innerText=r.data().name; sel.appendChild(o); });
-            m.classList.add('active');
+            } catch(e) {
+                console.error(e);
+                document.getElementById('coach-history-list').innerHTML = "Error cargando datos.";
+            }
         }
 
         window.assignRoutine = async () => {
             const rid=document.getElementById('coach-routine-select').value; if(!rid||!selectedUserCoach)return;
             const rRef=doc(db,"routines",rid); const rSnap=await getDoc(rRef);
-            let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ arr.push(selectedUserCoach); await updateDoc(rRef,{assignedTo:arr}); alert("Asignada"); }
+            let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ arr.push(selectedUserCoach); await updateDoc(rRef,{assignedTo:arr}); alert("Rutina asignada correctamente."); }
             document.getElementById('modal-coach').classList.remove('active');
         };
 
-        // --- FUNCIÓN ELIMINAR USUARIO ---
         window.deleteUser = async () => {
             if(confirm("⚠ ¿ELIMINAR ATLETA DEFINITIVAMENTE?\nEsta acción no se puede deshacer.")) {
                 try {
                     await deleteDoc(doc(db, "users", selectedUserCoach));
-                    // Nota: Borrar los entrenos del usuario requeriría una Cloud Function para ser perfecto,
-                    // pero al borrar el user ya no sale en la lista.
-                    alert("Atleta eliminado correctamente.");
+                    alert("Atleta eliminado.");
                     document.getElementById('modal-coach').classList.remove('active');
                     loadAdminUsers();
                 } catch(e) {
