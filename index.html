@@ -407,13 +407,23 @@
 
     <script>
         // --- 1. FIREBASE CONFIG ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
-            authDomain: "fitdata-7a86b.firebaseapp.com",
-            projectId: "fitdata-7a86b",
-            storageBucket: "fitdata-7a86b.firebasestorage.app",
-            messagingSenderId: "949628013924",
-            appId: "1:949628013924:web:86278ae2c2bafb384d7e71"
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
+  authDomain: "fitdata-7a86b.firebaseapp.com",
+  projectId: "fitdata-7a86b",
+  storageBucket: "fitdata-7a86b.firebasestorage.app",
+  messagingSenderId: "949628013924",
+  appId: "1:949628013924:web:86278ae2c2bafb384d7e71"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -646,41 +656,55 @@
             const email = document.getElementById('log-email').value;
             const pass = document.getElementById('log-pass').value;
 
-            // 1. Feedback visual inmediato
-            btn.innerText = "Conectando...";
-            btn.style.opacity = "0.7";
-
+            // Validación básica
             if(!email || !pass) {
-                alert("❌ Error: Faltan datos.\nPor favor escribe email y contraseña.");
-                btn.innerText = "INICIAR SESIÓN";
-                btn.style.opacity = "1";
+                alert("⚠️ Por favor, escribe tu email y contraseña.");
                 return;
             }
 
-            try {
-                // 2. Intento de conexión
-                console.log("Intentando conectar a Firebase...");
-                await auth.signInWithEmailAndPassword(email, pass);
-                console.log("¡Conexión exitosa!");
-                // No hace falta redirigir aquí, el listener onAuthStateChanged lo hará
-            } catch(e) {
-                // 3. Captura de errores ESPECÍFICOS
-                console.error(e);
-                btn.innerText = "INICIAR SESIÓN";
-                btn.style.opacity = "1";
+            // Feedback visual
+            const originalText = btn.innerText;
+            btn.innerText = "Conectando...";
+            btn.style.opacity = "0.7";
+            btn.disabled = true;
 
-                if (e.code === 'auth/user-not-found') {
-                    alert("❌ Usuario no encontrado.\n¿Te has registrado primero?");
-                } else if (e.code === 'auth/wrong-password') {
-                    alert("❌ Contraseña incorrecta.");
+            // TEMPORIZADOR DE SEGURIDAD (5 segundos)
+            const timeout = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("TIMEOUT")), 5000)
+            );
+
+            try {
+                // Intentamos loguear compitiendo contra el reloj
+                console.log("Intentando conectar con: " + email);
+                
+                // Carrera: ¿Quién gana? ¿El login o el temporizador de 5s?
+                await Promise.race([
+                    auth.signInWithEmailAndPassword(email, pass),
+                    timeout
+                ]);
+                
+                console.log("¡Éxito!");
+                // No hacemos nada, el listener onAuthStateChanged redirigirá solo
+
+            } catch(e) {
+                // RESTAURAR BOTÓN
+                btn.innerText = originalText;
+                btn.style.opacity = "1";
+                btn.disabled = false;
+
+                // DIAGNÓSTICO DEL ERROR
+                console.error("Error Login:", e);
+
+                if (e.message === "TIMEOUT") {
+                    alert("❌ ERROR DE CONEXIÓN:\nEl servidor no responde.\n\nPOSIBLES CAUSAS:\n1. Las claves (API KEY) en el código son incorrectas.\n2. No has habilitado 'Email/Contraseña' en Firebase > Authentication.\n3. Tu firewall bloquea la conexión.");
+                } else if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+                    alert("❌ Credenciales incorrectas.\nRevisa el email y la contraseña.");
                 } else if (e.code === 'auth/invalid-email') {
-                    alert("❌ El email no tiene un formato válido.");
+                    alert("❌ El formato del email no es válido.");
                 } else if (e.code === 'auth/network-request-failed') {
-                    alert("❌ Error de red.\n1. Revisa tu conexión.\n2. Si estás en GitHub, asegúrate de haber añadido el dominio en Firebase Authentication > Dominios Autorizados.");
+                    alert("❌ Error de Red.\nComprueba tu internet.");
                 } else if (e.code === 'auth/operation-not-allowed') {
-                    alert("❌ Error de Configuración:\nNo has habilitado 'Email/Contraseña' en la consola de Firebase.");
-                } else if (e.code === 'auth/internal-error') {
-                    alert("❌ Error Interno:\nProbablemente las claves (API KEY) en el código están mal o vacías.");
+                    alert("❌ ERROR DE CONFIGURACIÓN:\nDebes ir a la Consola de Firebase -> Authentication -> Sign-in method y habilitar 'Correo electrónico/Contraseña'.");
                 } else {
                     alert("❌ Error desconocido:\n" + e.message);
                 }
