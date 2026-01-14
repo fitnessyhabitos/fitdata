@@ -43,7 +43,7 @@
 
         .hidden { display: none !important; }
         .btn {
-            background: var(--accent-color); color: white; border: none; padding: 12px;
+            background: var(--accent-color); color: white; border: none; padding: 14px;
             border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
             cursor: pointer; width: 100%; box-shadow: var(--accent-glow); display: flex; justify-content: center; align-items: center;
         }
@@ -54,22 +54,26 @@
         }
         .btn-small { padding: 6px 12px; font-size: 0.75rem; width: auto; }
         
+        /* ESTADO COMPLETADO */
         .btn-done {
-            background-color: rgba(255, 51, 51, 0.25) !important;
+            background-color: rgba(255, 51, 51, 0.3) !important;
             border: 1px solid var(--accent-color) !important;
-            color: var(--accent-color) !important;
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+            color: white !important;
+            box-shadow: 0 0 8px rgba(255, 51, 51, 0.4);
         }
 
+        /* LOADING REDONDEADO */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         #loading-logo { 
             width: 140px; 
-            border-radius: 25px;
-            box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+            border-radius: 25px; /* Redondea las esquinas negras si existen */
+            box-shadow: 0 0 40px rgba(255, 51, 51, 0.4); /* Glow externo */
             animation: breathe 3s infinite;
+            /* Truco para eliminar fondo negro si la imagen no es transparente */
+            clip-path: inset(0 round 25px); 
         }
         .loading-text {
             margin-top: 30px; color: var(--accent-color); font-family: monospace;
@@ -77,7 +81,7 @@
             text-shadow: 0 0 10px var(--accent-color);
             animation: blink 0.8s infinite;
         }
-        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 40px rgba(255,51,51,0.6); } 50% { transform: scale(1.05); opacity: 0.8; box-shadow: 0 0 20px rgba(255,51,51,0.2); } }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         header {
@@ -304,7 +308,7 @@
                 <div style="display:flex; justify-content:space-between;">
                     <span>Pantalla Activa</span><label class="switch"><input type="checkbox" id="cfg-wake" checked><span class="slider"></span></label>
                 </div>
-                <p style="font-size:0.7rem; color:#666; margin-top:10px;">*En iPhone, desactiva el botón lateral de silencio.</p>
+                <p style="font-size:0.7rem; color:#666; margin-top:10px;">*Importante: Desactiva el botón de silencio lateral del iPhone.</p>
                 <button class="btn-outline" style="margin-top:15px;" onclick="saveConfig()">GUARDAR AJUSTES</button>
             </div>
 
@@ -391,7 +395,7 @@
         const ADMIN = "toni@fitdatapro.es";
         const CODE = "fityhab";
 
-        // AUDIO SYSTEM (MULTI-BEEP)
+        // AUDIO SYSTEM (5 BEEPS)
         let audioCtx = null;
 
         function unlockAudio() {
@@ -402,44 +406,44 @@
             if(audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-            // Play silent buffer to unlock iOS
-            const buffer = audioCtx.createBuffer(1, 1, 22050);
-            const source = audioCtx.createBufferSource();
-            source.buffer = buffer;
-            source.connect(audioCtx.destination);
-            source.start(0);
+            // Trigger 1 micro silent sound
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.001);
         }
         document.addEventListener('touchstart', unlockAudio, {once:true});
         document.addEventListener('click', unlockAudio, {once:true});
 
-        function playAlarmSequence() {
+        function play5Beeps() {
             if(!audioCtx) unlockAudio();
             if(audioCtx) {
                 const now = audioCtx.currentTime;
-                // 5 Beeps Sequence
+                // Sequence of 5 beeps
                 for(let i=0; i<5; i++) {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
-                    osc.type = 'square';
+                    osc.type = 'square'; // Aggressive tone
                     osc.frequency.value = 880; 
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     
-                    const startTime = now + (i * 0.4); // 0.4s interval
-                    const stopTime = startTime + 0.2;  // 0.2s beep duration
+                    const start = now + (i * 0.6); // Spaced out
+                    const end = start + 0.15;
                     
-                    osc.start(startTime);
-                    osc.stop(stopTime);
+                    osc.start(start);
+                    osc.stop(end);
                     
-                    gain.gain.setValueAtTime(0.5, startTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, stopTime);
+                    gain.gain.setValueAtTime(0.5, start);
+                    gain.gain.exponentialRampToValueAtTime(0.01, end);
                 }
             }
         }
 
         window.testSound = () => {
-            playAlarmSequence();
-            alert("Si no oyes 5 pitidos, verifica que el interruptor lateral de silencio de tu iPhone esté desactivado.");
+            play5Beeps();
         };
 
         // BASE DE DATOS
@@ -726,7 +730,7 @@
                 if(restTimeRemaining <= 0) {
                     clearInterval(timerInt); m.classList.remove('active');
                     if(document.getElementById('cfg-sound').checked) {
-                        playAlarmSequence();
+                        play5Beeps();
                     }
                 }
             }, 1000);
