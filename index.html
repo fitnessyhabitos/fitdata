@@ -641,7 +641,51 @@
         function toRegister() { showScreen('register'); }
         function toLogin() { showScreen('login'); }
         
-        async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('log-email').value, document.getElementById('log-pass').value); } catch(e) { showToast(e.message); } }
+        async function doLogin() {
+            const btn = document.querySelector('#login .btn-primary');
+            const email = document.getElementById('log-email').value;
+            const pass = document.getElementById('log-pass').value;
+
+            // 1. Feedback visual inmediato
+            btn.innerText = "Conectando...";
+            btn.style.opacity = "0.7";
+
+            if(!email || !pass) {
+                alert("❌ Error: Faltan datos.\nPor favor escribe email y contraseña.");
+                btn.innerText = "INICIAR SESIÓN";
+                btn.style.opacity = "1";
+                return;
+            }
+
+            try {
+                // 2. Intento de conexión
+                console.log("Intentando conectar a Firebase...");
+                await auth.signInWithEmailAndPassword(email, pass);
+                console.log("¡Conexión exitosa!");
+                // No hace falta redirigir aquí, el listener onAuthStateChanged lo hará
+            } catch(e) {
+                // 3. Captura de errores ESPECÍFICOS
+                console.error(e);
+                btn.innerText = "INICIAR SESIÓN";
+                btn.style.opacity = "1";
+
+                if (e.code === 'auth/user-not-found') {
+                    alert("❌ Usuario no encontrado.\n¿Te has registrado primero?");
+                } else if (e.code === 'auth/wrong-password') {
+                    alert("❌ Contraseña incorrecta.");
+                } else if (e.code === 'auth/invalid-email') {
+                    alert("❌ El email no tiene un formato válido.");
+                } else if (e.code === 'auth/network-request-failed') {
+                    alert("❌ Error de red.\n1. Revisa tu conexión.\n2. Si estás en GitHub, asegúrate de haber añadido el dominio en Firebase Authentication > Dominios Autorizados.");
+                } else if (e.code === 'auth/operation-not-allowed') {
+                    alert("❌ Error de Configuración:\nNo has habilitado 'Email/Contraseña' en la consola de Firebase.");
+                } else if (e.code === 'auth/internal-error') {
+                    alert("❌ Error Interno:\nProbablemente las claves (API KEY) en el código están mal o vacías.");
+                } else {
+                    alert("❌ Error desconocido:\n" + e.message);
+                }
+            }
+        }
         
         async function doRegister() {
             if(document.getElementById('reg-code').value !== SECRET_CODE) return showToast("Código incorrecto");
