@@ -12,7 +12,9 @@
     <title>Fit Data | High Performance</title>
     
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="logo.png"> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -26,11 +28,10 @@
             --success-color: #00ff88;
             --warning-color: #ffaa00;
             --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            /* Variables de área segura para el Notch/Isla Dinámica del iPhone */
             --safe-top: env(safe-area-inset-top, 20px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
             --header-height: 60px;
-            --nav-height: 70px; /* Un poco más alto para facilitar el toque */
+            --nav-height: 80px; /* Más altura para evitar toques fantasma en iOS */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -39,10 +40,9 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: var(--font-main);
-            /* USAR dvh (Dynamic Viewport Height) es la clave para que Safari no rompa el layout */
-            height: 100dvh; 
+            height: 100dvh; /* Dynamic Viewport Height para Safari */
             width: 100vw;
-            overflow: hidden; /* El body no hace scroll, lo hace el main */
+            overflow: hidden; 
             display: flex;
             flex-direction: column;
         }
@@ -62,27 +62,27 @@
             margin-top: 10px; font-size: 0.85rem;
         }
 
-        /* --- PANTALLA DE CARGA --- */
+        /* --- LOADING SCREEN --- */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         #loading-logo { 
-            width: 140px; 
+            width: 120px; 
             filter: drop-shadow(0 0 20px var(--accent-color));
             animation: breathe 3s infinite ease-in-out;
         }
         .loading-text {
-            margin-top: 30px; color: var(--accent-color); font-family: monospace;
-            font-size: 1.2rem; letter-spacing: 3px; font-weight: bold;
+            margin-top: 20px; color: var(--accent-color); font-family: monospace;
+            font-size: 1rem; letter-spacing: 3px; font-weight: bold;
             text-shadow: 0 0 10px var(--accent-color);
             animation: blink 0.8s infinite;
         }
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* --- HEADER & COACH BTN --- */
+        /* --- HEADER --- */
         header {
             flex-shrink: 0; 
             height: calc(var(--header-height) + var(--safe-top));
@@ -99,7 +99,7 @@
         .btn-neon-text {
             background: transparent; border: 1px solid var(--accent-color);
             color: var(--accent-color); font-weight: 800; text-shadow: 0 0 5px var(--accent-color);
-            padding: 5px 12px; border-radius: 4px; font-size: 0.8rem; letter-spacing: 1px;
+            padding: 5px 12px; border-radius: 4px; font-size: 0.7rem; letter-spacing: 1px;
             box-shadow: inset 0 0 10px rgba(255, 51, 51, 0.1);
         }
 
@@ -109,19 +109,17 @@
             overflow-y: auto; 
             position: relative; 
             scroll-behavior: smooth; 
-            /* Smooth scroll nativo en iOS */
             -webkit-overflow-scrolling: touch; 
         }
         .view-container {
             min-height: 100%; 
-            /* Padding inferior masivo para asegurar que NADA se tape con el menú */
-            padding: 20px 15px 150px 15px; 
+            padding: 20px 15px 180px 15px; /* PADDING EXTRA GRANDE PARA IPHONE */
             display: none; opacity: 0; animation: fadeIn 0.3s forwards;
         }
         .view-container.active { display: block; opacity: 1; }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* --- CARDS & UI --- */
+        /* --- UI ELEMENTS --- */
         .card { background: var(--card-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid #222; position: relative; }
         input, select { background: var(--input-bg); border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 16px; }
         input:focus { outline: 1px solid var(--accent-color); }
@@ -135,44 +133,29 @@
         }
         .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* HEATMAP */
         .muscle-bar-group { margin-bottom: 8px; }
         .muscle-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #ccc; margin-bottom: 2px; }
         .progress-track { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #ff3333, #ff6666); width: 0%; transition: width 1s ease; }
 
-        /* PHOTO COMPARE */
-        .compare-wrapper { position: relative; width: 100%; height: 250px; background: #000; border-radius: 8px; overflow: hidden; margin-top:10px; }
-        .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
-        .img-overlay { clip-path: inset(0 50% 0 0); transition: clip-path 0s; }
-        .slider-handle {
-            position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: white; cursor: ew-resize; z-index: 10;
-        }
-        .slider-btn {
-            position: absolute; top: 50%; left: -14px; width: 28px; height: 28px;
-            background: white; border-radius: 50%; display: grid; place-items: center; color: black; font-size:12px;
-            box-shadow: 0 0 5px black;
-        }
-
-        /* --- EXERCISES LIST --- */
+        /* --- IMAGENES DE EJERCICIOS CON FALLBACK --- */
         .ex-select-item {
             display: flex; align-items: center; gap: 10px;
             padding: 8px; background: #1a1a1a; margin-bottom: 5px; border-radius: 6px;
             cursor: pointer; border: 1px solid transparent;
         }
-        .ex-select-item img { width: 40px; height: 40px; object-fit: contain; background: black; border-radius: 4px; }
+        .ex-select-item img { width: 40px; height: 40px; object-fit: contain; background: black; border-radius: 4px; border: 1px solid #333; }
         .ex-select-item.selected { border-color: var(--accent-color); background: rgba(255,51,51,0.1); }
 
-        /* --- BOTTOM NAV CORRECTA PARA IPHONE --- */
+        /* --- NAV BOTTOM (AJUSTADO IOS) --- */
         nav.bottom-nav {
             flex-shrink: 0; 
-            /* Altura que respeta la zona segura inferior del iPhone */
             height: calc(var(--nav-height) + var(--safe-bottom));
             padding-bottom: var(--safe-bottom); 
             background: #0f0f0f; 
             border-top: 1px solid #222;
             display: flex; justify-content: space-around; 
-            z-index: 999; /* Por encima de todo */
+            z-index: 999;
         }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 0.65rem; }
         .nav-item.active { color: var(--accent-color); }
@@ -211,25 +194,32 @@
         input:checked + .slider { background-color: var(--accent-color); }
         input:checked + .slider:before { transform: translateX(18px); }
 
+        /* Slider Fotos */
+        .compare-wrapper { position: relative; width: 100%; height: 250px; background: #000; border-radius: 8px; overflow: hidden; margin-top:10px; }
+        .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+        .img-overlay { clip-path: inset(0 50% 0 0); transition: clip-path 0s; }
+        .slider-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: white; cursor: ew-resize; z-index: 10; }
+        .slider-btn { position: absolute; top: 50%; left: -14px; width: 28px; height: 28px; background: white; border-radius: 50%; display: grid; place-items: center; color: black; font-size:12px; box-shadow: 0 0 5px black; }
+
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
-        <img src="logo.png" id="loading-logo" alt="Logo">
+        <img src="logo.png" id="loading-logo" alt="Logo" onerror="this.style.display='none'">
         <div class="loading-text">SYSTEM INITIALIZED</div>
     </div>
 
     <header id="main-header" class="hidden">
         <div class="brand">FIT DATA <span>PRO</span></div>
-        <button id="coach-btn" class="hidden btn-neon-text">COACH AREA</button>
+        <button id="coach-btn" class="hidden btn-neon-text">COACH</button>
     </header>
 
     <main id="main-container">
 
         <section id="auth-view" class="view-container">
             <div style="text-align:center; margin-top:40px; margin-bottom:40px;">
-                <img src="logo.png" style="width:100px; margin-bottom:20px;">
+                <img src="logo.png" style="width:100px; margin-bottom:20px;" onerror="this.src='https://placehold.co/100x100?text=LOGO'">
                 <h1>ACCESO SEGURO</h1>
             </div>
             <div id="login-form">
@@ -261,7 +251,6 @@
         <section id="editor-view" class="view-container">
             <h2>EDITOR DE RUTINA</h2>
             <input type="text" id="editor-name" placeholder="Nombre de la Rutina">
-            
             <div class="card" style="max-height: 500px; display:flex; flex-direction:column;">
                 <div style="position:sticky; top:0; background:var(--card-color); padding-bottom:10px; z-index:10;">
                     <h3>Selección de Ejercicios</h3>
@@ -269,7 +258,6 @@
                 </div>
                 <div id="exercise-selector-list" style="overflow-y:auto; flex:1;"></div>
             </div>
-
             <div style="display:flex; gap:10px;">
                 <button class="btn" onclick="saveRoutine()">GUARDAR</button>
                 <button class="btn-outline" style="margin:0" onclick="switchTab('routines-view')">CANCELAR</button>
@@ -277,7 +265,6 @@
         </section>
 
         <section id="profile-view" class="view-container">
-            
             <div class="profile-header">
                 <div class="avatar-circle" onclick="document.getElementById('file-avatar').click()">
                     <img id="avatar-img" src="" style="display:none;">
@@ -286,52 +273,42 @@
                 <input type="file" id="file-avatar" accept="image/*" class="hidden" onchange="uploadAvatar(this)">
                 <div>
                     <h3 id="profile-name" style="margin:0;">Cargando...</h3>
-                    <span style="color:#666; font-size:0.8rem;">Atleta de Alto Rendimiento</span>
+                    <span style="color:#666; font-size:0.8rem;">Atleta</span>
                 </div>
             </div>
-
             <div class="card">
-                <h3>MAPA MUSCULAR (VOLUMEN)</h3>
+                <h3>MAPA MUSCULAR</h3>
                 <div id="heatmap-container"></div>
             </div>
-
             <div class="card">
-                <h3>COMPARATIVA VISUAL</h3>
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <button class="btn-outline" style="width:48%; margin:0; padding:5px; font-size:0.7rem;" onclick="document.getElementById('f-before').click()">1. CARGAR ANTES</button>
-                    <button class="btn-outline" style="width:48%; margin:0; padding:5px; font-size:0.7rem;" onclick="document.getElementById('f-after').click()">2. CARGAR ACTUAL</button>
+                <h3>COMPARATIVA FOTOS</h3>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button class="btn-outline" onclick="document.getElementById('f-before').click()">1. ANTES</button>
+                    <button class="btn-outline" onclick="document.getElementById('f-after').click()">2. AHORA</button>
                 </div>
                 <input type="file" id="f-before" class="hidden" accept="image/*" onchange="loadCompImg(this,'img-before')">
                 <input type="file" id="f-after" class="hidden" accept="image/*" onchange="loadCompImg(this,'img-overlay')">
-                
                 <div class="compare-wrapper" id="compare-box">
-                    <img src="" id="img-before" class="compare-img" alt="Sube foto A">
-                    <img src="" id="img-overlay" class="compare-img img-overlay" alt="Sube foto B">
-                    <div class="slider-handle" id="slider-handle">
-                        <div class="slider-btn">↔</div>
-                    </div>
+                    <img src="" id="img-before" class="compare-img" alt="A">
+                    <img src="" id="img-overlay" class="compare-img img-overlay" alt="B">
+                    <div class="slider-handle" id="slider-handle"><div class="slider-btn">↔</div></div>
                 </div>
                 <input type="range" min="0" max="100" value="50" style="width:100%; margin-top:15px;" oninput="moveSlider(this.value)">
             </div>
-
             <div class="card">
                 <h3>EVOLUCIÓN PESO</h3>
                 <div style="height:200px;"><canvas id="weightChart"></canvas></div>
                 <button class="btn-outline" onclick="addWeightEntry()">+ REGISTRAR PESO</button>
             </div>
-
             <div class="card">
-                <h3>CONFIGURACIÓN</h3>
+                <h3>AJUSTES</h3>
                 <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span>Sonido Timer</span>
-                    <label class="switch"><input type="checkbox" id="cfg-sound" checked><span class="slider"></span></label>
+                    <span>Sonido</span><label class="switch"><input type="checkbox" id="cfg-sound" checked><span class="slider"></span></label>
                 </div>
                 <div style="display:flex; justify-content:space-between;">
-                    <span>Pantalla Activa (WakeLock)</span>
-                    <label class="switch"><input type="checkbox" id="cfg-wake" checked><span class="slider"></span></label>
+                    <span>Pantalla Activa</span><label class="switch"><input type="checkbox" id="cfg-wake" checked><span class="slider"></span></label>
                 </div>
             </div>
-
             <button class="btn-outline" style="border-color:#500; color:#f55; margin-bottom:20px;" onclick="logout()">CERRAR SESIÓN</button>
         </section>
 
@@ -391,7 +368,6 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, where, addDoc, deleteDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        // CONFIG FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
@@ -407,9 +383,9 @@
         const ADMIN = "toni@fitdatapro.es";
         const CODE = "fityhab";
 
-        // --- BASE DE DATOS 82 EJERCICIOS COMPLETA ---
+        // BASE DE DATOS (Las imágenes que faltan usarán logo.png si fallan)
         const EXERCISES = [
-            // PIERNAS (19)
+            // PIERNAS
             {n:"Sentadilla con Barra", img:"cuadriceps.png"}, {n:"Sentadilla Jaca", img:"cuadriceps.png"}, {n:"Sentadilla Cinturón", img:"cuadriceps.png"},
             {n:"Prensa de Piernas", img:"cuadriceps.png"}, {n:"Extensión Cuádriceps", img:"cuadriceps.png"}, {n:"Zancadas Mancuernas", img:"cuadriceps.png"},
             {n:"Curl Femoral Tumbado", img:"isquiotibiales.png"}, {n:"Curl Femoral Sentado", img:"isquiotibiales.png"}, {n:"Prensa Horizontal", img:"cuadriceps.png"},
@@ -417,35 +393,30 @@
             {n:"Gemelo Máquina", img:"gemelos.png"}, {n:"Hip Thrust", img:"gluteos.png"}, {n:"Sentadilla Búlgara", img:"gluteos.png"},
             {n:"Patada Glúteo Polea", img:"gluteos.png"}, {n:"Abducción Máquina", img:"gluteos.png"}, {n:"Prensa Glúteos", img:"gluteos.png"},
             {n:"Peso Muerto Rumano", img:"isquiotibiales.png"},
-
-            // ESPALDA (18)
+            // ESPALDA
             {n:"Peso Muerto", img:"espalda.png"}, {n:"Peso Muerto Sumo", img:"espalda.png"}, {n:"Remo con Barra", img:"espalda.png"},
             {n:"Remo Mancuernas", img:"espalda.png"}, {n:"Jalón al Pecho", img:"espalda.png"}, {n:"Jalón Cerrado", img:"espalda.png"},
             {n:"Remo en Máquina", img:"espalda.png"}, {n:"Remo Polea Baja", img:"espalda.png"}, {n:"Dominadas", img:"espalda.png"},
             {n:"Dominadas Asistidas", img:"espalda.png"}, {n:"Remo Invertido", img:"espalda.png"}, {n:"Remo T", img:"espalda.png"},
             {n:"Hiperextensiones", img:"espalda.png"}, {n:"Buenos Días", img:"isquiotibiales.png"}, {n:"Remo Hammer", img:"espalda.png"},
             {n:"Jalón Neutro", img:"espalda.png"}, {n:"Jalón Abierto", img:"espalda.png"}, {n:"Remo al Cuello", img:"espalda.png"},
-
-            // PECHO (12)
+            // PECHO
             {n:"Press Banca", img:"pecho.png"}, {n:"Press Inclinado Mancuernas", img:"pecho.png"}, {n:"Aperturas Mancuernas", img:"pecho.png"},
             {n:"Cruce de Poleas", img:"pecho.png"}, {n:"Press Máquina", img:"pecho.png"}, {n:"Press Declinado", img:"pecho.png"},
             {n:"Fondos", img:"triceps.png"}, {n:"Contractora Pecho", img:"pecho.png"}, {n:"Press Inclinado Barra", img:"pecho.png"},
             {n:"Press Plano Mancuernas", img:"pecho.png"}, {n:"Press Iso Lateral", img:"pecho.png"}, {n:"Press Vertical", img:"pecho.png"},
-
-            // HOMBROS (12)
+            // HOMBROS
             {n:"Encogimientos Barra", img:"hombros.png"}, {n:"Encogimientos Mancuerna", img:"hombros.png"}, {n:"Press Militar", img:"hombros.png"},
             {n:"Press Hombro Mancuerna", img:"hombros.png"}, {n:"Press Hombro Máquina", img:"hombros.png"}, {n:"Elevaciones Laterales", img:"hombros.png"},
             {n:"Elevaciones Frontales", img:"hombros.png"}, {n:"Pájaros", img:"hombros.png"}, {n:"Laterales Polea", img:"hombros.png"},
             {n:"Press Arnold", img:"hombros.png"}, {n:"Press Trasnuca", img:"hombros.png"}, {n:"Face Pull", img:"hombros.png"},
-
-            // BRAZOS (13)
+            // BRAZOS
             {n:"Curl Barra", img:"biceps.png"}, {n:"Curl Mancuernas", img:"biceps.png"}, {n:"Curl Polea", img:"biceps.png"},
             {n:"Curl Martillo", img:"biceps.png"}, {n:"Curl Concentrado", img:"biceps.png"}, {n:"Curl Predicador", img:"biceps.png"},
             {n:"Extensión Polea", img:"triceps.png"}, {n:"Press Francés", img:"triceps.png"}, {n:"Rompecráneos", img:"triceps.png"},
             {n:"Fondos Tríceps", img:"triceps.png"}, {n:"Extensión Unilateral", img:"triceps.png"}, {n:"Patada Tríceps", img:"triceps.png"},
             {n:"Copa Tríceps", img:"triceps.png"},
-
-            // ABS (6)
+            // ABS
             {n:"Rueda Abdominal", img:"abs.png"}, {n:"Crunch Polea", img:"abs.png"}, {n:"Elevación Piernas", img:"abs.png"},
             {n:"Abdominales Banco", img:"abs.png"}, {n:"Crunch Máquina", img:"abs.png"}, {n:"Rodillas al Pecho", img:"abs.png"}
         ];
@@ -535,7 +506,7 @@
             });
         }
 
-        // EDITOR
+        // EDITOR (CON FALLBACK DE IMAGEN)
         window.openRoutineEditor = () => {
             document.getElementById('editor-name').value = '';
             document.getElementById('ex-search').value = '';
@@ -555,7 +526,8 @@
             list.forEach(ex => {
                 const div = document.createElement('div');
                 div.className = 'ex-select-item';
-                div.innerHTML = `<img src="${ex.img}" alt="img"><span>${ex.n}</span>`;
+                // El atributo onerror es la clave: si falla, usa el logo
+                div.innerHTML = `<img src="${ex.img}" alt="img" onerror="this.src='logo.png'"><span>${ex.n}</span>`;
                 div.onclick = () => {
                     div.classList.toggle('selected');
                 };
@@ -582,7 +554,6 @@
                 document.getElementById('avatar-img').src = userData.photo;
                 document.getElementById('avatar-img').style.display='block';
             }
-            
             // Heatmap Random
             const muscles = ["Pecho","Espalda","Cuádriceps","Isquios","Glúteos","Hombros","Bíceps","Tríceps"];
             const hC = document.getElementById('heatmap-container');
@@ -597,7 +568,6 @@
                 `;
                 hC.appendChild(d);
             });
-
             // Chart
             const ctx = document.getElementById('weightChart');
             if(chartInstance) chartInstance.destroy();
@@ -657,7 +627,7 @@
             const snap = await getDoc(doc(db,"routines",rid));
             const r = snap.data();
             activeWorkout = { name: r.name, exs: r.exercises.map(n => {
-                const img = EXERCISES.find(e=>e.n===n)?.img || 'pecho.png';
+                const img = EXERCISES.find(e=>e.n===n)?.img || 'logo.png';
                 return { n:n, img:img, sets:Array(5).fill().map((_,i)=>({r:i===0?20:16, w:'', d:false})) };
             })};
             
@@ -671,7 +641,8 @@
                 e.sets.forEach((s,j) => {
                     sH += `<div class="set-row"><span>${j+1}</span><input type="number" placeholder="kg" onchange="uS(${i},${j},'w',this.value)"><input type="number" value="${s.r}" onchange="uS(${i},${j},'r',this.value)"><button class="${s.d?'btn':'btn-outline'}" style="margin:0;padding:0;height:35px;background:${s.d?'#0f8':'transparent'};color:${s.d?'#000':'#ccc'}" onclick="tS(${i},${j})">${s.d?'✓':''}</button></div>`;
                 });
-                card.innerHTML = `<div class="exercise-visual"><img src="${e.img}" alt="ex"></div><h3>${e.n}</h3>${sH}`;
+                // Fallback en la imagen del entreno
+                card.innerHTML = `<div class="exercise-visual"><img src="${e.img}" alt="ex" onerror="this.src='logo.png'"></div><h3>${e.n}</h3>${sH}`;
                 c.appendChild(card);
             });
             switchTab('workout-view');
