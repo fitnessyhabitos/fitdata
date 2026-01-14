@@ -18,56 +18,75 @@
     
     <style>
         :root {
-            /* PALETA CYBERPUNK PREMIUM */
             --bg: #0a0a0a; 
-            --card: #141414; 
-            --card-light: #1f1f1f;
+            --card: #1a1a1a; 
+            --card-light: #222;
             --text: #ffffff; 
-            --muted: #888; 
-            --accent: #ff4444; 
-            --accent-glow: rgba(255, 68, 68, 0.2);
+            --muted: #888888;
+            --accent: #ff4444;       
+            --accent-glow: rgba(255, 68, 68, 0.25);
             --success: #22dd88; 
             --warning: #ffaa00;
-            --safe-top: env(safe-area-inset-top); 
+            --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
         
         * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color:transparent; outline:none; }
-        body { background:var(--bg); color:var(--text); min-height:100vh; padding-bottom:calc(100px + var(--safe-bottom)); user-select:none; }
+        
+        body { 
+            background:var(--bg); color:var(--text); 
+            min-height:100vh; 
+            padding-bottom: calc(100px + var(--safe-bottom)); 
+            overscroll-behavior-y:none; 
+            user-select: none; 
+        }
         
         .hidden { display:none !important; }
         .container { max-width:600px; margin:0 auto; padding:20px; padding-top:15px; }
         .text-accent { color:var(--accent); }
         .text-muted { color:var(--muted); font-size:0.8rem; }
         .text-center { text-align: center; }
-        h1, h2, h3 { font-weight:800; letter-spacing:-0.5px; margin-bottom:8px; }
-        
+        h1, h2, h3 { font-weight:800; letter-spacing:-0.5px; margin-bottom:10px; }
+
         /* HEADER FIJO */
-        .navbar-top { position:sticky; top:0; z-index:100; background:rgba(20,20,20,0.95); backdrop-filter:blur(15px); border-bottom:1px solid #333; padding:15px 20px; padding-top:calc(15px + var(--safe-top)); display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 20px rgba(0,0,0,0.5); }
+        .navbar-top {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(20, 20, 20, 0.98);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid #333;
+            padding: 15px 20px;
+            padding-top: calc(20px + var(--safe-top)); 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
 
-        /* BOTONES */
+        /* INPUTS & BOTONES */
         .btn { width:100%; padding:14px; border:none; border-radius:12px; font-weight:700; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; transition:0.2s; }
-        .btn:active { transform:scale(0.97); }
+        .btn:active { transform:scale(0.98); }
         .btn-primary { background:var(--accent); color:white; box-shadow:0 0 15px var(--accent-glow); }
-        .btn-secondary { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); color:white; }
-        .btn-success { background:var(--success); color:black; font-weight: 800; }
-        .btn-icon { width:auto; padding:8px 12px; font-size:1.2rem; background:rgba(255,255,255,0.1); border-radius:8px; border:none; color: white; cursor: pointer;}
-        
-        .input { width:100%; padding:14px; margin-bottom:12px; background:#222; border:1px solid #333; color:white; border-radius:10px; font-size:1rem; }
-        .input:focus { border-color:var(--accent); background:#2a2a2a; }
-        
-        .card { background:var(--card); padding:20px; border-radius:16px; margin-bottom:15px; border:1px solid #2a2a2a; border-left:4px solid var(--accent); position:relative; overflow:hidden; }
-        
-        /* SVG GENERATED IMAGE */
-        .ex-img { width:65px; height:65px; background:white; border:2px solid var(--accent); border-radius:12px; padding:2px; object-fit:contain; flex-shrink:0; }
+        .btn-secondary { background:rgba(255,255,255,0.1); border:1px solid #444; color:white; }
+        .btn-success { background:var(--success); color:black; font-weight:800; }
+        .btn-icon { background:transparent; border:none; color:#bbb; font-size:1.2rem; cursor:pointer; padding: 5px; border-radius: 5px; border: 1px solid #333; min-width: 40px;}
+        .btn-icon:hover { color:white; border-color: #666; background: #333; }
 
-        /* WORKOUT UI */
-        .set-row { display:grid; grid-template-columns:30px 1fr 1fr 40px 40px; gap:8px; align-items:center; background:#222; padding:10px; border-radius:8px; margin-bottom:8px; position:relative; border:1px solid #333; }
-        .set-row.done { border-color:var(--success); background:rgba(34,221,136,0.05); }
+        .input { width:100%; padding:14px; margin-bottom:12px; background:#222; border:1px solid #444; color:white; border-radius:10px; font-size:1rem; }
+        .input:focus { border-color:var(--accent); background:#2a2a2a; }
+
+        /* CARDS */
+        .card { background:var(--card); padding:20px; border-radius:16px; margin-bottom:15px; border:1px solid #2a2a2a; border-left:4px solid var(--accent); position:relative; }
         
-        .prev-val { position:absolute; top:-9px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#666; background:#222; padding:0 6px; border-radius:4px; border:1px solid #333; z-index: 5; pointer-events: none; }
-        
-        .check-btn { width:32px; height:32px; border-radius:10px; border:2px solid #444; background:none; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; transition:0.2s; }
+        /* EXERCISE IMAGE (SVG GENERATED) */
+        .ex-img { width: 65px; height: 65px; background: white; border: 2px solid var(--accent); border-radius: 12px; padding: 2px; object-fit: contain; flex-shrink: 0; }
+
+        /* WORKOUT ROWS */
+        .set-row { 
+            display:grid; grid-template-columns:30px 1fr 1fr 40px 40px; gap:8px; align-items:center; 
+            background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #333; 
+        }
+        .set-row.done { border-color:var(--success); background:rgba(34, 221, 136, 0.05); }
+        .prev-val { position:absolute; top:-8px; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#888; background:#222; padding:0 6px; border-radius:4px; border:1px solid #444; z-index:5; pointer-events:none; }
+
+        .check-btn { width:32px; height:32px; border-radius:50%; border:2px solid #555; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:transparent; font-weight:bold; transition:0.2s; }
         .check-btn.checked { background:var(--success); border-color:var(--success); color:black; transform:scale(1.1); }
         .check-btn.checked::after { content:'✓'; }
 
@@ -76,26 +95,42 @@
             position:fixed; bottom:0; left:0; width:100%; 
             background:rgba(20,20,20,0.98); border-top:1px solid #333; 
             display:flex; justify-content:space-around; padding:12px 0; 
-            padding-bottom: calc(12px + var(--safe-bottom)); 
+            padding-bottom: calc(15px + var(--safe-bottom)); 
             z-index:100; backdrop-filter: blur(10px);
         }
-        .nav-item { color:#555; background:none; border:none; font-size:0.65rem; display:flex; flex-direction:column; align-items:center; width:20%; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; transition:0.3s; }
-        .nav-item.active { color:var(--accent); transform:translateY(-2px); text-shadow: 0 0 10px var(--accent-glow); }
-        .nav-item i { font-size:1.4rem; margin-bottom:4px; font-style: normal; }
-
-        /* STATS & HEATMAP */
-        .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
-        .stat-box { background:var(--card-light); padding:15px; border-radius:12px; text-align:center; border:1px solid #333; }
-        .stat-val { font-size:1.4rem; font-weight:800; color:white; display:block; }
-        .stat-lbl { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
-        .heatmap-container { width: 100%; height: 300px; display: flex; justify-content: center; margin-bottom: 20px; }
+        .nav-item { color:#666; background:none; border:none; font-size:0.65rem; display:flex; flex-direction:column; align-items:center; width:20%; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; transition:0.3s; }
+        .nav-item.active { color:var(--accent); transform:translateY(-3px); text-shadow:0 0 10px var(--accent-glow); }
+        .nav-item i { font-size:1.4rem; margin-bottom:4px; font-style:normal; }
 
         /* MODALS */
         .screen { display:none; opacity:0; transition:opacity 0.3s; }
         .screen.active { display:block; opacity:1; }
-        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(5px); }
-        .modal-content { background:var(--card); width:95%; max-width:500px; padding:25px; border-radius:20px; border:1px solid #444; max-height:85vh; overflow-y:auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px); }
+        .modal-content { background:var(--card); width:95%; max-width:500px; padding:25px; border-radius:20px; border:1px solid #444; max-height:85vh; overflow-y:auto; box-shadow:0 10px 40px rgba(0,0,0,0.8); }
 
+        /* TIMER FLOAT */
+        .timer-float { position:fixed; bottom:calc(100px + var(--safe-bottom)); right:20px; width:70px; height:70px; background:var(--bg); border:3px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-family:monospace; color:var(--accent); box-shadow:0 0 20px var(--accent-glow); z-index:2000; cursor:pointer; animation:pulse 1s infinite; }
+        @keyframes pulse { 0% {box-shadow:0 0 0 0 rgba(255,68,68,0.4);} 70% {box-shadow:0 0 0 10px rgba(255,68,68,0);} 100% {box-shadow:0 0 0 0 rgba(255,68,68,0);} }
+
+        /* TOAST */
+        #toast { visibility:hidden; min-width:250px; background-color:#222; color:#fff; text-align:center; border-radius:50px; padding:12px 24px; position:fixed; z-index:6000; left:50%; bottom:calc(100px + var(--safe-bottom)); transform:translateX(-50%); border:1px solid var(--accent); box-shadow:0 5px 20px rgba(0,0,0,0.6); font-size:0.9rem; font-weight:bold; }
+        #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from{bottom:60px; opacity:0;} to{bottom:calc(100px + var(--safe-bottom)); opacity:1;} }
+        @keyframes fadeout { from{bottom:calc(100px + var(--safe-bottom)); opacity:1;} to{bottom:60px; opacity:0;} }
+
+        /* ADMIN LIST */
+        .user-row { display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-light); border-radius:10px; margin-bottom:10px; border-left:3px solid #444; }
+        .stagnant { border-left-color: var(--warning) !important; background: rgba(255, 170, 0, 0.05); }
+        .stat-badge { background: #333; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: var(--muted); margin-top: 4px; display: inline-block; }
+        
+        /* LOGO */
+        .loading-logo { width:140px; height:140px; margin-bottom:20px; border-radius:30px; animation:heartbeat 2.5s infinite ease-in-out; box-shadow:0 0 50px rgba(255,68,68,0.3); }
+        @keyframes heartbeat { 0% {transform:scale(1);} 50% {transform:scale(1.08);} 100% {transform:scale(1);} }
+
+        /* HEATMAP CONTAINERS */
+        .heatmap-wrapper { display: flex; justify-content: center; gap: 20px; height: 350px; }
+        .body-svg { height: 100%; width: auto; filter: drop-shadow(0 0 5px rgba(255,68,68,0.2)); }
+        
         /* TOGGLES */
         .toggle-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #222; }
         .switch { position:relative; display:inline-block; width:40px; height:24px; }
@@ -104,37 +139,21 @@
         .slider:before { position:absolute; content:""; height:16px; width:16px; left:4px; bottom:4px; background-color:white; transition:.4s; border-radius:50%; }
         input:checked + .slider { background-color:var(--accent); }
         input:checked + .slider:before { transform:translateX(16px); }
-
-        /* TIMER & TOAST */
-        .timer-float { position:fixed; bottom: calc(100px + var(--safe-bottom)); right:20px; width:70px; height:70px; background:var(--bg); border:3px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-family:monospace; color:var(--accent); box-shadow:0 0 20px rgba(255,68,68,0.4); z-index:2000; cursor:pointer; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4);} 70% {box-shadow: 0 0 0 10px rgba(255, 68, 68, 0);} 100% {box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);} }
-
-        #toast { visibility:hidden; min-width:250px; background-color:#222; color:#fff; text-align:center; border-radius:50px; padding:12px 24px; position:fixed; z-index:6000; left:50%; bottom:calc(100px + var(--safe-bottom)); transform:translateX(-50%); border:1px solid var(--accent); box-shadow:0 5px 15px rgba(0,0,0,0.5); font-size:0.9rem; font-weight:bold; }
-        #toast.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from{bottom:60px; opacity:0;} to{bottom:calc(100px + var(--safe-bottom)); opacity:1;} }
-        @keyframes fadeout { from{bottom:calc(100px + var(--safe-bottom)); opacity:1;} to{bottom:60px; opacity:0;} }
-
-        .loading-logo { width: 140px; height: 140px; margin-bottom: 20px; border-radius: 30px; animation: heartbeat 2.5s infinite ease-in-out; box-shadow: 0 0 50px rgba(255, 68, 68, 0.3); }
-        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
-        
-        .user-row { display:flex; justify-content:space-between; align-items:center; padding:15px; background:var(--card-light); border-radius:10px; margin-bottom:10px; border-left:3px solid #444; }
-        .stagnant { border-left-color: var(--warning) !important; background: rgba(255, 170, 0, 0.05); }
-        .stat-badge { background: #333; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: var(--muted); margin-top: 4px; display: inline-block; }
     </style>
 </head>
 <body>
 
     <div id="toast">Notificación</div>
 
-    <div id="loading" class="screen active" style="text-align:center; padding-top:30vh; background: #000; z-index: 5000;">
-        <img src="favicon.png" alt="Logo" class="loading-logo" onerror="this.style.display='none'">
+    <div id="loading" class="screen active" style="text-align:center; padding-top:30vh; background:#000; z-index:9999;">
+        <img src="favicon.png" class="loading-logo">
         <h1 style="color:var(--accent); font-size:3.5rem; margin:0; letter-spacing:-2px;">FIT DATA</h1>
-        <p style="color:var(--muted); margin-top:10px; font-size:1.1rem; letter-spacing: 1px;">COACH INTELLIGENCE</p>
+        <p style="color:var(--muted); margin-top:10px; font-size:1.1rem; letter-spacing:1px;">COACH INTELLIGENCE</p>
     </div>
 
     <div id="login" class="screen">
         <div class="container" style="padding-top:60px; text-align:center;">
-            <img src="favicon.png" style="width:100px; border-radius:20px; margin-bottom:20px; box-shadow: 0 0 20px rgba(255,68,68,0.2);">
+            <img src="favicon.png" style="width:100px; border-radius:20px; margin-bottom:20px; box-shadow:0 0 20px rgba(255,68,68,0.2);">
             <h1 style="color:var(--accent); font-size:3rem; margin-bottom:10px;">FIT DATA</h1>
             <p style="color:var(--muted); margin-bottom:40px;">Acceso Atletas</p>
             <div class="card" style="border:none; background:transparent;">
@@ -237,13 +256,9 @@
             <div class="container">
                 <div class="card">
                     <h3>Etapa Actual</h3>
-                    <select id="cfg-goal" class="input" onchange="saveConfig()">
-                        <option value="Definición">Definición (Déficit)</option>
-                        <option value="Mantenimiento">Mantenimiento</option>
-                        <option value="Volumen">Volumen (Superávit)</option>
-                    </select>
+                    <div id="cfg-goal-display" style="padding:10px; background:#222; border-radius:8px; color:var(--accent); font-weight:bold; text-align:center;">Cargando...</div>
 
-                    <h3>Avisos</h3>
+                    <h3 style="margin-top:20px;">Avisos</h3>
                     <div class="toggle-row">
                         <span>Recordatorio Fotos</span>
                         <div style="display:flex; gap:5px;">
@@ -320,6 +335,17 @@
                 <h2 id="adm-ath-name">Atleta</h2>
                 <button onclick="closeAdminModal()" class="btn-secondary" style="width:auto; padding:5px 10px;">X</button>
             </div>
+            
+            <div class="card">
+                <h3>Configuración Coach</h3>
+                <label class="text-muted">Etapa Actual:</label>
+                <select id="adm-set-goal" class="input">
+                    <option value="Definición">Definición</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                    <option value="Volumen">Volumen</option>
+                </select>
+                <button onclick="adminSaveConfig()" class="btn btn-primary" style="margin-top:10px;">Guardar Config</button>
+            </div>
 
             <div class="card">
                 <h3>Datos & Stats</h3>
@@ -389,7 +415,7 @@
     <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
 
     <script>
-        // --- 1. FIREBASE CONFIG (TUS CLAVES REALES) ---
+        // --- 1. FIREBASE CONFIG (PON TUS CLAVES AQUÍ) ---
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
@@ -398,19 +424,12 @@
             messagingSenderId: "949628013924",
             appId: "1:949628013924:web:86278ae2c2bafb384d7e71"
         };
-        
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch(e) {
-            console.error(e);
-            alert("Error de conexión a Firebase.");
-        }
-        
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
         // --- 2. CONSTANTES ---
-        const ADMIN_EMAIL = "toni@fitdatapro.es"; // Cambiado a tu email correcto
+        const ADMIN_EMAIL = "toni@fitdatapro.es";
         const SECRET_CODE = "fityhab";
         
         let currentUser = null;
@@ -428,44 +447,37 @@
         let currentNoteExId = null;
         let editingRoutineId = null;
 
-        // --- 3. GENERADOR SVG ---
+        // --- 3. GENERADOR SVG INTELIGENTE (ESTILO ICONO) ---
         function getMuscleSvg(muscle) {
             const m = muscle.toLowerCase();
             let silhouette = "";
             let highlight = "";
 
-            const frontBody = "M50,5 C55,5 60,10 60,15 L65,18 L70,35 L60,60 L62,80 L65,115 L55,115 L52,85 L48,85 L45,115 L35,115 L38,80 L40,60 L30,35 L35,18 L40,15 C40,10 45,5 50,5";
-            const backBody = "M50,5 C55,5 60,10 60,15 L68,18 L75,35 L65,60 L62,80 L65,115 L55,115 L52,85 L48,85 L45,115 L35,115 L38,80 L35,60 L25,35 L32,18 L40,15 C40,10 45,5 50,5";
-            
-            let view = `<path d="${frontBody}" fill="#000"/>`; 
+            // SILUETA TORSO (Negro Sólido - Cintura arriba)
+            const torsoPath = "M 50,10 L 70,15 L 75,30 L 65,75 L 67,90 L 33,90 L 35,75 L 25,30 L 30,15 Z"; 
+            // SILUETA PIERNAS (Negro Sólido - Cintura abajo)
+            const legsPath = "M 25,5 L 75,5 L 80,30 L 85,90 L 55,90 L 50,45 L 45,90 L 15,90 L 20,30 Z";
 
-            if (m.includes('pecho')) {
-                highlight = `<path d="M38,22 L62,22 L60,35 L40,35 Z" fill="#ff4444"/>`;
-            } else if (m.includes('espalda')) {
-                view = `<path d="${backBody}" fill="#000"/>`;
-                highlight = `<path d="M35,20 L65,20 L58,50 L42,50 Z" fill="#ff4444"/>`;
-            } else if (m.includes('pierna') || m.includes('femoral') || m.includes('glute')) {
-                if(m.includes('femoral') || m.includes('glute')) {
-                     view = `<path d="${backBody}" fill="#000"/>`;
-                     highlight = `<path d="M35,60 L30,110 L45,110 L48,80 L52,80 L55,110 L70,110 L65,60 Z" fill="#ff4444"/>`;
-                } else {
-                     highlight = `<path d="M38,60 L35,115 L45,115 L48,85 L52,85 L55,115 L65,115 L62,60 Z" fill="#ff4444"/>`;
-                }
-            } else if (m.includes('hombro')) {
-                highlight = `<circle cx="30" cy="22" r="5" fill="#ff4444"/><circle cx="70" cy="22" r="5" fill="#ff4444"/>`;
-            } else if (m.includes('biceps') || m.includes('brazo')) {
-                 highlight = `<path d="M28,35 L22,55 L32,55 Z" fill="#ff4444"/><path d="M72,35 L78,55 L68,55 Z" fill="#ff4444"/>`;
-            } else if (m.includes('triceps') || m.includes('tríceps')) {
-                 view = `<path d="${backBody}" fill="#000"/>`;
-                 highlight = `<path d="M25,30 L20,50 L30,50 Z" fill="#ff4444"/><path d="M75,30 L80,50 L70,50 Z" fill="#ff4444"/>`;
-            } else if (m.includes('abs')) {
-                 highlight = `<rect x="42" y="38" width="16" height="20" fill="#ff4444"/>`;
+            if (m.includes('pierna') || m.includes('glute') || m.includes('femoral') || m.includes('gemelo') || m.includes('abductor')) {
+                // TREN INFERIOR
+                silhouette = `<path d="${legsPath}" fill="#000000"/>`;
+                highlight = `<path d="${legsPath}" fill="#FF0000" stroke="none"/>`; 
+            } else {
+                // TREN SUPERIOR
+                silhouette = `<path d="${torsoPath}" fill="#000000"/>`;
+                
+                if (m.includes('pecho')) highlight = `<rect x="35" y="30" width="30" height="15" fill="#FF0000"/>`;
+                else if (m.includes('hombro')) highlight = `<circle cx="25" cy="25" r="8" fill="#FF0000"/><circle cx="75" cy="25" r="8" fill="#FF0000"/>`;
+                else if (m.includes('biceps') || m.includes('brazo')) highlight = `<rect x="15" y="40" width="10" height="20" fill="#FF0000"/><rect x="75" y="40" width="10" height="20" fill="#FF0000"/>`;
+                else if (m.includes('espalda')) highlight = `<path d="M 30,25 L 70,25 L 60,60 L 40,60 Z" fill="#FF0000"/>`;
+                else if (m.includes('abs')) highlight = `<rect x="40" y="50" width="20" height="25" fill="#FF0000"/>`;
+                else if (m.includes('triceps') || m.includes('tríceps')) highlight = `<rect x="10" y="40" width="8" height="20" fill="#FF0000"/><rect x="82" y="40" width="8" height="20" fill="#FF0000"/>`;
             }
 
             return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
-              <rect x="2" y="2" width="96" height="116" rx="10" fill="#ffffff" stroke="#ff4444" stroke-width="4"/>
-              ${view}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+              <rect x="2" y="2" width="96" height="96" rx="18" fill="#ffffff" stroke="#FF0000" stroke-width="6"/>
+              ${silhouette}
               ${highlight}
             </svg>`);
         }
@@ -1014,6 +1026,7 @@
             const u = uDoc.data();
             
             document.getElementById('adm-ath-name').innerText = u.username;
+            document.getElementById('adm-set-goal').value = u.settings?.goal || 'Mantenimiento';
             
             document.getElementById('adm-ath-age').innerText = u.age || '-';
             document.getElementById('adm-ath-height').innerText = u.height || '-';
@@ -1033,6 +1046,12 @@
         }
 
         function closeAdminModal() { document.getElementById('modal-athlete').classList.add('hidden'); }
+
+        async function adminSaveConfig() {
+            const goal = document.getElementById('adm-set-goal').value;
+            await db.collection('users').doc(currentAdminUser).update({ 'settings.goal': goal });
+            showToast("Etapa actualizada");
+        }
 
         // ALERTAS ADMIN
         function sendAlert(uid) {
