@@ -760,8 +760,8 @@
             const imgA = document.getElementById('img-overlay'); // OVERLAY = ANTES
             
             // Logic: Background = Current (After), Overlay = Past (Before)
-            if(after) imgB.src = after; else imgB.src = ""; // Fondo = Ahora
-            if(before) imgA.src = before; else imgA.src = ""; // Overlay = Antes
+            if(before) imgB.src = before; else imgB.src = ""; // Fondo = Ahora
+            if(after) imgA.src = after; else imgA.src = ""; // Overlay = Antes
 
             document.getElementById('date-before').innerText = `ANTES (${dateB})`;
             document.getElementById('date-after').innerText = `AHORA (${dateA})`;
@@ -1260,8 +1260,8 @@
             pCont.innerHTML = `
                 <div class="compare-wrapper">
                     <div class="slider-labels"><span class="label-tag">ANTES</span><span class="label-tag">AHORA</span></div>
-                    <img src="${a || ''}" class="compare-img">
-                    <img src="${b || ''}" id="coach-overlay-img" class="compare-img img-overlay" style="clip-path:inset(0 0 0 0)">
+                    <img src="${b || ''}" class="compare-img">
+                    <img src="${a || ''}" id="coach-overlay-img" class="compare-img img-overlay" style="clip-path:inset(0 0 0 0)">
                     <div class="slider-handle" id="coach-slider-handle" style="left:0%"><div class="slider-btn"></div></div>
                 </div>
                 <input type="range" min="0" max="100" value="0" style="width:100%; margin-top:15px;" oninput="moveCoachSlider(this.value)">
@@ -1330,3 +1330,4 @@
     </script>
 </body>
 </html>
+
