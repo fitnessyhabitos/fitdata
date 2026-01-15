@@ -91,7 +91,6 @@
         .set-row { display: grid; grid-template-columns: 25px 1fr 1fr 45px; gap: 10px; align-items: center; margin-bottom: 10px; }
         .set-num { font-size: 0.85rem; color: #666; font-weight: bold; text-align: center; }
         .shadow-val { display: block; font-size: 0.65rem; color: #555; text-align: center; margin-bottom: 2px; }
-        
         .sets-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; }
         .btn-set-control { background: #222; border: 1px solid #444; color: #888; padding: 2px 8px; font-size: 0.7rem; border-radius: 4px; }
 
@@ -113,7 +112,6 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal.active { opacity: 1; pointer-events: auto; }
         .modal-content { background: #1a1a1a; width: 90%; max-width: 400px; padding: 25px; border-radius: 15px; border: 1px solid var(--accent-color); text-align: center; max-height: 85vh; overflow-y: auto; }
-        @media (min-width: 768px) { .modal-content { max-width: 700px; } }
 
         .switch { position: relative; display: inline-block; width: 46px; height: 24px; } .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
@@ -124,7 +122,6 @@
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         .img-overlay { clip-path: inset(0 50% 0 0); border-right: 2px solid white; }
         .slider-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; cursor: ew-resize; z-index: 10; background: rgba(255,255,255,0.5); }
-        /* NO BOLITA: .slider-btn removed visually */
         .slider-btn { display: none; }
 
         .admin-user-row { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -329,6 +326,68 @@
             <button class="btn-outline" onclick="switchTab('routines-view')">VOLVER</button>
         </section>
 
+        <section id="coach-detail-view" class="view-container">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <button class="btn-outline btn-small" style="width:auto; margin:0;" onclick="switchTab('admin-view')">← VOLVER</button>
+                <h3 style="margin:0;">FICHA ATLETA</h3>
+            </div>
+
+            <div style="text-align:center; margin-bottom:20px;">
+                <div class="avatar-circle" style="width:80px; height:80px; margin:0 auto 10px auto;">
+                    <img id="coach-user-img" src="" style="display:none;">
+                    <span id="coach-user-initial" style="font-size:2rem; color:var(--accent-color);">U</span>
+                </div>
+                <h2 id="coach-user-name" style="margin:0;">Usuario</h2>
+                <p id="coach-user-email" style="color:#666; font-size:0.8rem;"></p>
+                
+                <div id="pending-approval-banner" class="hidden" style="margin-top:15px;">
+                    <button class="btn btn-success" onclick="window.approveUser()">✅ APROBAR ACCESO</button>
+                </div>
+            </div>
+            
+            <div id="coach-stats-text" class="stat-pill-grid" style="margin-bottom:20px;"></div>
+
+            <div class="card">
+                <h3>📸 FOTOS PROGRESO</h3>
+                <div class="photo-tabs">
+                    <div class="photo-tab active" id="coach-tab-front" onclick="switchCoachPose('front')">FRONTAL</div>
+                    <div class="photo-tab" id="coach-tab-back" onclick="switchCoachPose('back')">ESPALDA</div>
+                </div>
+                <div class="coach-photos-row" id="coach-photos-container">
+                    <div class="coach-photo-box" style="color:#666; font-size:0.7rem;">Sin Foto Antes</div>
+                    <div class="coach-photo-box" style="color:#666; font-size:0.7rem;">Sin Foto Ahora</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>GRÁFICA PESO</h3>
+                <div style="height:200px; width:100%; position:relative;">
+                    <canvas id="coachWeightChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>RUTINAS ASIGNADAS</h3>
+                <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:15px;">Cargando...</div>
+
+                <label style="font-size:0.7rem; color:#ccc; text-transform:uppercase;">Asignar Nueva:</label>
+                <input type="text" placeholder="🔍 Buscar rutina..." id="coach-routine-filter" style="margin-bottom:5px; padding:10px; font-size:0.9rem;" oninput="filterCoachRoutines(this.value)">
+                
+                <div style="display:flex; gap:5px; margin-top:5px;">
+                    <select id="coach-routine-select" style="margin:0;"></select>
+                    <button class="btn-small btn-outline" style="width:auto; padding:0 15px;" onclick="goToCreateRoutine()">➕ CREAR</button>
+                    <button class="btn-small btn" style="width:auto; padding:0 15px;" onclick="assignRoutine()">ENVIAR</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>HISTORIAL RECIENTE</h3>
+                <div id="coach-history-list" style="max-height:300px; overflow-y:auto;"></div>
+            </div>
+
+            <button class="btn-danger btn" style="width:100%; margin-bottom:30px;" onclick="deleteUser()">🗑️ ELIMINAR ATLETA DEFINITIVAMENTE</button>
+        </section>
+
     </main>
 
     <nav class="bottom-nav hidden" id="bottom-nav">
@@ -360,55 +419,6 @@
             <button class="rpe-btn rpe-max" onclick="finishWorkout('Fallo')">🔴 Fallo / Extremo</button>
             <textarea id="workout-notes" rows="3" placeholder="📝 Notas (opcional)..." style="width:100%; background:#222; border:1px solid #333; color:white; border-radius:8px; padding:10px; margin-top:10px; font-family:inherit;"></textarea>
             <button class="btn-outline" onclick="document.getElementById('modal-rpe').classList.remove('active')">Cancelar</button>
-        </div>
-    </div>
-
-    <div id="modal-coach" class="modal">
-        <div class="modal-content" style="text-align:left;">
-            <div style="text-align:center; margin-bottom:10px;">
-                <div class="avatar-circle" style="width:60px; height:60px; margin:0 auto 10px auto;">
-                    <img id="coach-user-img" src="" style="display:none;">
-                    <span id="coach-user-initial" style="font-size:1.5rem; color:var(--accent-color);">U</span>
-                </div>
-                <h3 id="coach-user-name" style="margin:0;">Usuario</h3>
-                <p id="coach-user-email" style="color:#666; font-size:0.8rem;"></p>
-                <div id="pending-approval-banner" class="hidden">
-                    <button class="btn btn-success" style="margin-top:10px;" onclick="window.approveUser()">✅ APROBAR ACCESO</button>
-                </div>
-            </div>
-            
-            <div id="coach-stats-text" class="stat-pill-grid" style="margin-bottom:15px;"></div>
-
-            <h4 style="margin-bottom:5px;">📸 Fotos Progreso</h4>
-            <div class="photo-tabs">
-                <div class="photo-tab active" id="coach-tab-front" onclick="switchCoachPose('front')">FRONTAL</div>
-                <div class="photo-tab" id="coach-tab-back" onclick="switchCoachPose('back')">ESPALDA</div>
-            </div>
-            <div class="coach-photos-row" id="coach-photos-container">
-                <div class="coach-photo-box" style="color:#666; font-size:0.7rem;">Sin Foto Antes</div>
-                <div class="coach-photo-box" style="color:#666; font-size:0.7rem;">Sin Foto Ahora</div>
-            </div>
-
-            <h4 style="margin-bottom:5px;">Gráfica Peso</h4>
-            <div style="height:120px; margin-bottom:20px; position:relative;"><canvas id="coachWeightChart"></canvas></div>
-
-            <h4 style="margin-bottom:5px;">📋 Rutinas Activas</h4>
-            <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:10px;">Cargando...</div>
-
-            <label style="font-size:0.8rem; color:#ccc;">Asignar Nueva:</label>
-            <input type="text" placeholder="🔍 Buscar rutina..." id="coach-routine-filter" style="margin-bottom:5px; padding:8px; font-size:0.8rem; width:100%; border-radius:6px; border:1px solid #333; background:#222; color:white;" oninput="filterCoachRoutines(this.value)">
-            
-            <div style="display:flex; gap:5px; margin-top:5px; margin-bottom:15px;">
-                <select id="coach-routine-select" style="margin:0;"></select>
-                <button class="btn-small btn-outline" style="width:auto; padding:0 10px;" onclick="goToCreateRoutine()">➕ NUEVA</button>
-                <button class="btn-small btn" style="width:auto;" onclick="assignRoutine()">ENVIAR</button>
-            </div>
-
-            <h4 style="margin-bottom:5px;">Historial Reciente</h4>
-            <div id="coach-history-list" style="height:120px; overflow-y:auto; font-size:0.75rem; color:#aaa; margin-bottom:15px; border:1px solid #333; padding:5px; background:#000;"></div>
-
-            <button class="btn-danger btn" style="width:100%;" onclick="deleteUser()">🗑️ ELIMINAR ATLETA</button>
-            <button class="btn-outline" style="margin-top:10px;" onclick="document.getElementById('modal-coach').classList.remove('active')">CERRAR</button>
         </div>
     </div>
 
@@ -625,7 +635,6 @@
             });
         }
 
-        // EDITOR LOGIC REWRITTEN FOR SELECTION PERSISTENCE
         window.openEditor = async (id=null) => {
             editingRoutineId = id;
             document.getElementById('editor-name').value = '';
@@ -639,7 +648,7 @@
                 currentRoutineSelections = r.exercises || [];
             }
             
-            renderExercises(EXERCISES); // Render all initially
+            renderExercises(EXERCISES); 
             renderSelectedSummary();
             switchTab('editor-view');
         };
@@ -686,7 +695,6 @@
         window.removeSelection = (name) => {
             currentRoutineSelections = currentRoutineSelections.filter(x => x !== name);
             renderSelectedSummary();
-            // Re-render list to update UI state if visible
             const searchVal = document.getElementById('ex-search').value;
             window.filterExercises(searchVal); 
         }
@@ -716,7 +724,6 @@
         
         window.delRoutine = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db,"routines",id)); };
 
-        // --- PHOTO COMPARISON LOGIC ---
         window.switchPose = (pose) => {
             currentPose = pose;
             document.getElementById('tab-front').classList.toggle('active', pose==='front');
@@ -731,7 +738,6 @@
             const dateB = u[`dateBefore${prefix}`] || '-';
             const dateA = u[`dateAfter${prefix}`] || '-';
 
-            // FIX: Explicitly clear if empty
             const imgB = document.getElementById('img-before');
             const imgA = document.getElementById('img-overlay');
             
@@ -742,7 +748,6 @@
             document.getElementById('date-after').innerText = `AHORA (${dateA})`;
         }
 
-        // COMPRESION Y GUARDADO DE FOTOS COMPARATIVAS
         window.loadCompImg = (inp, field) => { 
             if(inp.files[0]) { 
                 const r = new FileReader(); 
@@ -797,12 +802,10 @@
             document.getElementById('profile-name').innerText = userData.name;
             if(userData.photo) { document.getElementById('avatar-text').style.display='none'; document.getElementById('avatar-img').src = userData.photo; document.getElementById('avatar-img').style.display='block'; }
             
-            // Initial load of photos (Front)
             updatePhotoDisplay(userData);
 
             if(userData.restTime) document.getElementById('cfg-rest-time').value = userData.restTime;
             
-            // STATS
             if(userData.stats) {
                 document.getElementById('stat-workouts').innerText = userData.stats.workouts || 0;
                 document.getElementById('stat-kg').innerText = userData.stats.totalKg ? (userData.stats.totalKg/1000).toFixed(1)+'t' : 0;
@@ -822,11 +825,10 @@
                 hC.appendChild(d);
             });
             
-            // CHART FIX FOR EMPTY DATA
             const ctx = document.getElementById('weightChart'); 
             if(chartInstance) chartInstance.destroy();
             const rawData = userData.weightHistory;
-            const data = (rawData && rawData.length > 0) ? rawData : [70]; // Default flat line if empty
+            const data = (rawData && rawData.length > 0) ? rawData : [70]; 
             
             chartInstance = new Chart(ctx, { 
                 type:'line', 
@@ -866,11 +868,9 @@
         
         window.moveSlider = (v) => { document.getElementById('img-overlay').style.clipPath = `inset(0 ${100-v}% 0 0)`; document.getElementById('slider-handle').style.left = `${v}%`; };
         
-        // FIXED WEIGHT ENTRY WITH COMMA SUPPORT
         window.addWeightEntry = async () => { 
             const wStr = prompt("Introduce tu peso (kg):");
             if(!wStr) return;
-            // Replaces comma with dot for international support
             const w = parseFloat(wStr.replace(',','.'));
             if(isNaN(w)) return alert("Número inválido");
 
@@ -880,7 +880,7 @@
             try {
                 await updateDoc(doc(db,"users",currentUser.uid), {weightHistory: history});
                 userData.weightHistory = history; 
-                loadProfile(); // Refresh chart instantly
+                loadProfile(); 
                 alert("✅ Peso Guardado");
             } catch(e) {
                 alert("Error al guardar: " + e.message);
@@ -893,7 +893,8 @@
             const r = snap.data();
             activeWorkout = { name: r.name, exs: r.exercises.map(n => {
                 const data = getExerciseData(n);
-                return { n:n, img:data.img, mInfo: data.mInfo, sets:Array(3).fill().map((_,i)=>({r:10, w:0, d:false})) }; // Default 3 sets
+                // FIXED SETS: 5 SETS TOTAL. 1st is 20 reps, others 16.
+                return { n:n, img:data.img, mInfo: data.mInfo, sets:Array(5).fill().map((_,i)=>({r: i===0 ? 20 : 16, w:0, d:false})) }; 
             })};
             
             renderWorkout();
@@ -901,9 +902,8 @@
             startTimerMini();
         };
 
-        // NEW: DYNAMIC SETS
         window.addSet = (exIdx) => {
-            activeWorkout.exs[exIdx].sets.push({r:10, w:0, d:false});
+            activeWorkout.exs[exIdx].sets.push({r:16, w:0, d:false}); // Add 16 by default
             renderWorkout();
         };
 
@@ -928,7 +928,6 @@
                     setsHtml += `<div class="set-row"><div class="set-num">${j+1}</div><div><span class="shadow-val">${s.r}</span><input type="number" value="${s.r}" onchange="uS(${i},${j},'r',this.value)"></div><div><span class="shadow-val">--</span><input type="number" placeholder="kg" value="${s.w}" onchange="uS(${i},${j},'w',this.value)"></div><button id="btn-${i}-${j}" class="btn-outline ${s.d?'btn-done':''}" style="margin:0;padding:0;height:35px;" onclick="tS(${i},${j})">${s.d?'✓':''}</button></div>`;
                 });
 
-                // ADD SET BUTTONS
                 setsHtml += `<div class="sets-actions"><button class="btn-set-control" onclick="removeSet(${i})">- Serie</button><button class="btn-set-control" onclick="addSet(${i})">+ Serie</button></div>`;
 
                 card.innerHTML = `<div class="workout-split"><div class="workout-visual"><img src="${e.img}" onerror="this.src='logo.png'"></div><div class="workout-bars" style="width:100%">${bars}</div></div><h3 style="margin-bottom:10px; border:none;">${e.n}</h3>${setsHtml}`;
@@ -939,7 +938,6 @@
         window.uS = (i,j,k,v) => activeWorkout.exs[i].sets[j][k]=v;
         window.tS = (i,j) => {
             const s = activeWorkout.exs[i].sets[j]; s.d = !s.d;
-            // Re-render not needed for simple toggle, just update class
             const btn = document.getElementById(`btn-${i}-${j}`);
             if(s.d) {
                 btn.classList.add('btn-done');
@@ -963,7 +961,6 @@
                 document.getElementById('timer-display').innerText = restTimeRemaining;
                 if(restTimeRemaining <= 0) {
                     clearInterval(timerInt); m.classList.remove('active');
-                    // AUDIO FIX: Force logic check
                     if(document.getElementById('cfg-sound').checked) {
                         play5Beeps();
                     }
@@ -989,7 +986,6 @@
             let muscleCounts = {};
             let prAlert = ""; 
 
-            // Check previous PRs (create if not exists)
             if(!userData.prs) userData.prs = {};
             
             activeWorkout.exs.forEach(e => {
@@ -1002,7 +998,6 @@
                         const mName = e.mInfo.main;
                         muscleCounts[mName] = (muscleCounts[mName] || 0) + 1;
 
-                        // PR CHECK
                         if(weight > (userData.prs[e.n] || 0)) {
                             userData.prs[e.n] = weight;
                             prAlert = `🏆 RÉCORD: ${e.n} (${weight}kg)\n`;
@@ -1038,13 +1033,11 @@
             switchTab('routines-view');
         };
 
-        // GLOBAL ADMIN LOADER - ATTACHED TO WINDOW FOR BUTTON TO WORK
         window.loadAdminUsers = async () => {
             const l = document.getElementById('admin-list');
             l.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">↻ Cargando base de datos...</div>';
             
             try {
-                // FORCE FRESH FETCH FROM SERVER
                 const s = await getDocs(collection(db, "users"));
                 l.innerHTML = '';
                 
@@ -1059,7 +1052,6 @@
                     const div = document.createElement('div');
                     div.className = "admin-user-row";
                     
-                    // STATUS ICON
                     const statusIcon = u.approved ? '🟢' : '⏳';
                     const statusText = u.approved ? 'Activo' : 'Pendiente';
 
@@ -1068,9 +1060,9 @@
                             <strong>${u.name}</strong><br>
                             <small>${statusIcon} ${statusText} • ${u.email}</small>
                         </div>
-                        <button class="btn-outline btn-small" style="width:auto;">⚙️ VER FICHA</button>
+                        <button class="btn-outline btn-small" style="width:auto;">⚙️ FICHA</button>
                     `;
-                    div.onclick=()=>openCoachModal(d.id,u); 
+                    div.onclick=()=>openCoachView(d.id,u); 
                     l.appendChild(div);
                 });
             } catch (e) {
@@ -1079,21 +1071,19 @@
             }
         };
 
-        async function openCoachModal(uid,u) {
+        // NEW FULL SCREEN COACH VIEW LOGIC
+        async function openCoachView(uid,u) {
             selectedUserCoach=uid;
             
-            // FIX: Refresh user data to ensure realtime
             const freshSnap = await getDoc(doc(db, "users", uid));
             const freshU = freshSnap.data();
-            selectedUserObj = freshU; // Update local obj
+            selectedUserObj = freshU; 
 
-            const m=document.getElementById('modal-coach');
-            m.classList.add('active'); 
+            switchTab('coach-detail-view');
             
             document.getElementById('coach-user-name').innerText=freshU.name;
             document.getElementById('coach-user-email').innerText=freshU.email;
 
-            // SHOW APPROVE BUTTON IF PENDING
             const banner = document.getElementById('pending-approval-banner');
             if(!freshU.approved) {
                 banner.classList.remove('hidden');
@@ -1111,7 +1101,6 @@
             
             updateCoachPhotoDisplay('front');
 
-            // 1. CARGAR RUTINAS (SELECTOR) PRIMERO - PARA EVITAR CHOQUES
             try {
                 const s = document.getElementById('coach-routine-select'); s.innerHTML = '';
                 const rS = await getDocs(collection(db,"routines")); 
@@ -1126,7 +1115,6 @@
                 });
             } catch(e) { console.error("Error loading routines for dropdown", e); }
 
-            // 2. CARGAR RESTO DE DATOS (SAFE MODE)
             try {
                 const st = freshU.stats || {};
                 const age = freshU.age ? freshU.age : 'N/D';
@@ -1139,12 +1127,10 @@
                 if(coachChart) coachChart.destroy();
                 const ctx = document.getElementById('coachWeightChart');
                 const wData = freshU.weightHistory || [];
-                // CHART FIX FOR EMPTY DATA IN COACH MODE
                 const data = (wData && wData.length > 0) ? wData : [70];
                 
                 coachChart = new Chart(ctx, { type:'line', data:{ labels:data.map((_,i)=>i+1), datasets:[{label:'Kg', data:data, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}}});
 
-                // Rutinas Activas
                 const rList = document.getElementById('coach-assigned-list');
                 rList.innerHTML = 'Cargando...';
                 const qR = query(collection(db, "routines"), where("assignedTo", "array-contains", uid));
@@ -1159,7 +1145,6 @@
                     rList.appendChild(div);
                 });
 
-                // Historial (CON NOTAS FIX)
                 const hList = document.getElementById('coach-history-list');
                 hList.innerHTML = 'Cargando historial...';
                 const qH = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(10));
@@ -1170,18 +1155,21 @@
                     const d = w.data();
                     const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
                     let rpeBadge = d.rpe === 'Suave' ? '<span class="badge green">🟢 Suave</span>' : (d.rpe === 'Duro' ? '<span class="badge orange">🟠 Duro</span>' : (d.rpe === 'Fallo' ? '<span class="badge red">🔴 Fallo</span>' : '<span class="badge gray">--</span>'));
-                    // Note logic: only show icon if text exists and is not empty spaces
                     const noteIcon = (d.note && d.note.trim().length > 0) ? `<span class="note-icon" title="${d.note}" onclick="alert('${d.note}')">📝</span>` : '';
                     hList.innerHTML += `<div class="history-row"><div class="hist-date">${date}</div><div class="hist-name">${d.routine} ${noteIcon}</div><div class="hist-rpe">${rpeBadge}</div></div>`;
                 });
-
-                if(!freshU.approved && confirm("¿Aprobar acceso a este atleta?")) { 
-                    await updateDoc(doc(db,"users",uid),{approved:true}); 
-                    window.loadAdminUsers(); // REFRESH LIST MANUALLY
-                }
             
             } catch(e) { console.error("Error loading coach details", e); }
         }
+
+        window.approveUser = async () => {
+            if(confirm("¿Confirmar acceso a este atleta?")) {
+                await updateDoc(doc(db,"users",selectedUserCoach), {approved: true});
+                alert("Atleta Aprobado ✅");
+                // Refresh full view
+                openCoachView(selectedUserCoach, selectedUserObj);
+            }
+        };
 
         window.renderCoachRoutines = (list) => {
             const s = document.getElementById('coach-routine-select'); s.innerHTML = '';
@@ -1206,36 +1194,31 @@
             const prefix = pose === 'front' ? '' : '_back';
             const b = u[`photoBefore${prefix}`];
             const a = u[`photoAfter${prefix}`];
-            const db = u[`dateBefore${prefix}`] || '-';
-            const da = u[`dateAfter${prefix}`] || '-';
             
             const pCont = document.getElementById('coach-photos-container');
             pCont.innerHTML = `
-                <div class="coach-photo-box">${b ? `<img src="${b}"><div class="photo-date-label">ANTES (${db})</div>` : 'Sin Foto'}</div>
-                <div class="coach-photo-box">${a ? `<img src="${a}"><div class="photo-date-label">AHORA (${da})</div>` : 'Sin Foto'}</div>
+                <div class="coach-photo-box">${b ? `<img src="${b}"><div class="photo-date-label">ANTES</div>` : 'Sin Foto'}</div>
+                <div class="coach-photo-box">${a ? `<img src="${a}"><div class="photo-date-label">AHORA</div>` : 'Sin Foto'}</div>
             `;
         }
 
         window.goToCreateRoutine = () => {
-            document.getElementById('modal-coach').classList.remove('active');
-            openEditor(); 
+            switchTab('routines-view'); // Go back to routines tab
+            openEditor(); // Open editor directly
         };
 
         window.assignRoutine = async () => {
             const rid=document.getElementById('coach-routine-select').value; if(!rid||!selectedUserCoach)return;
-            const rRef=doc(db,"routines",rid); const rSnap=await getDoc(rRef);
-            let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ 
-                await updateDoc(rRef,{assignedTo: arrayUnion(selectedUserCoach)}); 
-                const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
-                openCoachModal(selectedUserCoach, uSnap.data());
-            }
+            const rRef=doc(db,"routines",rid); 
+            await updateDoc(rRef,{assignedTo: arrayUnion(selectedUserCoach)}); 
+            alert("Rutina Asignada");
+            openCoachView(selectedUserCoach, selectedUserObj); // Refresh view
         };
 
         window.unassignRoutine = async (rid) => {
             if(confirm("¿Quitar esta rutina al atleta?")) {
                 await updateDoc(doc(db, "routines", rid), { assignedTo: arrayRemove(selectedUserCoach) });
-                const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
-                openCoachModal(selectedUserCoach, uSnap.data());
+                openCoachView(selectedUserCoach, selectedUserObj); // Refresh view
             }
         };
 
@@ -1245,7 +1228,7 @@
                     try {
                         await deleteDoc(doc(db, "users", selectedUserCoach));
                         alert("Atleta eliminado.");
-                        document.getElementById('modal-coach').classList.remove('active');
+                        switchTab('admin-view');
                         window.loadAdminUsers();
                     } catch(e) { alert("Error: " + e.message); }
                 }
