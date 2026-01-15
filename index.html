@@ -37,8 +37,14 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-main);
-            height: 100dvh; width: 100vw; overflow: hidden; display: flex; flex-direction: column;
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: var(--font-main);
+            height: 100dvh; 
+            width: 100vw; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
         }
 
         .hidden { display: none !important; }
@@ -827,9 +833,32 @@
                 d.innerHTML = `<div class="muscle-label"><span>${m}</span><span>${count} series</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
                 hC.appendChild(d);
             });
-            const ctx = document.getElementById('weightChart'); if(chartInstance) chartInstance.destroy();
-            const data = userData.weightHistory || [70,70.5,71];
-            chartInstance = new Chart(ctx, { type:'line', data:{ labels:data.map((_,i)=>`T${i}`), datasets:[{label:'Kg', data:data, borderColor:'#ff3333', backgroundColor:'rgba(255,51,51,0.1)', fill:true, tension:0.4}] }, options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{grid:{color:'#333'}}},maintainAspectRatio:false} });
+            
+            // CHART FIX FOR EMPTY DATA
+            const ctx = document.getElementById('weightChart'); 
+            if(chartInstance) chartInstance.destroy();
+            const rawData = userData.weightHistory;
+            const data = (rawData && rawData.length > 0) ? rawData : [70]; // Default flat line if empty
+            
+            chartInstance = new Chart(ctx, { 
+                type:'line', 
+                data:{ 
+                    labels:data.map((_,i)=>`T${i}`), 
+                    datasets:[{
+                        label:'Kg', 
+                        data:data, 
+                        borderColor:'#ff3333', 
+                        backgroundColor:'rgba(255,51,51,0.1)', 
+                        fill:true, 
+                        tension:0.4
+                    }] 
+                }, 
+                options:{
+                    plugins:{legend:{display:false}},
+                    scales:{x:{display:false},y:{grid:{color:'#333'}}},
+                    maintainAspectRatio:false
+                } 
+            });
         }
 
         window.saveConfig = async () => {
@@ -849,10 +878,11 @@
         
         window.moveSlider = (v) => { document.getElementById('img-overlay').style.clipPath = `inset(0 ${100-v}% 0 0)`; document.getElementById('slider-handle').style.left = `${v}%`; };
         
-        // FIXED WEIGHT ENTRY
+        // FIXED WEIGHT ENTRY WITH COMMA SUPPORT
         window.addWeightEntry = async () => { 
             const wStr = prompt("Introduce tu peso (kg):");
             if(!wStr) return;
+            // Replaces comma with dot for international support
             const w = parseFloat(wStr.replace(',','.'));
             if(isNaN(w)) return alert("Número inválido");
 
@@ -861,7 +891,7 @@
 
             await updateDoc(doc(db,"users",currentUser.uid), {weightHistory: history});
             userData.weightHistory = history; 
-            loadProfile(); 
+            loadProfile(); // Refresh chart instantly
         };
 
         window.startWorkout = async (rid) => {
@@ -1174,4 +1204,3 @@
     </script>
 </body>
 </html>
-
