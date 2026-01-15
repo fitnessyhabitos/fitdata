@@ -17,12 +17,21 @@
 
     <style>
         :root {
-            --bg-color: #050505; --card-color: #121212; --input-bg: #1f1f1f; --text-color: #ffffff;
-            --text-dim: #888888; --accent-color: #ff3333; --accent-dim: rgba(255, 51, 51, 0.2);
-            --accent-glow: 0 0 12px rgba(255, 51, 51, 0.5); --success-color: #00ff88; --warning-color: #ffaa00;
+            --bg-color: #050505;
+            --card-color: #121212;
+            --input-bg: #1f1f1f;
+            --text-color: #ffffff;
+            --text-dim: #888888;
+            --accent-color: #ff3333;
+            --accent-dim: rgba(255, 51, 51, 0.2);
+            --accent-glow: 0 0 12px rgba(255, 51, 51, 0.5);
+            --success-color: #00ff88;
+            --warning-color: #ffaa00;
             --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px);
-            --header-height: 60px; --nav-height: 70px;
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
+            --header-height: 60px;
+            --nav-height: 70px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -33,6 +42,8 @@
         }
 
         .hidden { display: none !important; }
+        
+        /* BOTONES */
         .btn {
             background: var(--accent-color); color: white; border: none; padding: 14px;
             border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
@@ -40,21 +51,27 @@
             display: flex; justify-content: center; align-items: center;
         }
         .btn:active { transform: scale(0.98); }
+        
         .btn-outline { 
             background: transparent; border: 1px solid #444; color: #ccc; padding: 12px; width: 100%;
             border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 0.85rem;
         }
+        
         .btn-small { padding: 6px 12px; font-size: 0.75rem; width: auto; margin:0; }
         .btn-danger { background: #600; border: 1px solid #f00; color: #fcc; margin-top: 15px; }
+        
         .btn-done {
-            background-color: rgba(255, 51, 51, 0.3) !important; border: 1px solid var(--accent-color) !important;
-            color: white !important; box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+            background-color: rgba(255, 51, 51, 0.3) !important;
+            border: 1px solid var(--accent-color) !important;
+            color: white !important;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
         }
 
         /* LOADING */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg-color); z-index: 9999; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         #loading-logo { 
             width: 140px; border-radius: 25px; box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
@@ -107,10 +124,11 @@
         .stat-num { font-size: 1.2rem; font-weight: 800; color: white; display: block; }
         .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
 
-        /* WORKOUT */
+        /* WORKOUT CARDS */
         .workout-split { display: grid; grid-template-columns: 80px 1fr; gap: 15px; margin-bottom: 15px; align-items: center; }
         .workout-visual { width: 80px; height: 80px; background: #000; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; padding: 5px; }
         .workout-visual img { width: 100%; height: 100%; object-fit: contain; }
+        
         .workout-bars { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .mini-bar-label { font-size: 0.65rem; color: #888; display: flex; justify-content: space-between; margin-bottom: 2px; }
         .mini-track { width: 100%; height: 4px; background: #333; border-radius: 2px; overflow: hidden; }
@@ -123,22 +141,37 @@
         .set-num { font-size: 0.85rem; color: #666; font-weight: bold; text-align: center; }
         .shadow-val { display: block; font-size: 0.65rem; color: #555; text-align: center; margin-bottom: 2px; }
 
-        .sticky-editor-header { position: sticky; top: -20px; background: var(--bg-color); z-index: 50; padding: 20px 0 10px 0; border-bottom: 1px solid #222; margin-top: -20px; margin-bottom: 15px; }
+        /* EDITOR */
+        .sticky-editor-header {
+            position: sticky; top: -20px; background: var(--bg-color); z-index: 50;
+            padding: 20px 0 10px 0; border-bottom: 1px solid #222; margin-top: -20px; margin-bottom: 15px;
+        }
         .ex-select-item { display: flex; align-items: center; gap: 15px; padding: 12px; background: #1a1a1a; margin-bottom: 6px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
         .ex-select-item img { width: 45px; height: 45px; object-fit: contain; background: black; border: 1px solid #333; border-radius: 4px; }
         .ex-select-item.selected { border-color: var(--accent-color); background: rgba(255,51,51,0.1); }
 
-        nav.bottom-nav { flex-shrink: 0; height: calc(var(--nav-height) + var(--safe-bottom)); padding-bottom: var(--safe-bottom); background: #0f0f0f; border-top: 1px solid #222; display: flex; justify-content: space-around; z-index: 999; }
+        nav.bottom-nav {
+            flex-shrink: 0; height: calc(var(--nav-height) + var(--safe-bottom)); padding-bottom: var(--safe-bottom);
+            background: #0f0f0f; border-top: 1px solid #222; display: flex; justify-content: space-around; z-index: 999;
+        }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 0.65rem; }
         .nav-item.active { color: var(--accent-color); }
         .nav-icon { font-size: 1.5rem; margin-bottom: 3px; }
 
-        .btn-float { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--accent-color); color: white; display: grid; place-items: center; font-size: 28px; box-shadow: 0 5px 20px rgba(255,51,51,0.6); z-index: 1000; }
+        .btn-float {
+            position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px;
+            border-radius: 50%; background: var(--accent-color); color: white; display: grid; place-items: center;
+            font-size: 28px; box-shadow: 0 5px 20px rgba(255,51,51,0.6); z-index: 1000; cursor: pointer;
+        }
 
         /* MODALS */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal.active { opacity: 1; pointer-events: auto; }
-        .modal-content { background: #1a1a1a; width: 90%; max-width: 400px; padding: 25px; border-radius: 15px; border: 1px solid var(--accent-color); text-align: center; max-height: 85vh; overflow-y: auto; }
+        .modal-content { 
+            background: #1a1a1a; width: 90%; max-width: 400px; padding: 25px; 
+            border-radius: 15px; border: 1px solid var(--accent-color); text-align: center;
+            max-height: 85vh; overflow-y: auto;
+        }
 
         .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -147,6 +180,7 @@
         input:checked + .slider { background-color: var(--accent-color); }
         input:checked + .slider:before { transform: translateX(22px); }
 
+        /* PHOTOS & SLIDER */
         .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 5px; border:1px solid #333; }
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         .img-overlay { clip-path: inset(0 50% 0 0); border-right: 2px solid white; }
@@ -181,6 +215,7 @@
         .tip-box { background: rgba(255, 170, 0, 0.15); border: 1px solid var(--warning-color); color: #ffcc80; padding: 10px; border-radius: 8px; font-size: 0.75rem; text-align: center; margin-bottom: 15px; }
         .photo-actions { display: grid; grid-template-columns: 1fr 40px 1fr 40px; gap: 5px; margin-top: 15px; }
 
+        /* RPE BUTTONS */
         .rpe-btn { width: 100%; margin-bottom: 10px; border: none; padding: 15px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         .rpe-easy { background: #2e7d32; }
         .rpe-hard { background: #f57f17; color: black; }
@@ -314,7 +349,9 @@
                 <div style="margin-bottom:15px;">
                     <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">Recordatorio Fotos:</div>
                     <div style="display:flex; gap:10px;">
-                        <select id="photo-day" style="margin:0;"><option value="1">Lunes</option><option value="5">Viernes</option></select>
+                        <select id="photo-day" style="margin:0;"><option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
+                            <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option><option value="0">Domingo</option>
+                        </select>
                         <input type="time" id="photo-time" value="09:00" style="margin:0;">
                         <button class="btn-small btn" onclick="savePhotoReminder()">OK</button>
                     </div>
@@ -811,7 +848,21 @@
         window.uploadAvatar = (inp) => { if(inp.files[0]) { const r = new FileReader(); r.onload=async(e)=>{ await updateDoc(doc(db,"users",currentUser.uid), {photo:e.target.result}); loadProfile(); }; r.readAsDataURL(inp.files[0]); } };
         
         window.moveSlider = (v) => { document.getElementById('img-overlay').style.clipPath = `inset(0 ${100-v}% 0 0)`; document.getElementById('slider-handle').style.left = `${v}%`; };
-        window.addWeightEntry = async () => { const w=prompt("Kg:"); if(w){ let h=userData.weightHistory||[]; h.push(parseFloat(w)); await updateDoc(doc(db,"users",currentUser.uid),{weightHistory:h}); userData.weightHistory=h; loadProfile(); } };
+        
+        // FIXED WEIGHT ENTRY
+        window.addWeightEntry = async () => { 
+            const wStr = prompt("Introduce tu peso (kg):");
+            if(!wStr) return;
+            const w = parseFloat(wStr.replace(',','.'));
+            if(isNaN(w)) return alert("Número inválido");
+
+            let history = userData.weightHistory || [];
+            history.push(w);
+
+            await updateDoc(doc(db,"users",currentUser.uid), {weightHistory: history});
+            userData.weightHistory = history; 
+            loadProfile(); 
+        };
 
         window.startWorkout = async (rid) => {
             if(document.getElementById('cfg-wake').checked && 'wakeLock' in navigator) try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}
@@ -865,6 +916,7 @@
                 document.getElementById('timer-display').innerText = restTimeRemaining;
                 if(restTimeRemaining <= 0) {
                     clearInterval(timerInt); m.classList.remove('active');
+                    // AUDIO FIX: Force logic check
                     if(document.getElementById('cfg-sound').checked) {
                         play5Beeps();
                     }
@@ -953,23 +1005,24 @@
             });
         }
 
-        async function openCoachModal(uid, u_old) {
-            // FIX: Load FRESH user data for real-time updates
+        async function openCoachModal(uid,u) {
+            selectedUserCoach=uid;
+            
+            // FIX: Refresh user data to ensure realtime
             const freshSnap = await getDoc(doc(db, "users", uid));
-            const u = freshSnap.data();
-            selectedUserObj = u;
-            selectedUserCoach = uid;
+            const freshU = freshSnap.data();
+            selectedUserObj = freshU; // Update local obj
 
             const m=document.getElementById('modal-coach');
             m.classList.add('active'); 
             
-            document.getElementById('coach-user-name').innerText=u.name;
-            document.getElementById('coach-user-email').innerText=u.email;
+            document.getElementById('coach-user-name').innerText=freshU.name;
+            document.getElementById('coach-user-email').innerText=freshU.email;
             
             const img = document.getElementById('coach-user-img');
             const initial = document.getElementById('coach-user-initial');
-            if(u.photo) {
-                img.src = u.photo; img.style.display = 'block'; initial.style.display = 'none';
+            if(freshU.photo) {
+                img.src = freshU.photo; img.style.display = 'block'; initial.style.display = 'none';
             } else {
                 img.style.display = 'none'; initial.style.display = 'block';
             }
@@ -993,8 +1046,8 @@
 
             // 2. CARGAR RESTO DE DATOS (SAFE MODE)
             try {
-                const st = u.stats || {};
-                const age = u.age ? u.age : 'N/D';
+                const st = freshU.stats || {};
+                const age = freshU.age ? freshU.age : 'N/D';
                 document.getElementById('coach-stats-text').innerHTML = `
                     <div class="stat-pill"><b>${st.workouts||0}</b><span>ENTRENOS</span></div>
                     <div class="stat-pill"><b>${(st.totalKg/1000||0).toFixed(1)}t</b><span>CARGA</span></div>
@@ -1003,7 +1056,7 @@
 
                 if(coachChart) coachChart.destroy();
                 const ctx = document.getElementById('coachWeightChart');
-                const wData = u.weightHistory || [];
+                const wData = freshU.weightHistory || [];
                 coachChart = new Chart(ctx, { type:'line', data:{ labels:wData.map((_,i)=>i+1), datasets:[{label:'Kg', data:wData, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}}});
 
                 // Rutinas Activas
@@ -1037,7 +1090,7 @@
                     hList.innerHTML += `<div class="history-row"><div class="hist-date">${date}</div><div class="hist-name">${d.routine} ${noteIcon}</div><div class="hist-rpe">${rpeBadge}</div></div>`;
                 });
 
-                if(!u.approved && confirm("¿Aprobar acceso a este atleta?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
+                if(!freshU.approved && confirm("¿Aprobar acceso a este atleta?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
             
             } catch(e) { console.error("Error loading coach details", e); }
         }
@@ -1085,7 +1138,6 @@
             const rRef=doc(db,"routines",rid); const rSnap=await getDoc(rRef);
             let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ 
                 await updateDoc(rRef,{assignedTo: arrayUnion(selectedUserCoach)}); 
-                // Refresh modal with FRESH data
                 const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
                 openCoachModal(selectedUserCoach, uSnap.data());
             }
@@ -1094,7 +1146,6 @@
         window.unassignRoutine = async (rid) => {
             if(confirm("¿Quitar esta rutina al atleta?")) {
                 await updateDoc(doc(db, "routines", rid), { assignedTo: arrayRemove(selectedUserCoach) });
-                // Refresh modal with FRESH data
                 const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
                 openCoachModal(selectedUserCoach, uSnap.data());
             }
