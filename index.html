@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -228,145 +227,322 @@
     </header>
 
     <main id="main-container">
+
         <section id="auth-view" class="view-container">
-            <div style="text-align:center;margin:50px 0"><img src="logo.png" style="width:100px;border-radius:20px;clip-path:inset(0 round 20px)"><h1>ACCESO</h1></div>
+            <div style="text-align:center; margin: 50px 0;">
+                <img src="logo.png" style="width:110px; border-radius:20px; margin-bottom:15px;" onerror="this.src='https://placehold.co/100x100?text=FD'">
+                <h1>ACCESO</h1>
+            </div>
             <div id="login-form">
-                <input type="email" id="login-email" placeholder="Email"><input type="password" id="login-pass" placeholder="Contraseña">
-                <button class="btn" id="btn-login">ENTRAR</button><button class="btn-outline" onclick="toggleAuth('register')">CREAR CUENTA</button>
+                <input type="email" id="login-email" placeholder="Email">
+                <input type="password" id="login-pass" placeholder="Contraseña">
+                <button class="btn" id="btn-login">ENTRAR</button>
+                <button class="btn-outline" onclick="toggleAuth('register')">CREAR CUENTA</button>
             </div>
             <div id="register-form" class="hidden">
-                <input type="text" id="reg-name" placeholder="Nombre"><input type="email" id="reg-email" placeholder="Email"><input type="password" id="reg-pass" placeholder="Contraseña">
-                <div style="display:flex;gap:10px"><input type="number" id="reg-age" placeholder="Edad"><input type="number" id="reg-height" placeholder="Altura (cm)"></div>
+                <input type="text" id="reg-name" placeholder="Nombre">
+                <input type="email" id="reg-email" placeholder="Email">
+                <input type="password" id="reg-pass" placeholder="Contraseña">
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="reg-age" placeholder="Edad">
+                    <input type="number" id="reg-height" placeholder="Altura (cm)">
+                </div>
                 <input type="text" id="reg-code" placeholder="CÓDIGO SECRETO">
-                <button class="btn" id="btn-register">REGISTRARSE</button><button class="btn-outline" onclick="toggleAuth('login')">VOLVER</button>
+                <button class="btn" id="btn-register">REGISTRARSE</button>
+                <button class="btn-outline" onclick="toggleAuth('login')">VOLVER</button>
             </div>
         </section>
 
         <section id="routines-view" class="view-container">
-            <h2>MIS RUTINAS</h2><div id="routines-list"></div>
+            <h2>MIS RUTINAS</h2>
+            <div id="routines-list"></div>
             <button class="btn-float" onclick="openEditor()">+</button>
         </section>
 
         <section id="editor-view" class="view-container">
             <div class="sticky-editor-header">
                 <h2 id="editor-title">NUEVA RUTINA</h2>
-                <div style="display:flex;gap:10px"><input type="text" id="editor-name" placeholder="Nombre"><button class="btn" style="width:auto" onclick="saveRoutine()">GUARDAR</button></div>
-                <input type="search" placeholder="🔍 Buscar ejercicio..." oninput="filterExercises(this.value)" style="margin:0">
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="text" id="editor-name" placeholder="Nombre de Rutina" style="margin:0;">
+                    <button class="btn" style="width:auto; padding:0 25px;" onclick="saveRoutine()">GUARDAR</button>
+                </div>
+                <input type="search" id="ex-search" placeholder="🔍 Buscar ejercicio..." oninput="filterExercises(this.value)" style="margin-bottom:0;">
             </div>
-            <div class="card" id="exercise-selector-list"></div><button class="btn-outline" onclick="switchTab('routines-view')">CANCELAR</button>
+            <div class="card">
+                <div id="exercise-selector-list"></div>
+            </div>
+            <button class="btn-outline" style="border-color:#666;" onclick="switchTab('routines-view')">CANCELAR</button>
         </section>
 
         <section id="profile-view" class="view-container">
             <div class="profile-header">
-                <div class="avatar-circle" onclick="document.getElementById('file-avatar').click()"><img id="avatar-img" src="" style="display:none"><span id="avatar-text">U</span></div>
+                <div class="avatar-circle" onclick="document.getElementById('file-avatar').click()">
+                    <img id="avatar-img" src="" style="display:none;">
+                    <span id="avatar-text" style="font-size:1.5rem; color:var(--accent-color);">U</span>
+                </div>
                 <input type="file" id="file-avatar" accept="image/*" class="hidden" onchange="uploadAvatar(this)">
-                <div><h3 id="profile-name">Cargando...</h3><span style="color:#666;font-size:.8rem">Atleta</span></div>
+                <div>
+                    <h3 id="profile-name" style="margin:0;">Cargando...</h3>
+                    <span style="color:#666; font-size:0.8rem;">Atleta de Alto Rendimiento</span>
+                </div>
             </div>
+
             <div class="card">
-                <h3>ESTADÍSTICAS</h3>
+                <h3>ESTADÍSTICAS TOTALES</h3>
                 <div class="stats-grid">
                     <div class="stat-box"><span class="stat-num" id="stat-workouts">0</span><span class="stat-label">Entrenos</span></div>
-                    <div class="stat-box"><span class="stat-num" id="stat-kg">0</span><span class="stat-label">Kg Total</span></div>
+                    <div class="stat-box"><span class="stat-num" id="stat-kg">0</span><span class="stat-label">Kg Movidos</span></div>
                     <div class="stat-box"><span class="stat-num" id="stat-sets">0</span><span class="stat-label">Series</span></div>
                     <div class="stat-box"><span class="stat-num" id="stat-reps">0</span><span class="stat-label">Reps</span></div>
                 </div>
             </div>
-            <div class="card"><h3>MAPA MUSCULAR</h3><div id="heatmap-container"></div></div>
+
             <div class="card">
-                <h3>EVOLUCIÓN</h3>
-                <div class="tip-box">💡 TIP: Usa siempre la misma luz, ropa y lugar.</div>
-                <div class="photo-tabs"><div class="photo-tab active" id="tab-front" onclick="switchPose('front')">FRONTAL</div><div class="photo-tab" id="tab-back" onclick="switchPose('back')">ESPALDA</div></div>
-                <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#888;margin-bottom:5px"><span id="date-before">-</span><span id="date-after">-</span></div>
-                <div class="compare-wrapper"><img src="" id="img-before" class="compare-img"><img src="" id="img-overlay" class="compare-img img-overlay"><div class="slider-handle" id="slider-handle"><div class="slider-btn">↔</div></div></div>
-                <input type="range" min="0" max="100" value="50" style="width:100%;margin-top:10px" oninput="moveSlider(this.value)">
-                <div class="photo-actions">
-                    <button class="btn-outline" style="margin:0" onclick="document.getElementById('f-before').click()">1. ANTES</button>
-                    <button class="btn" style="background:#b71c1c;margin:0" onclick="deletePhoto('before')">🗑️</button>
-                    <button class="btn-outline" style="margin:0" onclick="document.getElementById('f-after').click()">2. AHORA</button>
-                    <button class="btn" style="background:#b71c1c;margin:0" onclick="deletePhoto('after')">🗑️</button>
+                <h3>MAPA MUSCULAR (SERIES)</h3>
+                <div id="heatmap-container"></div>
+            </div>
+
+            <div class="card">
+                <h3>EVOLUCIÓN FÍSICA</h3>
+                
+                <div class="tip-box">💡 TIP: Usa siempre la misma luz, ropa y lugar para ver el progreso real.</div>
+
+                <div class="photo-tabs">
+                    <div class="photo-tab active" id="tab-front" onclick="switchPose('front')">👤 FRONTAL</div>
+                    <div class="photo-tab" id="tab-back" onclick="switchPose('back')">🛡️ ESPALDA</div>
                 </div>
+
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.7rem; color:#888;">
+                    <span id="date-before">-</span>
+                    <span id="date-after">-</span>
+                </div>
+
+                <div class="compare-wrapper">
+                    <img src="" id="img-before" class="compare-img">
+                    <img src="" id="img-overlay" class="compare-img img-overlay">
+                    <div class="slider-handle" id="slider-handle"><div class="slider-btn">↔</div></div>
+                </div>
+                <input type="range" min="0" max="100" value="50" style="width:100%; margin-top:15px;" oninput="moveSlider(this.value)">
+
+                <div class="photo-actions">
+                    <button class="btn-outline" style="margin:0; padding:10px 5px;" onclick="document.getElementById('f-before').click()">1. ANTES</button>
+                    <button class="btn-danger btn-small" style="margin:0;" onclick="deletePhoto('before')">🗑️</button>
+                    
+                    <button class="btn-outline" style="margin:0; padding:10px 5px;" onclick="document.getElementById('f-after').click()">2. AHORA</button>
+                    <button class="btn-danger btn-small" style="margin:0;" onclick="deletePhoto('after')">🗑️</button>
+                </div>
+
                 <input type="file" id="f-before" class="hidden" accept="image/*" onchange="loadCompImg(this,'before')">
                 <input type="file" id="f-after" class="hidden" accept="image/*" onchange="loadCompImg(this,'after')">
             </div>
+
             <div class="card">
-                <h3>AJUSTES</h3>
-                <div style="display:flex;gap:10px;margin-bottom:15px"><select id="photo-day" style="margin:0"><option value="1">Lunes</option><option value="5">Viernes</option></select><input type="time" id="photo-time" style="margin:0"><button class="btn-small btn" onclick="savePhotoReminder()">OK</button></div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span>Sonido (5 Beeps)</span><div><button class="btn-small btn-outline" style="margin-right:10px" onclick="testSound()">PROBAR</button><label class="switch"><input type="checkbox" id="cfg-sound" checked><span class="slider"></span></label></div></div>
-                <div style="display:flex;justify-content:space-between"><span>Pantalla Activa</span><label class="switch"><input type="checkbox" id="cfg-wake" checked><span class="slider"></span></label></div>
-                <button class="btn-outline" onclick="saveConfig()">GUARDAR</button>
+                <h3>CONFIGURACIÓN & ALARMAS</h3>
+                <div style="margin-bottom:15px;">
+                    <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">Recordatorio Fotos:</div>
+                    <div style="display:flex; gap:10px;">
+                        <select id="photo-day" style="margin:0;">
+                            <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
+                            <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option><option value="0">Domingo</option>
+                        </select>
+                        <input type="time" id="photo-time" value="09:00" style="margin:0;">
+                        <button class="btn-small btn" onclick="savePhotoReminder()">OK</button>
+                    </div>
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+                    <span>Descanso (seg)</span>
+                    <input type="number" id="cfg-rest-time" value="60" style="width:70px; padding:5px; margin:0; text-align:center;">
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
+                    <span>Sonido (5 Beeps)</span>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button class="btn-small btn-outline" style="margin:0; padding:2px 8px; font-size:0.7rem;" onclick="testSound()">🔊 PROBAR</button>
+                        <label class="switch"><input type="checkbox" id="cfg-sound" checked><span class="slider"></span></label>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span>Pantalla Activa</span><label class="switch"><input type="checkbox" id="cfg-wake" checked><span class="slider"></span></label>
+                </div>
+                <p style="font-size:0.7rem; color:#666; margin-top:10px;">*Importante: Desactiva el botón de silencio lateral del iPhone.</p>
+                <button class="btn-outline" style="margin-top:15px;" onclick="saveConfig()">GUARDAR AJUSTES</button>
             </div>
-            <div class="card"><h3>PESO</h3><div style="height:150px"><canvas id="weightChart"></canvas></div><button class="btn-outline" onclick="addWeightEntry()">+ REGISTRAR</button></div>
-            <button class="btn-outline" style="border-color:#500;color:#f55" onclick="logout()">CERRAR SESIÓN</button>
+
+            <div class="card">
+                <h3>PESO CORPORAL</h3>
+                <div style="height:200px;"><canvas id="weightChart"></canvas></div>
+                <button class="btn-outline" onclick="addWeightEntry()">+ REGISTRAR HOY</button>
+            </div>
+
+            <button class="btn-outline" style="border-color:#500; color:#f55; margin-bottom:20px;" onclick="logout()">CERRAR SESIÓN</button>
         </section>
 
         <section id="workout-view" class="view-container">
-            <div style="display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg);z-index:10;padding:10px 0;border-bottom:1px solid #222">
-                <button onclick="switchTab('routines-view')" style="background:0;border:0;color:#666;font-size:1.5rem">✕</button>
-                <div style="text-align:center"><span style="font-size:.6rem;color:#666">TIEMPO</span><br><span id="mini-timer" style="color:var(--accent);font-weight:bold">00:00</span></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; position:sticky; top:0; background:var(--bg-color); z-index:10; padding:10px 0; border-bottom:1px solid #222;">
+                <button onclick="switchTab('routines-view')" style="background:none; border:none; color:#666; font-size:1.5rem;">✕</button>
+                <div style="text-align:center;">
+                    <span style="font-size:0.6rem; color:#666;">TIEMPO</span><br>
+                    <span id="mini-timer" style="color:var(--accent-color); font-weight:bold;">00:00</span>
+                </div>
                 <button class="btn-small btn" onclick="promptRPE()">TERMINAR</button>
             </div>
-            <h2 id="workout-title">Entreno</h2><div id="workout-exercises"></div>
+            <h2 id="workout-title" style="margin-bottom:20px;">Entreno</h2>
+            <div id="workout-exercises"></div>
         </section>
 
-        <section id="admin-view" class="view-container"><h2>PANEL COACH</h2><div class="card"><h3>Atletas</h3><div id="admin-list"></div></div><button class="btn-outline" onclick="switchTab('routines-view')">VOLVER</button></section>
+        <section id="admin-view" class="view-container">
+            <h2>PANEL COACH</h2>
+            <div class="card">
+                <h3>Lista de Atletas</h3>
+                <div id="admin-list"></div>
+            </div>
+            <button class="btn-outline" onclick="switchTab('routines-view')">VOLVER</button>
+        </section>
+
     </main>
 
     <nav class="bottom-nav hidden" id="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('routines-view')"><span class="nav-icon">🏋️</span>Rutinas</div>
-        <div class="nav-item" onclick="switchTab('profile-view')"><span class="nav-icon">⚙️</span>Perfil</div>
+        <div class="nav-item active" onclick="switchTab('routines-view')">
+            <span class="nav-icon">🏋️</span><span>Rutinas</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile-view')">
+            <span class="nav-icon">⚙️</span><span>Perfil</span>
+        </div>
     </nav>
 
-    <div id="modal-timer" class="modal"><div class="modal-content"><h3 style="color:var(--success-color)">DESCANSO</h3><div id="timer-display" style="font-size:5rem;font-weight:900;margin:20px 0">60</div><div style="display:flex;gap:15px;justify-content:center"><button class="btn-outline" onclick="addRestTime(20)">+20s</button><button class="btn" onclick="closeTimer()">OMITIR</button></div></div></div>
-    
-    <div id="modal-rpe" class="modal"><div class="modal-content"><h3>INTENSIDAD</h3><button class="rpe-btn rpe-easy" onclick="finishWorkout('Suave')">🟢 SUAVE</button><button class="rpe-btn rpe-hard" onclick="finishWorkout('Duro')">🟠 DURO</button><button class="rpe-btn rpe-max" onclick="finishWorkout('Fallo')">🔴 FALLO</button><button class="btn-outline" onclick="document.getElementById('modal-rpe').classList.remove('active')">CANCELAR</button></div></div>
+    <div id="modal-timer" class="modal">
+        <div class="modal-content">
+            <h3 style="color:var(--success-color)">DESCANSO</h3>
+            <div id="timer-display" style="font-size:5rem; font-weight:900; color:white; margin:20px 0;">60</div>
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <button class="btn-outline" onclick="addRestTime(20)">+20s</button>
+                <button class="btn" onclick="closeTimer()">OMITIR</button>
+            </div>
+        </div>
+    </div>
 
-    <div id="modal-coach" class="modal"><div class="modal-content" style="text-align:left">
-        <div style="text-align:center;margin-bottom:10px"><div class="avatar-circle" style="width:60px;height:60px;margin:0 auto 10px"><img id="coach-user-img" style="display:none"><span id="coach-user-initial">U</span></div><h3 id="coach-user-name">User</h3><p id="coach-user-email" style="color:#666;font-size:.8rem"></p></div>
-        <div id="coach-stats-text" class="stat-pill-grid" style="margin-bottom:15px"></div>
-        
-        <h4>📸 Fotos</h4>
-        <div class="photo-tabs"><div class="photo-tab active" id="coach-tab-front" onclick="switchCoachPose('front')">FRONTAL</div><div class="photo-tab" id="coach-tab-back" onclick="switchCoachPose('back')">ESPALDA</div></div>
-        <div class="coach-photos-row" id="coach-photos-container"></div>
+    <div id="modal-rpe" class="modal">
+        <div class="modal-content">
+            <h3>FINALIZAR ENTRENO</h3>
+            <p style="color:#888; margin-bottom:20px;">¿Dificultad?</p>
+            <button class="rpe-btn rpe-easy" onclick="finishWorkout('Suave')">🟢 Suave / Moderado</button>
+            <button class="rpe-btn rpe-hard" onclick="finishWorkout('Duro')">🟠 Duro / Intenso</button>
+            <button class="rpe-btn rpe-max" onclick="finishWorkout('Fallo')">🔴 Fallo / Extremo</button>
+            <button class="btn-outline" onclick="document.getElementById('modal-rpe').classList.remove('active')">Cancelar</button>
+        </div>
+    </div>
 
-        <h4>Gráfica Peso</h4><div style="height:120px;margin-bottom:15px"><canvas id="coachWeightChart"></canvas></div>
-        
-        <h4>Rutinas Activas</h4><div id="coach-assigned-list" style="margin-bottom:15px;color:#888;font-size:.8rem"></div>
-        
-        <label style="font-size:.8rem;color:#ccc">Asignar:</label>
-        <input type="text" placeholder="🔍 Buscar rutina..." oninput="filterCoachRoutines(this.value)" style="width:100%;padding:8px;margin-bottom:5px;border-radius:6px;border:1px solid #333;background:#222;color:white">
-        <div style="display:flex;gap:5px"><select id="coach-routine-select" style="margin:0"></select><button class="btn-small btn-outline" style="width:auto" onclick="goToCreateRoutine()">➕</button><button class="btn-small btn" style="width:auto" onclick="assignRoutine()">OK</button></div>
-        
-        <div style="height:1px;background:#333;margin:15px 0"></div>
-        <h4>Historial</h4><div id="coach-history-list" style="height:120px;overflow-y:auto;background:#000;padding:5px;border:1px solid #333;margin-bottom:15px"></div>
-        
-        <button class="btn" style="background:#600;border:1px solid #f00" onclick="deleteUser()">ELIMINAR ATLETA</button>
-        <button class="btn-outline" onclick="document.getElementById('modal-coach').classList.remove('active')">CERRAR</button>
-    </div></div>
+    <div id="modal-coach" class="modal">
+        <div class="modal-content" style="text-align:left;">
+            <div style="text-align:center; margin-bottom:10px;">
+                <div class="avatar-circle" style="width:60px; height:60px; margin:0 auto 10px auto;">
+                    <img id="coach-user-img" src="" style="display:none;">
+                    <span id="coach-user-initial" style="font-size:1.5rem; color:var(--accent-color);">U</span>
+                </div>
+                <h3 id="coach-user-name" style="margin:0;">Usuario</h3>
+                <p id="coach-user-email" style="color:#666; font-size:0.8rem;"></p>
+            </div>
+            
+            <div id="coach-stats-text" class="stat-pill-grid" style="margin-bottom:15px;"></div>
+
+            <h4 style="margin-bottom:5px;">📸 Fotos Progreso</h4>
+            <div class="photo-tabs">
+                <div class="photo-tab active" id="coach-tab-front" onclick="switchCoachPose('front')">FRONTAL</div>
+                <div class="photo-tab" id="coach-tab-back" onclick="switchCoachPose('back')">ESPALDA</div>
+            </div>
+            <div class="coach-photos-row" id="coach-photos-container"></div>
+
+            <h4 style="margin-bottom:5px;">Gráfica Peso</h4>
+            <div style="height:120px; margin-bottom:15px;"><canvas id="coachWeightChart"></canvas></div>
+
+            <h4 style="margin-bottom:5px;">Últimos Entrenos</h4>
+            <div id="coach-history-list" style="height:120px; overflow-y:auto; font-size:0.75rem; color:#aaa; margin-bottom:15px; border:1px solid #333; padding:5px; background:#000;"></div>
+
+            <hr style="border-color:#333; margin:15px 0;">
+            
+            <div style="margin-bottom:15px;">
+                <h4 style="margin-bottom:5px;">📋 Rutinas Activas</h4>
+                <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:10px;">Cargando...</div>
+
+                <label style="font-size:0.8rem; color:#ccc;">Asignar Nueva:</label>
+                <input type="text" placeholder="🔍 Buscar rutina..." id="coach-routine-filter" style="margin-bottom:5px; padding:8px; font-size:0.8rem; width:100%; border-radius:6px; border:1px solid #333; background:#222; color:white;" oninput="filterCoachRoutines(this.value)">
+                
+                <div style="display:flex; gap:5px; margin-top:5px;">
+                    <select id="coach-routine-select" style="margin:0;"></select>
+                    <button class="btn-small btn-outline" style="width:auto; padding:0 10px;" onclick="goToCreateRoutine()">➕ NUEVA</button>
+                    <button class="btn-small btn" style="width:auto;" onclick="assignRoutine()">ENVIAR</button>
+                </div>
+            </div>
+
+            <button class="btn-danger btn" style="width:100%;" onclick="deleteUser()">🗑️ ELIMINAR ATLETA</button>
+            <button class="btn-outline" style="margin-top:10px;" onclick="document.getElementById('modal-coach').classList.remove('active')">CERRAR</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, where, addDoc, deleteDoc, getDocs, serverTimestamp, increment, orderBy, limit, arrayRemove, arrayUnion } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        const app = initializeApp({
+        const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
             authDomain: "fitdata-7a86b.firebaseapp.com",
             projectId: "fitdata-7a86b",
             storageBucket: "fitdata-7a86b.firebasestorage.app",
             messagingSenderId: "949628013924",
             appId: "1:949628013924:web:86278ae2c2bafb384d7e71"
-        });
-        const auth = getAuth(app); const db = getFirestore(app);
-        const ADMIN = "toni@fitdatapro.es"; const CODE = "fityhab";
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // AUDIO
-        let audioCtx=null;
-        function unlockAudio(){ if(!audioCtx){audioCtx=new(window.AudioContext||window.webkitAudioContext)()} if(audioCtx.state==='suspended')audioCtx.resume(); const b=audioCtx.createBuffer(1,1,22050); const s=audioCtx.createBufferSource(); s.buffer=b; s.connect(audioCtx.destination); s.start(0); }
-        document.addEventListener('touchstart',unlockAudio,{once:true}); document.addEventListener('click',unlockAudio,{once:true});
-        function play5Beeps(){ if(!audioCtx)unlockAudio(); if(audioCtx){ const now=audioCtx.currentTime; for(let i=0;i<5;i++){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='square'; o.frequency.value=880; o.connect(g); g.connect(audioCtx.destination); o.start(now+(i*0.6)); o.stop(now+(i*0.6)+0.15); g.gain.setValueAtTime(0.5,now+(i*0.6)); g.gain.exponentialRampToValueAtTime(0.01,now+(i*0.6)+0.15); } } }
-        window.testSound=play5Beeps;
+        const ADMIN = "toni@fitdatapro.es";
+        const CODE = "fityhab";
 
-        // BASE DE DATOS COMPLETA
+        // AUDIO SYSTEM (5 BEEPS)
+        let audioCtx = null;
+
+        function unlockAudio() {
+            if(!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if(audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const buffer = audioCtx.createBuffer(1, 1, 22050);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
+        }
+        document.addEventListener('touchstart', unlockAudio, {once:true});
+        document.addEventListener('click', unlockAudio, {once:true});
+
+        function play5Beeps() {
+            if(!audioCtx) unlockAudio();
+            if(audioCtx) {
+                const now = audioCtx.currentTime;
+                for(let i=0; i<5; i++) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.value = 880; 
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    const start = now + (i * 0.6);
+                    const end = start + 0.15;
+                    osc.start(start);
+                    osc.stop(end);
+                    gain.gain.setValueAtTime(0.5, start);
+                    gain.gain.exponentialRampToValueAtTime(0.01, end);
+                }
+            }
+        }
+
+        window.testSound = () => { play5Beeps(); };
+
+        // BASE DE DATOS
         const EXERCISES = [
             {n:"Sentadilla con Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Jaca", img:"cuadriceps.png", m:"Cuádriceps"},
             {n:"Sentadilla Cinturón", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa de Piernas", img:"cuadriceps.png", m:"Cuádriceps"},
@@ -410,239 +586,545 @@
             {n:"Elevación Piernas", img:"abs.png", m:"Abs"}, {n:"Abdominales Banco", img:"abs.png", m:"Abs"},
             {n:"Crunch Máquina", img:"abs.png", m:"Abs"}, {n:"Rodillas al Pecho", img:"abs.png", m:"Abs"}
         ];
-        
+
         let currentUser=null, userData=null, activeWorkout=null, timerInt=null, restTimeRemaining=0, wakeLock=null, chartInstance=null, selectedUserCoach=null, selectedUserObj=null, editingRoutineId=null, coachChart=null, currentPose='front', coachCurrentPose='front', allRoutinesCache=[];
 
-        function getExerciseData(name) { 
-            let m=EXERCISES.find(e=>e.n===name); 
-            if(!m){ 
-                if(name.toLowerCase().includes("press")||name.toLowerCase().includes("pecho")) return {img:"pecho.png", mInfo:{main:"Pecho",sec:["Tríceps"]}};
-                if(name.toLowerCase().includes("remo")||name.toLowerCase().includes("espalda")) return {img:"espalda.png", mInfo:{main:"Espalda",sec:["Bíceps"]}};
-                if(name.toLowerCase().includes("sentadilla")||name.toLowerCase().includes("pierna")) return {img:"cuadriceps.png", mInfo:{main:"Cuádriceps",sec:["Glúteos"]}};
-                if(name.toLowerCase().includes("curl")||name.toLowerCase().includes("biceps")) return {img:"biceps.png", mInfo:{main:"Bíceps",sec:["Antebrazo"]}};
-                if(name.toLowerCase().includes("triceps")||name.toLowerCase().includes("frances")) return {img:"triceps.png", mInfo:{main:"Tríceps",sec:["Pecho"]}};
-                if(name.toLowerCase().includes("hombro")||name.toLowerCase().includes("militar")) return {img:"hombros.png", mInfo:{main:"Hombros",sec:["Tríceps"]}};
-                return {img:"logo.png", mInfo:{main:"General",sec:[]}} 
-            } 
-            // Muscle info calc fallback
-            let sec=[]; 
-            if(m.m==="Pecho") sec=["Tríceps","Hombros"]; else if(m.m==="Espalda") sec=["Bíceps"]; 
-            else if(m.m==="Cuádriceps") sec=["Glúteos"]; else if(m.m==="Isquios") sec=["Glúteos"];
-            else if(m.m==="Hombros") sec=["Tríceps"]; else if(m.m==="Bíceps") sec=["Antebrazo"];
-            else if(m.m==="Tríceps") sec=["Pecho"];
-            return {img:m.img, mInfo:{main:m.m,sec:sec}}; 
+        function getExerciseData(name) {
+            let match = EXERCISES.find(e => e.n === name);
+            if (!match) {
+                const cleanName = name.toLowerCase().replace(/ de | con | en | el | la /g, " ").trim();
+                match = EXERCISES.find(e => {
+                    const cleanDbName = e.n.toLowerCase().replace(/ de | con | en | el | la /g, " ").trim();
+                    return cleanDbName.includes(cleanName) || cleanName.includes(cleanDbName);
+                });
+            }
+            if (!match) {
+                const n = name.toLowerCase();
+                let m = "General", img = "logo.png";
+                if(n.includes("press")||n.includes("pecho")||n.includes("aperturas")) { m="Pecho"; img="pecho.png"; }
+                else if(n.includes("remo")||n.includes("jalon")||n.includes("espalda")||n.includes("dominadas")) { m="Espalda"; img="espalda.png"; }
+                else if(n.includes("sentadilla")||n.includes("prensa")||n.includes("extension")||n.includes("zancada")) { m="Cuádriceps"; img="cuadriceps.png"; }
+                else if(n.includes("curl")||n.includes("biceps")) { m="Bíceps"; img="biceps.png"; }
+                else if(n.includes("triceps")||n.includes("frances")||n.includes("fondos")) { m="Tríceps"; img="triceps.png"; }
+                else if(n.includes("hombro")||n.includes("militar")||n.includes("elevacion")||n.includes("pajaros")) { m="Hombros"; img="hombros.png"; }
+                return { img: img, mInfo: getMuscleInfoByGroup(m) };
+            }
+            return { img: match.img, mInfo: getMuscleInfoByGroup(match.m) };
         }
 
-        onAuthStateChanged(auth, async(u)=>{
-            if(u){
-                currentUser=u; const s=await getDoc(doc(db,"users",u.uid));
-                if(s.exists()){
-                    userData=s.data();
-                    if(userData.email===ADMIN) { document.getElementById('coach-btn').classList.remove('hidden'); document.getElementById('coach-btn').onclick=()=>{loadAdminUsers();switchTab('admin-view')}; }
-                    if(userData.approved){ document.getElementById('loading-screen').classList.add('hidden'); document.getElementById('main-header').classList.remove('hidden'); document.getElementById('bottom-nav').classList.remove('hidden'); loadRoutines(); switchTab('routines-view'); loadProfile(); } 
-                    else { alert("Cuenta en revisión"); signOut(auth); }
+        function getMuscleInfoByGroup(m) {
+            let s = [];
+            if(m==="Pecho") s=["Tríceps","Hombros"]; 
+            else if(m==="Espalda") s=["Bíceps", "Antebrazo"]; 
+            else if(m==="Cuádriceps") s=["Glúteos", "Gemelos"]; 
+            else if(m==="Isquios") s=["Glúteos", "Espalda Baja"];
+            else if(m==="Hombros") s=["Tríceps", "Trapecio"]; 
+            else if(m==="Bíceps") s=["Antebrazo"];
+            else if(m==="Tríceps") s=["Hombros", "Pecho"];
+            else if(m==="Glúteos") s=["Isquios", "Cuádriceps"];
+            return {main:m, sec:s};
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if(user) {
+                currentUser = user;
+                const snap = await getDoc(doc(db,"users",user.uid));
+                if(snap.exists()){
+                    userData = snap.data();
+                    checkPhotoReminder();
+                    if(userData.email === ADMIN){
+                        document.getElementById('coach-btn').classList.remove('hidden');
+                        document.getElementById('coach-btn').onclick = () => { loadAdminUsers(); switchTab('admin-view'); };
+                    }
+                    if(userData.approved){
+                        document.getElementById('loading-screen').classList.add('hidden');
+                        document.getElementById('main-header').classList.remove('hidden');
+                        document.getElementById('bottom-nav').classList.remove('hidden');
+                        loadRoutines();
+                        switchTab('routines-view');
+                    } else { alert("Cuenta en revisión."); signOut(auth); }
                 }
-            } else { document.getElementById('loading-screen').classList.add('hidden'); switchTab('auth-view'); document.getElementById('main-header').classList.add('hidden'); document.getElementById('bottom-nav').classList.add('hidden'); }
+            } else {
+                document.getElementById('loading-screen').classList.add('hidden');
+                switchTab('auth-view');
+                document.getElementById('main-header').classList.add('hidden');
+                document.getElementById('bottom-nav').classList.add('hidden');
+            }
         });
 
-        window.switchTab=(t)=>{ document.querySelectorAll('.view-container').forEach(e=>e.classList.remove('active')); document.getElementById(t).classList.add('active'); if(t==='profile-view')loadProfile(); };
-        window.toggleAuth=(m)=>{ document.getElementById('login-form').classList.toggle('hidden',m!=='login'); document.getElementById('register-form').classList.toggle('hidden',m!=='register'); };
-        window.logout=()=>signOut(auth).then(()=>location.reload());
+        function checkPhotoReminder() {
+            if(!userData.photoDay) return;
+            const now = new Date();
+            const day = now.getDay();
+            const time = now.toTimeString().substr(0,5);
+            if(day == userData.photoDay && time === userData.photoTime) alert("📸 HORA DE TU FOTO DE PROGRESO 📸");
+        }
 
-        // ROUTINES
-        async function loadRoutines(){
-            const l=document.getElementById('routines-list'); l.innerHTML='Cargando...';
-            onSnapshot(query(collection(db,"routines")),(s)=>{
-                l.innerHTML='';
+        window.switchTab = (t) => {
+            document.querySelectorAll('.view-container').forEach(e=>e.classList.remove('active'));
+            document.getElementById(t).classList.add('active');
+            document.getElementById('main-container').scrollTop = 0;
+            const ns = document.querySelectorAll('.nav-item');
+            ns.forEach(n=>n.classList.remove('active'));
+            if(t==='routines-view') ns[0].classList.add('active');
+            if(t==='profile-view') { ns[1].classList.add('active'); loadProfile(); }
+        };
+        window.toggleAuth = (m) => { document.getElementById('login-form').classList.toggle('hidden',m!=='login'); document.getElementById('register-form').classList.toggle('hidden',m!=='register'); };
+        window.logout = () => signOut(auth).then(()=>location.reload());
+
+        async function loadRoutines() {
+            const l = document.getElementById('routines-list'); l.innerHTML = 'Cargando...';
+            onSnapshot(query(collection(db,"routines")), (s)=>{
+                l.innerHTML = '';
                 s.forEach(d=>{
-                    const r=d.data();
+                    const r = d.data();
                     if(r.uid===currentUser.uid || (r.assignedTo && r.assignedTo.includes(currentUser.uid))){
-                        const div=document.createElement('div'); div.className='card';
-                        div.innerHTML=`<div style="display:flex;justify-content:space-between"><h3>${r.name}</h3>${r.uid===currentUser.uid?`<button style="background:0;border:0" onclick="openEditor('${d.id}')">✏️</button>`:''}</div><button class="btn" onclick="startWorkout('${d.id}')">ENTRENAR</button>`;
+                        const isMine = r.uid===currentUser.uid;
+                        const div = document.createElement('div');
+                        div.className = 'card';
+                        div.innerHTML = `<div style="display:flex; justify-content:space-between;"><h3 style="color:${isMine?'white':'var(--accent-color)'}">${r.name}</h3><div>${isMine ? `<button style="background:none;border:none;margin-right:10px;" onclick="openEditor('${d.id}')">✏️</button><button style="background:none;border:none;" onclick="delRoutine('${d.id}')">🗑️</button>` : '🔒'}</div></div><p style="color:#666; font-size:0.8rem; margin:10px 0;">${r.exercises.length} Ejercicios</p><button class="btn" onclick="startWorkout('${d.id}')">ENTRENAR</button>`;
                         l.appendChild(div);
                     }
                 });
             });
         }
 
-        window.openEditor=async(id=null)=>{ editingRoutineId=id; document.getElementById('editor-name').value=''; renderExercises(EXERCISES); if(id){const s=await getDoc(doc(db,"routines",id));document.getElementById('editor-name').value=s.data().name} switchTab('editor-view'); };
-        window.saveRoutine=async()=>{ const n=document.getElementById('editor-name').value; const s=Array.from(document.querySelectorAll('.ex-select-item.selected')).map(e=>e.innerText); if(!n||s.length===0)return alert("Datos?"); const d={uid:currentUser.uid,name:n,exercises:s,createdAt:serverTimestamp()}; if(editingRoutineId)await updateDoc(doc(db,"routines",editingRoutineId),d); else await addDoc(collection(db,"routines"),d); switchTab('routines-view'); };
-        window.renderExercises=(l)=>{ const c=document.getElementById('exercise-selector-list'); c.innerHTML=''; l.forEach(e=>{const d=document.createElement('div');d.className='ex-select-item';d.innerHTML=`<img src="${e.img}" onerror="this.src='logo.png'"><span>${e.n}</span>`;d.onclick=()=>d.classList.toggle('selected');c.appendChild(d)}) };
-        window.filterExercises=(v)=>renderExercises(EXERCISES.filter(e=>e.n.toLowerCase().includes(v.toLowerCase())));
-
-        // WORKOUT
-        window.startWorkout=async(rid)=>{
-            if(document.getElementById('cfg-wake').checked && 'wakeLock' in navigator) try{wakeLock=await navigator.wakeLock.request('screen')}catch(e){}
-            const snap=await getDoc(doc(db,"routines",rid)); const r=snap.data();
-            activeWorkout={name:r.name,exs:r.exercises.map(n=>{
-                const d = getExerciseData(n);
-                return {n:n, img:d.img, mInfo:d.mInfo, sets:[{r:12,w:0,d:false},{r:12,w:0,d:false},{r:12,w:0,d:false}]}
-            })};
-            renderWorkout(); switchTab('workout-view');
+        window.openEditor = async (id=null) => {
+            editingRoutineId = id;
+            document.getElementById('editor-name').value = '';
+            document.getElementById('editor-title').innerText = id ? "EDITAR RUTINA" : "NUEVA RUTINA";
+            renderExercises(EXERCISES);
+            if(id) {
+                const docSnap = await getDoc(doc(db,"routines",id));
+                const r = docSnap.data();
+                document.getElementById('editor-name').value = r.name;
+                const items = document.querySelectorAll('.ex-select-item');
+                items.forEach(item => { 
+                    const name = item.querySelector('span').innerText;
+                    if(r.exercises.includes(name)) item.classList.add('selected'); 
+                });
+            }
+            switchTab('editor-view');
         };
-        function renderWorkout(){
-            const c=document.getElementById('workout-exercises'); c.innerHTML='';
-            activeWorkout.exs.forEach((e,i)=>{
-                let bars = `<div class="mini-bar-label"><span>${e.mInfo.main}</span><span>100%</span></div><div class="mini-track"><div class="mini-fill" style="width:100%"></div></div>`;
-                let h=`<div class="card" style="border-left:3px solid var(--accent)">
-                <div class="workout-split"><div class="workout-visual"><img src="${e.img}"></div><div class="workout-bars" style="width:100%">${bars}</div></div>
-                <h3>${e.n}</h3>`;
-                e.sets.forEach((s,j)=>{ h+=`<div class="set-row"><div class="set-num">${j+1}</div><input type="number" value="${s.r}" onchange="activeWorkout.exs[${i}].sets[${j}].r=this.value"><input type="number" value="${s.w}" onchange="activeWorkout.exs[${i}].sets[${j}].w=this.value"><button class="btn-outline ${s.d?'btn-done':''}" onclick="toggleSet(${i},${j})">${s.d?'✓':''}</button></div>`; });
-                c.innerHTML+=h+'</div>';
+
+        window.filterExercises = (t) => renderExercises(EXERCISES.filter(e=>e.n.toLowerCase().includes(t.toLowerCase())));
+        function renderExercises(l) {
+            const c = document.getElementById('exercise-selector-list'); c.innerHTML = '';
+            l.forEach(e=>{
+                const d = document.createElement('div'); d.className = 'ex-select-item';
+                d.innerHTML = `<img src="${e.img}" onerror="this.src='logo.png'"><span>${e.n}</span>`;
+                d.onclick = () => d.classList.toggle('selected');
+                c.appendChild(d);
             });
         }
-        window.toggleSet=(i,j)=>{ activeWorkout.exs[i].sets[j].d=!activeWorkout.exs[i].sets[j].d; renderWorkout(); if(activeWorkout.exs[i].sets[j].d)openRest(); };
-        function openRest(){ const m=document.getElementById('modal-timer'); m.classList.add('active'); restTimeRemaining=userData.restTime||60; document.getElementById('timer-display').innerText=restTimeRemaining; if(timerInt)clearInterval(timerInt); timerInt=setInterval(()=>{ restTimeRemaining--; document.getElementById('timer-display').innerText=restTimeRemaining; if(restTimeRemaining<=0){ clearInterval(timerInt); m.classList.remove('active'); if(document.getElementById('cfg-sound').checked)play5Beeps(); } },1000); }
-        window.addRestTime=(s)=>{restTimeRemaining+=s;document.getElementById('timer-display').innerText=restTimeRemaining};
-        window.closeTimer=()=>{clearInterval(timerInt);document.getElementById('modal-timer').classList.remove('active')};
-        window.promptRPE=()=>document.getElementById('modal-rpe').classList.add('active');
-        window.finishWorkout=async(rpe)=>{
-            document.getElementById('modal-rpe').classList.remove('active');
-            let s=0,r=0,k=0; let mc={}; 
-            activeWorkout.exs.forEach(e=>e.sets.forEach(st=>{
-                if(st.d){ s++;r+=parseInt(st.r)||0;k+=(parseInt(st.w)||0)*(parseInt(st.r)||0); mc[e.mInfo.main]=(mc[e.mInfo.main]||0)+1; }
-            }));
-            await addDoc(collection(db,"workouts"),{uid:currentUser.uid,date:serverTimestamp(),routine:activeWorkout.name,rpe:rpe});
-            let up={"stats.workouts":increment(1),"stats.totalSets":increment(s),"stats.totalReps":increment(r),"stats.totalKg":increment(k)};
-            for(const [m,c] of Object.entries(mc)) up[`muscleStats.${m}`]=increment(c);
-            await updateDoc(doc(db,"users",currentUser.uid),up);
-            if(wakeLock)wakeLock.release(); switchTab('routines-view');
+
+        window.saveRoutine = async () => {
+            const n = document.getElementById('editor-name').value;
+            const s = Array.from(document.querySelectorAll('.ex-select-item.selected')).map(e=>e.innerText);
+            if(!n || s.length===0) return alert("Faltan datos");
+            const data = { uid:currentUser.uid, name:n, exercises:s, createdAt:serverTimestamp() };
+            if(editingRoutineId) await updateDoc(doc(db,"routines",editingRoutineId), {name:n, exercises:s});
+            else await addDoc(collection(db,"routines"), data);
+            switchTab('routines-view');
+        };
+        window.delRoutine = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db,"routines",id)); };
+
+        // --- PHOTO COMPARISON LOGIC ---
+        window.switchPose = (pose) => {
+            currentPose = pose;
+            document.getElementById('tab-front').classList.toggle('active', pose==='front');
+            document.getElementById('tab-back').classList.toggle('active', pose==='back');
+            updatePhotoDisplay(userData); // Reload images based on pose
         };
 
-        // PROFILE & PHOTOS
-        async function loadProfile(){
-            document.getElementById('profile-name').innerText=userData.name;
-            if(userData.photo) document.getElementById('avatar-img').src=userData.photo;
+        function updatePhotoDisplay(u) {
+            const prefix = currentPose === 'front' ? '' : '_back';
+            const before = u[`photoBefore${prefix}`] || '';
+            const after = u[`photoAfter${prefix}`] || '';
+            const dateB = u[`dateBefore${prefix}`] || '-';
+            const dateA = u[`dateAfter${prefix}`] || '-';
+
+            document.getElementById('img-before').src = before;
+            document.getElementById('img-overlay').src = after;
+            document.getElementById('date-before').innerText = `ANTES (${dateB})`;
+            document.getElementById('date-after').innerText = `AHORA (${dateA})`;
+        }
+
+        // COMPRESION Y GUARDADO DE FOTOS COMPARATIVAS
+        window.loadCompImg = (inp, field) => { 
+            if(inp.files[0]) { 
+                const r = new FileReader(); 
+                r.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = async () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 600;
+                        const scale = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scale;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        
+                        // Determinar campos según pose actual
+                        const prefix = currentPose === 'front' ? '' : '_back';
+                        const fieldName = field === 'before' ? `photoBefore${prefix}` : `photoAfter${prefix}`;
+                        const dateField = field === 'before' ? `dateBefore${prefix}` : `dateAfter${prefix}`;
+                        const today = new Date().toLocaleDateString();
+
+                        let update = {}; 
+                        update[fieldName] = dataUrl;
+                        update[dateField] = today;
+                        await updateDoc(doc(db, "users", currentUser.uid), update);
+                        userData[fieldName] = dataUrl;
+                        userData[dateField] = today;
+                        updatePhotoDisplay(userData);
+                    };
+                }; 
+                r.readAsDataURL(inp.files[0]); 
+            } 
+        };
+
+        window.deletePhoto = async (type) => {
+            if(!confirm("¿Borrar esta foto permanentemente?")) return;
+            const prefix = currentPose === 'front' ? '' : '_back';
+            const fieldPhoto = type === 'before' ? `photoBefore${prefix}` : `photoAfter${prefix}`;
+            const fieldDate = type === 'before' ? `dateBefore${prefix}` : `dateAfter${prefix}`;
+
+            let update = {};
+            update[fieldPhoto] = "";
+            update[fieldDate] = "";
+
+            await updateDoc(doc(db, "users", currentUser.uid), update);
+            userData[fieldPhoto] = "";
+            userData[fieldDate] = "";
             updatePhotoDisplay(userData);
-            if(userData.restTime) document.getElementById('cfg-rest-time').value = userData.restTime;
-            if(userData.stats){ document.getElementById('stat-workouts').innerText=userData.stats.workouts||0; document.getElementById('stat-kg').innerText=((userData.stats.totalKg||0)/1000).toFixed(1)+'t'; document.getElementById('stat-sets').innerText=userData.stats.totalSets||0; document.getElementById('stat-reps').innerText=userData.stats.totalReps||0; }
+        }
+
+        async function loadProfile() {
+            document.getElementById('profile-name').innerText = userData.name;
+            if(userData.photo) { document.getElementById('avatar-text').style.display='none'; document.getElementById('avatar-img').src = userData.photo; document.getElementById('avatar-img').style.display='block'; }
             
+            // Initial load of photos (Front)
+            updatePhotoDisplay(userData);
+
+            if(userData.restTime) document.getElementById('cfg-rest-time').value = userData.restTime;
+            
+            // STATS
+            if(userData.stats) {
+                document.getElementById('stat-workouts').innerText = userData.stats.workouts || 0;
+                document.getElementById('stat-kg').innerText = userData.stats.totalKg ? (userData.stats.totalKg/1000).toFixed(1)+'t' : 0;
+                document.getElementById('stat-sets').innerText = userData.stats.totalSets || 0;
+                document.getElementById('stat-reps').innerText = userData.stats.totalReps || 0;
+            }
+
             const muscles = ["Pecho","Espalda","Cuádriceps","Isquios","Glúteos","Hombros","Bíceps","Tríceps"];
             const hC = document.getElementById('heatmap-container'); hC.innerHTML = '';
-            const mS = userData.muscleStats || {};
+            const muscleStats = userData.muscleStats || {};
+            
             muscles.forEach(m=>{
-                const c = mS[m] || 0; const pct = Math.min((c/20)*100,100);
-                hC.innerHTML+=`<div class="muscle-bar-group"><div class="muscle-label"><span>${m}</span><span>${c} s</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div></div>`;
+                const count = muscleStats[m] || 0;
+                const pct = Math.min((count / 20) * 100, 100); 
+                const d = document.createElement('div'); d.className = 'muscle-bar-group';
+                d.innerHTML = `<div class="muscle-label"><span>${m}</span><span>${count} series</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+                hC.appendChild(d);
             });
-
             const ctx = document.getElementById('weightChart'); if(chartInstance) chartInstance.destroy();
-            const d = userData.weightHistory || [70];
-            chartInstance = new Chart(ctx, { type:'line', data:{ labels:d.map((_,i)=>i+1), datasets:[{label:'Kg', data:d, borderColor:'#ff3333', fill:true, backgroundColor:'rgba(255,51,51,0.1)'}] }, options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{grid:{color:'#333'}}},maintainAspectRatio:false} });
+            const data = userData.weightHistory || [70,70.5,71];
+            chartInstance = new Chart(ctx, { type:'line', data:{ labels:data.map((_,i)=>`T${i}`), datasets:[{label:'Kg', data:data, borderColor:'#ff3333', backgroundColor:'rgba(255,51,51,0.1)', fill:true, tension:0.4}] }, options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{grid:{color:'#333'}}},maintainAspectRatio:false} });
         }
-        window.switchPose=(p)=>{ currentPose=p; document.getElementById('tab-front').classList.toggle('active',p==='front'); document.getElementById('tab-back').classList.toggle('active',p==='back'); updatePhotoDisplay(userData); };
-        function updatePhotoDisplay(u){
-            const pre=currentPose==='front'?'':'_back';
-            document.getElementById('img-before').src=u[`photoBefore${pre}`]||'';
-            document.getElementById('img-overlay').src=u[`photoAfter${pre}`]||'';
-            document.getElementById('date-before').innerText = `ANTES (${u[`dateBefore${pre}`]||'-'})`;
-            document.getElementById('date-after').innerText = `AHORA (${u[`dateAfter${pre}`]||'-'})`;
-        }
-        window.loadCompImg=(inp,t)=>{
-            if(inp.files[0]){
-                const r=new FileReader();
-                r.onload=(e)=>{
-                    const img=new Image(); img.src=e.target.result;
-                    img.onload=async()=>{
-                        const c=document.createElement('canvas'); const ctx=c.getContext('2d');
-                        const sc=600/img.width; c.width=600; c.height=img.height*sc;
-                        ctx.drawImage(img,0,0,c.width,c.height);
-                        const d=c.toDataURL('image/jpeg',0.7); const pre=currentPose==='front'?'':'_back';
-                        const today=new Date().toLocaleDateString();
-                        let up={}; up[`photo${t==='before'?'Before':'After'}${pre}`]=d; up[`date${t==='before'?'Before':'After'}${pre}`]=today;
-                        await updateDoc(doc(db,"users",currentUser.uid),up);
-                        userData[`photo${t==='before'?'Before':'After'}${pre}`]=d; userData[`date${t==='before'?'Before':'After'}${pre}`]=today; updatePhotoDisplay(userData);
-                    }
-                }; r.readAsDataURL(inp.files[0]);
+
+        window.saveConfig = async () => {
+            const rt = document.getElementById('cfg-rest-time').value;
+            await updateDoc(doc(db,"users",currentUser.uid), { restTime: parseInt(rt) });
+            userData.restTime = parseInt(rt);
+            alert("Ajustes Guardados");
+        };
+        window.savePhotoReminder = async () => {
+            const d = document.getElementById('photo-day').value;
+            const t = document.getElementById('photo-time').value;
+            await updateDoc(doc(db,"users",currentUser.uid), { photoDay:d, photoTime:t });
+            userData.photoDay = d; userData.photoTime = t;
+            alert("Alarma Guardada");
+        };
+        window.uploadAvatar = (inp) => { if(inp.files[0]) { const r = new FileReader(); r.onload=async(e)=>{ await updateDoc(doc(db,"users",currentUser.uid), {photo:e.target.result}); loadProfile(); }; r.readAsDataURL(inp.files[0]); } };
+        
+        window.moveSlider = (v) => { document.getElementById('img-overlay').style.clipPath = `inset(0 ${100-v}% 0 0)`; document.getElementById('slider-handle').style.left = `${v}%`; };
+        window.addWeightEntry = async () => { const w=prompt("Kg:"); if(w){ let h=userData.weightHistory||[]; h.push(parseFloat(w)); await updateDoc(doc(db,"users",currentUser.uid),{weightHistory:h}); userData.weightHistory=h; loadProfile(); } };
+
+        window.startWorkout = async (rid) => {
+            if(document.getElementById('cfg-wake').checked && 'wakeLock' in navigator) try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}
+            const snap = await getDoc(doc(db,"routines",rid));
+            const r = snap.data();
+            activeWorkout = { name: r.name, exs: r.exercises.map(n => {
+                const data = getExerciseData(n);
+                return { n:n, img:data.img, mInfo: data.mInfo, sets:Array(5).fill().map((_,i)=>({r:i===0?20:16, w:'', d:false})) };
+            })};
+            
+            const c = document.getElementById('workout-exercises'); c.innerHTML = '';
+            document.getElementById('workout-title').innerText = activeWorkout.name;
+            activeWorkout.exs.forEach((e,i) => {
+                const card = document.createElement('div'); card.className = 'card'; card.style.borderLeft="3px solid var(--accent-color)";
+                let bars = `<div class="mini-bar-label"><span>${e.mInfo.main}</span><span>100%</span></div><div class="mini-track"><div class="mini-fill fill-primary"></div></div>`;
+                e.mInfo.sec.forEach(s => { bars += `<div class="mini-bar-label" style="margin-top:4px;"><span>${s}</span><span>40%</span></div><div class="mini-track"><div class="mini-fill fill-sec"></div></div>`; });
+                let setsHtml = `<div class="set-header"><div>#</div><div>REPS</div><div>KG</div><div></div></div>`;
+                e.sets.forEach((s,j) => {
+                    setsHtml += `<div class="set-row"><div class="set-num">${j+1}</div><div><span class="shadow-val">${s.r}</span><input type="number" value="${s.r}" onchange="uS(${i},${j},'r',this.value)"></div><div><span class="shadow-val">--</span><input type="number" placeholder="kg" value="${s.w}" onchange="uS(${i},${j},'w',this.value)"></div><button id="btn-${i}-${j}" class="btn-outline" style="margin:0;padding:0;height:35px;" onclick="tS(${i},${j})"></button></div>`;
+                });
+                card.innerHTML = `<div class="workout-split"><div class="workout-visual"><img src="${e.img}" onerror="this.src='logo.png'"></div><div class="workout-bars" style="width:100%">${bars}</div></div><h3 style="margin-bottom:10px; border:none;">${e.n}</h3>${setsHtml}`;
+                c.appendChild(card);
+            });
+            switchTab('workout-view');
+            startTimerMini();
+        };
+
+        window.uS = (i,j,k,v) => activeWorkout.exs[i].sets[j][k]=v;
+        window.tS = (i,j) => {
+            const s = activeWorkout.exs[i].sets[j]; s.d = !s.d;
+            const btn = document.getElementById(`btn-${i}-${j}`);
+            if(s.d) {
+                btn.classList.add('btn-done');
+                btn.innerHTML = '✓';
+                openRest();
+            } else {
+                btn.classList.remove('btn-done');
+                btn.innerHTML = '';
             }
         };
-        window.deletePhoto=async(t)=>{
-            if(!confirm("¿Borrar foto?"))return;
-            const pre=currentPose==='front'?'':'_back';
-            let up={}; up[`photo${t==='before'?'Before':'After'}${pre}`]=""; up[`date${t==='before'?'Before':'After'}${pre}`]="";
-            await updateDoc(doc(db,"users",currentUser.uid),up);
-            userData[`photo${t==='before'?'Before':'After'}${pre}`]=""; updatePhotoDisplay(userData);
-        };
-        window.moveSlider=(v)=>{document.getElementById('img-overlay').style.clipPath=`inset(0 ${100-v}% 0 0)`;document.getElementById('slider-handle').style.left=`${v}%`};
-        window.saveConfig=async()=>{ await updateDoc(doc(db,"users",currentUser.uid),{restTime:parseInt(document.getElementById('cfg-rest-time').value)}); alert("Guardado"); };
-        window.savePhotoReminder=async()=>{ await updateDoc(doc(db,"users",currentUser.uid),{photoDay:document.getElementById('photo-day').value,photoTime:document.getElementById('photo-time').value}); alert("Alarma OK"); };
-        window.addWeightEntry=async()=>{ const w=prompt("Kg:"); if(w){ let h=userData.weightHistory||[]; h.push(parseFloat(w)); await updateDoc(doc(db,"users",currentUser.uid),{weightHistory:h}); userData.weightHistory=h; loadProfile(); } };
 
-        // COACH
-        async function loadAdminUsers(){
-            const l=document.getElementById('admin-list'); l.innerHTML='';
-            const s=await getDocs(collection(db,"users"));
+        function openRest() {
+            const m = document.getElementById('modal-timer'); m.classList.add('active');
+            const rest = userData.restTime || 60;
+            restTimeRemaining = rest;
+            document.getElementById('timer-display').innerText = restTimeRemaining;
+            
+            if(timerInt) clearInterval(timerInt);
+            timerInt = setInterval(() => {
+                restTimeRemaining--;
+                document.getElementById('timer-display').innerText = restTimeRemaining;
+                if(restTimeRemaining <= 0) {
+                    clearInterval(timerInt); m.classList.remove('active');
+                    if(document.getElementById('cfg-sound').checked) {
+                        play5Beeps();
+                    }
+                }
+            }, 1000);
+        }
+        window.closeTimer = () => { clearInterval(timerInt); document.getElementById('modal-timer').classList.remove('active'); };
+        window.addRestTime = (s) => { 
+            restTimeRemaining += s; 
+            document.getElementById('timer-display').innerText = restTimeRemaining; 
+        };
+        
+        function startTimerMini() { const d=document.getElementById('mini-timer'); const s=Date.now(); setInterval(()=>{const df=Math.floor((Date.now()-s)/1000); d.innerText=`${Math.floor(df/60)}:${(df%60).toString().padStart(2,'0')}`;},1000); }
+        
+        window.promptRPE = () => {
+            document.getElementById('modal-rpe').classList.add('active');
+        };
+
+        window.finishWorkout = async (rpeVal) => {
+            document.getElementById('modal-rpe').classList.remove('active');
+            
+            let s=0, r=0, k=0;
+            let muscleCounts = {};
+            
+            activeWorkout.exs.forEach(e => {
+                e.sets.forEach(st => { 
+                    if(st.d) { 
+                        s++; 
+                        r+=parseInt(st.r)||0; 
+                        k+=(parseInt(st.w)||0)*(parseInt(st.r)||0); 
+                        const mName = e.mInfo.main;
+                        muscleCounts[mName] = (muscleCounts[mName] || 0) + 1;
+                    }
+                });
+            });
+
+            await addDoc(collection(db,"workouts"), {
+                uid:currentUser.uid, 
+                date:serverTimestamp(), 
+                routine:activeWorkout.name,
+                rpe: rpeVal
+            });
+            
+            const updates = { 
+                "stats.workouts": increment(1), 
+                "stats.totalSets": increment(s), 
+                "stats.totalReps": increment(r), 
+                "stats.totalKg": increment(k) 
+            };
+            
+            for (const [muscle, count] of Object.entries(muscleCounts)) {
+                updates[`muscleStats.${muscle}`] = increment(count);
+            }
+
+            await updateDoc(doc(db,"users",currentUser.uid), updates);
+            if(wakeLock) wakeLock.release(); 
+            switchTab('routines-view');
+        };
+
+        async function loadAdminUsers() {
+            const l = document.getElementById('admin-list'); l.innerHTML = '';
+            const s = await getDocs(collection(db,"users"));
             s.forEach(d=>{
                 const u=d.data(); if(u.email===ADMIN)return;
-                const div=document.createElement('div'); div.className='admin-user-row';
-                div.innerHTML=`<div><strong>${u.name}</strong><br><small>${u.approved?'🟢':'⏳'} ${u.email}</small></div><button class="btn-outline btn-small" style="width:auto">VER FICHA</button>`;
-                div.onclick=()=>openCoachModal(d.id,u); l.appendChild(div);
+                const div=document.createElement('div');
+                div.className = "admin-user-row";
+                div.innerHTML=`<div><strong>${u.name}</strong><br><small>${u.approved?'🟢':'⏳'} ${u.email}</small></div><button class="btn-outline btn-small" style="width:auto;">⚙️ VER FICHA</button>`;
+                div.onclick=()=>openCoachModal(d.id,u); 
+                l.appendChild(div);
             });
         }
-        async function openCoachModal(uid,u){
-            selectedUserCoach=uid; selectedUserObj=u;
-            document.getElementById('modal-coach').classList.add('active');
+
+        async function openCoachModal(uid,u) {
+            selectedUserCoach=uid;
+            selectedUserObj = u;
+            const m=document.getElementById('modal-coach');
+            m.classList.add('active'); 
+            
             document.getElementById('coach-user-name').innerText=u.name;
             document.getElementById('coach-user-email').innerText=u.email;
             
-            // Photo & Stats
-            const img=document.getElementById('coach-user-img'); const ini=document.getElementById('coach-user-initial');
-            if(u.photo){img.src=u.photo;img.style.display='block';ini.style.display='none'}else{img.style.display='none';ini.style.display='block'}
-            const st=u.stats||{}; const age=u.age||'N/A';
-            document.getElementById('coach-stats-text').innerHTML=`<div class="stat-pill"><b>${st.workouts||0}</b><span>WO</span></div><div class="stat-pill"><b>${(st.totalKg/1000||0).toFixed(1)}t</b><span>KG</span></div><div class="stat-pill"><b>${age}</b><span>EDAD</span></div>`;
+            const img = document.getElementById('coach-user-img');
+            const initial = document.getElementById('coach-user-initial');
+            if(u.photo) {
+                img.src = u.photo; img.style.display = 'block'; initial.style.display = 'none';
+            } else {
+                img.style.display = 'none'; initial.style.display = 'block';
+            }
             
-            // Photos Tab
-            switchCoachPose('front');
+            // Initial Photo Load (Coach sees Front by default)
+            updateCoachPhotoDisplay('front');
 
-            // Load Routines Cache
-            const rS=await getDocs(collection(db,"routines"));
-            allRoutinesCache=[]; rS.forEach(r=>allRoutinesCache.push({id:r.id,...r.data()}));
-            renderCoachRoutines(allRoutinesCache);
+            try {
+                const st = u.stats || {};
+                const age = u.age ? u.age : 'N/D';
+                document.getElementById('coach-stats-text').innerHTML = `
+                    <div class="stat-pill"><b>${st.workouts||0}</b><span>ENTRENOS</span></div>
+                    <div class="stat-pill"><b>${(st.totalKg/1000||0).toFixed(1)}t</b><span>CARGA</span></div>
+                    <div class="stat-pill"><b>${age}</b><span>AÑOS</span></div>
+                `;
 
-            // Assigned
-            const aList=document.getElementById('coach-assigned-list'); aList.innerHTML='Cargando...';
-            const qA=query(collection(db,"routines"),where("assignedTo","array-contains",uid));
-            const sA=await getDocs(qA); aList.innerHTML=''; 
-            if(sA.empty)aList.innerHTML='Sin rutinas.';
-            sA.forEach(r=>{ aList.innerHTML+=`<div class="assigned-routine-item"><span>${r.data().name}</span><button style="color:red;background:0;border:0" onclick="unassignRoutine('${r.id}')">❌</button></div>`; });
+                if(coachChart) coachChart.destroy();
+                const ctx = document.getElementById('coachWeightChart');
+                const wData = u.weightHistory || [];
+                coachChart = new Chart(ctx, { type:'line', data:{ labels:wData.map((_,i)=>i+1), datasets:[{label:'Kg', data:wData, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}}});
 
-            // History & Chart
-            const hList=document.getElementById('coach-history-list'); hList.innerHTML='Cargando...';
-            const qH=query(collection(db,"workouts"),where("uid","==",uid),orderBy("date","desc"),limit(10));
-            const sH=await getDocs(qH); hList.innerHTML='';
-            sH.forEach(w=>{
-                const d=w.data(); const dt=new Date(d.date.seconds*1000).toLocaleDateString();
-                const col=d.rpe==='Fallo'?'red':(d.rpe==='Duro'?'orange':'green');
-                hList.innerHTML+=`<div class="history-row"><div>${dt}</div><div>${d.routine}</div><div class="badge ${col}">${d.rpe||'-'}</div></div>`;
-            });
+                // --- RUTINAS ACTIVAS (FIX) ---
+                const rList = document.getElementById('coach-assigned-list');
+                rList.innerHTML = 'Cargando...';
+                // Consulta correcta: busca rutinas donde el uid esté en assignedTo
+                const qR = query(collection(db, "routines"), where("assignedTo", "array-contains", uid));
+                const snapR = await getDocs(qR);
+                rList.innerHTML = '';
+                if(snapR.empty) rList.innerHTML = 'Ninguna rutina asignada.';
+                snapR.forEach(r => {
+                    const rd = r.data();
+                    const div = document.createElement('div');
+                    div.className = "assigned-routine-item";
+                    div.innerHTML = `<span>${rd.name}</span><button style="background:none;border:none;color:#f55;font-weight:bold;cursor:pointer;" onclick="unassignRoutine('${r.id}')">❌</button>`;
+                    rList.appendChild(div);
+                });
 
-            if(coachChart) coachChart.destroy();
-            const ctx = document.getElementById('coachWeightChart'); const wData = u.weightHistory || [];
-            coachChart = new Chart(ctx, { type:'line', data:{ labels:wData.map((_,i)=>i+1), datasets:[{label:'Kg', data:wData, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}}});
+                // --- HISTORIAL ---
+                const hList = document.getElementById('coach-history-list');
+                hList.innerHTML = 'Cargando historial...';
+                const qH = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(10));
+                const wSnap = await getDocs(qH);
+                hList.innerHTML = '';
+                if(wSnap.empty) hList.innerHTML='Sin datos recientes.';
+                wSnap.forEach(w=>{
+                    const d = w.data();
+                    const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
+                    let rpeBadge = d.rpe === 'Suave' ? '<span class="badge green">🟢 Suave</span>' : (d.rpe === 'Duro' ? '<span class="badge orange">🟠 Duro</span>' : (d.rpe === 'Fallo' ? '<span class="badge red">🔴 Fallo</span>' : '<span class="badge gray">--</span>'));
+                    hList.innerHTML += `<div class="history-row"><div class="hist-date">${date}</div><div class="hist-name">${d.routine}</div><div class="hist-rpe">${rpeBadge}</div></div>`;
+                });
 
-            if(!u.approved && confirm("¿Aprobar acceso a este atleta?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
+                if(!u.approved && confirm("¿Aprobar acceso a este atleta?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
+                
+                // --- BUSCADOR DE RUTINAS (CACHE) ---
+                const rS = await getDocs(collection(db,"routines")); 
+                allRoutinesCache = [];
+                rS.forEach(r => allRoutinesCache.push({id: r.id, ...r.data()}));
+                renderCoachRoutines(allRoutinesCache);
+            
+            } catch(e) { console.error(e); }
         }
 
-        window.renderCoachRoutines=(l)=>{ const s=document.getElementById('coach-routine-select'); s.innerHTML=''; l.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.innerText=r.name;s.appendChild(o)}); }
-        window.filterCoachRoutines=(v)=>{ renderCoachRoutines(allRoutinesCache.filter(r=>r.name.toLowerCase().includes(v.toLowerCase()))); }
-        
-        window.switchCoachPose=(p)=>{
-            coachCurrentPose=p; document.getElementById('coach-tab-front').classList.toggle('active',p==='front'); document.getElementById('coach-tab-back').classList.toggle('active',p==='back');
-            const u=selectedUserObj; const pre=p==='front'?'':'_back';
-            const b=u[`photoBefore${pre}`]; const a=u[`photoAfter${pre}`]; const db=u[`dateBefore${pre}`]||'-'; const da=u[`dateAfter${pre}`]||'-';
-            document.getElementById('coach-photos-container').innerHTML=`<div class="coach-photo-box">${b?`<img src="${b}"><div class="photo-date-label">ANTES (${db})</div>`:'Sin Foto'}</div><div class="coach-photo-box">${a?`<img src="${a}"><div class="photo-date-label">AHORA (${da})</div>`:'Sin Foto'}</div>`;
+        window.renderCoachRoutines = (list) => {
+            const s = document.getElementById('coach-routine-select'); s.innerHTML = '';
+            list.forEach(r => { const o = document.createElement('option'); o.value = r.id; o.innerText = r.name; s.appendChild(o); });
+        };
+
+        window.filterCoachRoutines = (val) => {
+            const filtered = allRoutinesCache.filter(r => r.name.toLowerCase().includes(val.toLowerCase()));
+            renderCoachRoutines(filtered);
+        };
+
+        window.switchCoachPose = (pose) => {
+            coachCurrentPose = pose;
+            document.getElementById('coach-tab-front').classList.toggle('active', pose==='front');
+            document.getElementById('coach-tab-back').classList.toggle('active', pose==='back');
+            updateCoachPhotoDisplay(pose);
+        };
+
+        function updateCoachPhotoDisplay(pose) {
+            const u = selectedUserObj;
+            if(!u) return;
+            const prefix = pose === 'front' ? '' : '_back';
+            const b = u[`photoBefore${prefix}`];
+            const a = u[`photoAfter${prefix}`];
+            const db = u[`dateBefore${prefix}`] || '-';
+            const da = u[`dateAfter${prefix}`] || '-';
+            
+            const pCont = document.getElementById('coach-photos-container');
+            pCont.innerHTML = `
+                <div class="coach-photo-box">${b ? `<img src="${b}"><div class="photo-date-label">ANTES (${db})</div>` : 'Sin Foto'}</div>
+                <div class="coach-photo-box">${a ? `<img src="${a}"><div class="photo-date-label">AHORA (${da})</div>` : 'Sin Foto'}</div>
+            `;
         }
 
-        window.assignRoutine=async()=>{ const rid=document.getElementById('coach-routine-select').value; if(!rid)return; await updateDoc(doc(db,"routines",rid),{assignedTo:arrayUnion(selectedUserCoach)}); alert("Asignada"); const u=await getDoc(doc(db,"users",selectedUserCoach)); openCoachModal(selectedUserCoach,u.data()); };
-        window.unassignRoutine=async(rid)=>{ if(confirm("Quitar?")){ await updateDoc(doc(db,"routines",rid),{assignedTo:arrayRemove(selectedUserCoach)}); const u=await getDoc(doc(db,"users",selectedUserCoach)); openCoachModal(selectedUserCoach,u.data()); } };
-        window.goToCreateRoutine=()=>{ document.getElementById('modal-coach').classList.remove('active'); openEditor(); };
-        window.deleteUser=async()=>{ if(confirm("¿ELIMINAR?") && confirm("¿SEGURO?")){ await deleteDoc(doc(db,"users",selectedUserCoach)); document.getElementById('modal-coach').classList.remove('active'); loadAdminUsers(); } };
+        window.goToCreateRoutine = () => {
+            document.getElementById('modal-coach').classList.remove('active');
+            openEditor(); 
+        };
+
+        window.assignRoutine = async () => {
+            const rid=document.getElementById('coach-routine-select').value; if(!rid||!selectedUserCoach)return;
+            const rRef=doc(db,"routines",rid); const rSnap=await getDoc(rRef);
+            let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ 
+                await updateDoc(rRef,{assignedTo: arrayUnion(selectedUserCoach)}); 
+                const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
+                openCoachModal(selectedUserCoach, uSnap.data());
+            }
+        };
+
+        window.unassignRoutine = async (rid) => {
+            if(confirm("¿Quitar esta rutina al atleta?")) {
+                await updateDoc(doc(db, "routines", rid), { assignedTo: arrayRemove(selectedUserCoach) });
+                const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
+                openCoachModal(selectedUserCoach, uSnap.data());
+            }
+        };
+
+        window.deleteUser = async () => {
+            if(confirm("⚠ ¿ELIMINAR ATLETA DEFINITIVAMENTE?")) {
+                if(confirm("Esta acción borrará todo su historial y acceso. ¿Proceder?")) {
+                    try {
+                        await deleteDoc(doc(db, "users", selectedUserCoach));
+                        alert("Atleta eliminado.");
+                        document.getElementById('modal-coach').classList.remove('active');
+                        loadAdminUsers();
+                    } catch(e) { alert("Error: " + e.message); }
+                }
+            }
+        };
 
         document.getElementById('btn-login').onclick=()=>signInWithEmailAndPassword(auth,document.getElementById('login-email').value,document.getElementById('login-pass').value).catch(e=>alert(e.message));
         document.getElementById('btn-register').onclick=async()=>{
-            if(document.getElementById('reg-code').value!==CODE)return alert("Código incorrecto");
-            try{ const c=await createUserWithEmailAndPassword(auth,document.getElementById('reg-email').value,document.getElementById('reg-pass').value);
-            await setDoc(doc(db,"users",c.user.uid),{name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,approved:document.getElementById('reg-email').value===ADMIN,age:parseInt(document.getElementById('reg-age').value),height:parseInt(document.getElementById('reg-height').value)});
-            }catch(e){alert(e.message)}
+            if(document.getElementById('reg-code').value!==CODE)return alert("Código mal");
+            try{ const c=await createUserWithEmailAndPassword(auth,document.getElementById('reg-email').value,document.getElementById('reg-pass').value); await setDoc(doc(db,"users",c.user.uid),{name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,approved:document.getElementById('reg-email').value===ADMIN, age:parseInt(document.getElementById('reg-age').value), height:parseInt(document.getElementById('reg-height').value)}); }catch(e){alert(e.message);}
         };
     </script>
 </body>
