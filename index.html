@@ -42,17 +42,23 @@
         }
 
         .hidden { display: none !important; }
+        
+        /* BOTONES Y ESTILOS GENERALES (DISEÑO v15) */
         .btn {
             background: var(--accent-color); color: white; border: none; padding: 14px;
             border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer; width: 100%; box-shadow: var(--accent-glow); display: flex; justify-content: center; align-items: center;
+            cursor: pointer; width: 100%; box-shadow: var(--accent-glow); 
+            display: flex; justify-content: center; align-items: center;
         }
         .btn:active { transform: scale(0.98); }
+        
         .btn-outline { 
             background: transparent; border: 1px solid #444; color: #ccc; padding: 12px; width: 100%;
             border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 0.85rem;
         }
-        .btn-small { padding: 6px 12px; font-size: 0.75rem; width: auto; margin:0;}
+        
+        .btn-small { padding: 6px 12px; font-size: 0.75rem; width: auto; margin:0; }
+        .btn-danger { background: #600; border: 1px solid #f00; color: #fcc; margin-top: 15px; }
         
         .btn-done {
             background-color: rgba(255, 51, 51, 0.3) !important;
@@ -61,10 +67,11 @@
             box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
         }
 
-        /* LOADING */
+        /* LOADING SCREEN */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg-color); z-index: 9999; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         #loading-logo { 
             width: 140px; border-radius: 25px; box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
@@ -75,12 +82,14 @@
             font-size: 1.1rem; letter-spacing: 4px; font-weight: bold;
             text-shadow: 0 0 10px var(--accent-color); animation: blink 0.8s infinite;
         }
-        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 40px rgba(255,51,51,0.6); } 50% { transform: scale(1.05); opacity: 0.8; box-shadow: 0 0 20px rgba(255,51,51,0.2); } }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
+        /* HEADER */
         header {
             flex-shrink: 0; height: calc(var(--header-height) + var(--safe-top)); padding-top: var(--safe-top);
-            background: rgba(5,5,5,0.98); border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(5,5,5,0.98); border-bottom: 1px solid #222; 
+            display: flex; justify-content: space-between; align-items: center;
             padding-left: 20px; padding-right: 20px; z-index: 100;
         }
         .brand { font-weight: 900; font-size: 1.3rem; color: white; letter-spacing: -0.5px; }
@@ -90,6 +99,7 @@
             font-weight: 800; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; letter-spacing: 1px;
         }
 
+        /* LAYOUT & CARDS */
         #main-container { flex: 1; overflow-y: auto; position: relative; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         .view-container { min-height: 100%; padding: 20px 15px 180px 15px; display: none; opacity: 0; animation: fadeIn 0.3s forwards; }
         .view-container.active { display: block; opacity: 1; }
@@ -99,6 +109,7 @@
         input, select { background: var(--input-bg); border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 12px; font-size: 16px; }
         input:focus { outline: 1px solid var(--accent-color); }
 
+        /* PROFILE */
         .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; }
         .avatar-circle { width: 75px; height: 75px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; border: 2px solid var(--accent-color); overflow: hidden; }
         .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
@@ -113,6 +124,7 @@
         .stat-num { font-size: 1.2rem; font-weight: 800; color: white; display: block; }
         .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
 
+        /* WORKOUT & EDITOR */
         .workout-split { display: grid; grid-template-columns: 80px 1fr; gap: 15px; margin-bottom: 15px; align-items: center; }
         .workout-visual { width: 80px; height: 80px; background: #000; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; padding: 5px; }
         .workout-visual img { width: 100%; height: 100%; object-fit: contain; }
@@ -145,7 +157,6 @@
         .nav-item.active { color: var(--accent-color); }
         .nav-icon { font-size: 1.5rem; margin-bottom: 3px; }
 
-        /* FIXED FLOATING BUTTON */
         .btn-float {
             position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px;
             border-radius: 50%; background: var(--accent-color); color: white; display: grid; place-items: center;
@@ -154,7 +165,6 @@
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal.active { opacity: 1; pointer-events: auto; }
-        
         .modal-content { 
             background: #1a1a1a; width: 90%; max-width: 400px; padding: 25px; 
             border-radius: 15px; border: 1px solid var(--accent-color); text-align: center;
@@ -168,49 +178,48 @@
         input:checked + .slider { background-color: var(--accent-color); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 5px; border:1px solid #333; }
+        /* FOTOS & SLIDERS */
+        .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 10px; border:1px solid #333; }
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         .img-overlay { clip-path: inset(0 50% 0 0); border-right: 2px solid white; }
         .slider-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; cursor: ew-resize; z-index: 10; }
         .slider-btn { position: absolute; top: 50%; left: -15px; width: 30px; height: 30px; background: white; border-radius: 50%; display: grid; place-items: center; color: black; box-shadow: 0 0 10px black; }
 
-        .rpe-btn { width: 100%; margin-bottom: 10px; border: none; padding: 15px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        .rpe-easy { background: #2e7d32; }
-        .rpe-hard { background: #f57f17; color: black; }
-        .rpe-max { background: #c62828; }
-        
+        /* COACH ELEMENTS */
         .admin-user-row { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .btn-danger { background: #500; border: 1px solid #800; color: #fcc; margin-top: 15px; }
-        
         .coach-photos-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
         .coach-photo-box { width: 45%; height: 150px; background: #000; border: 1px solid #333; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position:relative; }
         .coach-photo-box img { width: 100%; height: 100%; object-fit: contain; }
         .photo-date-label { position:absolute; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.7); font-size:0.6rem; color:white; padding:2px 0; text-align:center; }
         
-        .assigned-routine-item { background: #222; padding: 8px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; border:1px solid #333; }
+        .assigned-routine-item { background: #222; padding: 10px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; border:1px solid #333; }
 
-        .history-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 8px 0; align-items: center; font-size: 0.75rem; }
-        .hist-date { font-size: 0.7rem; color: #888; width: 60px; }
+        .history-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 10px 0; align-items: center; font-size: 0.75rem; }
+        .hist-date { font-size: 0.7rem; color: #888; width: 70px; }
         .hist-name { font-size: 0.8rem; color: #fff; flex: 1; text-align: left; padding-left: 10px; }
-        .hist-rpe { width: 80px; text-align: right; }
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
         .badge.green { background: rgba(46, 125, 50, 0.3); color: #4caf50; border: 1px solid #2e7d32; }
         .badge.orange { background: rgba(245, 127, 23, 0.3); color: #ffb74d; border: 1px solid #f57f17; }
         .badge.red { background: rgba(198, 40, 40, 0.3); color: #ef5350; border: 1px solid #c62828; }
         .badge.gray { background: #333; color: #aaa; }
 
+        .photo-tabs { display: flex; margin-bottom: 10px; background: #222; border-radius: 8px; padding: 2px; }
+        .photo-tab { flex: 1; text-align: center; padding: 10px; font-size: 0.8rem; cursor: pointer; color: #888; border-radius: 6px; }
+        .photo-tab.active { background: var(--accent-color); color: white; font-weight: bold; }
+        
+        .tip-box { background: rgba(255, 170, 0, 0.15); border: 1px solid var(--warning-color); color: #ffcc80; padding: 10px; border-radius: 8px; font-size: 0.75rem; text-align: center; margin-bottom: 15px; }
+        .photo-actions { display: grid; grid-template-columns: 1fr 40px 1fr 40px; gap: 5px; margin-top: 15px; }
+        
         .stat-pill-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
         .stat-pill { background: #111; border: 1px solid #333; padding: 8px 4px; border-radius: 6px; }
         .stat-pill b { display: block; font-size: 1rem; color: var(--accent-color); }
         .stat-pill span { font-size: 0.65rem; color: #888; text-transform: uppercase; }
 
-        .photo-tabs { display: flex; margin-bottom: 10px; background: #222; border-radius: 8px; pading: 2px; }
-        .photo-tab { flex: 1; text-align: center; padding: 10px; font-size: 0.8rem; cursor: pointer; color: #888; border-radius: 6px; }
-        .photo-tab.active { background: var(--accent-color); color: white; font-weight: bold; }
-        
-        .tip-box { background: rgba(255, 170, 0, 0.15); border: 1px solid var(--warning-color); color: #ffcc80; padding: 10px; border-radius: 8px; font-size: 0.75rem; text-align: center; margin-bottom: 15px; }
-
-        .photo-actions { display: grid; grid-template-columns: 1fr 40px 1fr 40px; gap: 5px; margin-top: 15px; }
+        /* RPE BUTTONS */
+        .rpe-btn { width: 100%; margin-bottom: 10px; border: none; padding: 15px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .rpe-easy { background: #2e7d32; }
+        .rpe-hard { background: #f57f17; color: black; }
+        .rpe-max { background: #c62828; }
 
     </style>
 </head>
@@ -305,7 +314,7 @@
             <div class="card">
                 <h3>EVOLUCIÓN FÍSICA</h3>
                 
-                <div class="tip-box">💡 TIP: Usa siempre la misma luz, ropa y lugar para ver el progreso real.</div>
+                <div class="tip-box">💡 TIP: Usa siempre la misma luz, ropa y lugar.</div>
 
                 <div class="photo-tabs">
                     <div class="photo-tab active" id="tab-front" onclick="switchPose('front')">👤 FRONTAL</div>
@@ -364,7 +373,6 @@
                 <div style="display:flex; justify-content:space-between;">
                     <span>Pantalla Activa</span><label class="switch"><input type="checkbox" id="cfg-wake" checked><span class="slider"></span></label>
                 </div>
-                <p style="font-size:0.7rem; color:#666; margin-top:10px;">*Importante: Desactiva el botón de silencio lateral del iPhone.</p>
                 <button class="btn-outline" style="margin-top:15px;" onclick="saveConfig()">GUARDAR AJUSTES</button>
             </div>
 
@@ -450,29 +458,28 @@
                 <div class="photo-tab active" id="coach-tab-front" onclick="switchCoachPose('front')">FRONTAL</div>
                 <div class="photo-tab" id="coach-tab-back" onclick="switchCoachPose('back')">ESPALDA</div>
             </div>
-            <div class="coach-photos-row" id="coach-photos-container"></div>
+            <div class="coach-photos-row" id="coach-photos-container">
+                <div class="coach-photo-box" style="color:#666; font-size:0.7rem;">Sin Foto Antes</div>
+                <div class="coach-photo-box" style="color:#666; font-size:0.7rem;">Sin Foto Ahora</div>
+            </div>
 
             <h4 style="margin-bottom:5px;">Gráfica Peso</h4>
             <div style="height:120px; margin-bottom:15px;"><canvas id="coachWeightChart"></canvas></div>
 
-            <h4 style="margin-bottom:5px;">Últimos Entrenos</h4>
-            <div id="coach-history-list" style="height:120px; overflow-y:auto; font-size:0.75rem; color:#aaa; margin-bottom:15px; border:1px solid #333; padding:5px; background:#000;"></div>
+            <h4 style="margin-bottom:5px;">📋 Rutinas Activas</h4>
+            <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:10px;">Cargando...</div>
 
-            <hr style="border-color:#333; margin:15px 0;">
+            <label style="font-size:0.8rem; color:#ccc;">Asignar Nueva:</label>
+            <input type="text" placeholder="🔍 Buscar rutina..." id="coach-routine-filter" style="margin-bottom:5px; padding:8px; font-size:0.8rem; width:100%; border-radius:6px; border:1px solid #333; background:#222; color:white;" oninput="filterCoachRoutines(this.value)">
             
-            <div style="margin-bottom:15px;">
-                <h4 style="margin-bottom:5px;">📋 Rutinas Activas</h4>
-                <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:10px;">Cargando...</div>
-
-                <label style="font-size:0.8rem; color:#ccc;">Asignar Nueva:</label>
-                <input type="text" placeholder="🔍 Buscar rutina..." id="coach-routine-filter" style="margin-bottom:5px; padding:8px; font-size:0.8rem; width:100%; border-radius:6px; border:1px solid #333; background:#222; color:white;" oninput="filterCoachRoutines(this.value)">
-                
-                <div style="display:flex; gap:5px; margin-top:5px;">
-                    <select id="coach-routine-select" style="margin:0;"></select>
-                    <button class="btn-small btn-outline" style="width:auto; padding:0 10px;" onclick="goToCreateRoutine()">➕ NUEVA</button>
-                    <button class="btn-small btn" style="width:auto;" onclick="assignRoutine()">ENVIAR</button>
-                </div>
+            <div style="display:flex; gap:5px; margin-top:5px; margin-bottom:15px;">
+                <select id="coach-routine-select" style="margin:0;"></select>
+                <button class="btn-small btn-outline" style="width:auto; padding:0 10px;" onclick="goToCreateRoutine()">➕ NUEVA</button>
+                <button class="btn-small btn" style="width:auto;" onclick="assignRoutine()">ENVIAR</button>
             </div>
+
+            <h4 style="margin-bottom:5px;">Historial Reciente</h4>
+            <div id="coach-history-list" style="height:120px; overflow-y:auto; font-size:0.75rem; color:#aaa; margin-bottom:15px; border:1px solid #333; padding:5px; background:#000;"></div>
 
             <button class="btn-danger btn" style="width:100%;" onclick="deleteUser()">🗑️ ELIMINAR ATLETA</button>
             <button class="btn-outline" style="margin-top:10px;" onclick="document.getElementById('modal-coach').classList.remove('active')">CERRAR</button>
@@ -542,7 +549,7 @@
 
         window.testSound = () => { play5Beeps(); };
 
-        // BASE DE DATOS
+        // BASE DE DATOS COMPLETA
         const EXERCISES = [
             {n:"Sentadilla con Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Jaca", img:"cuadriceps.png", m:"Cuádriceps"},
             {n:"Sentadilla Cinturón", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa de Piernas", img:"cuadriceps.png", m:"Cuádriceps"},
@@ -997,6 +1004,22 @@
             // Initial Photo Load (Coach sees Front by default)
             updateCoachPhotoDisplay('front');
 
+            // 1. CARGAR RUTINAS (SELECTOR) PRIMERO - PARA EVITAR CHOQUES
+            try {
+                const s = document.getElementById('coach-routine-select'); s.innerHTML = '';
+                const rS = await getDocs(collection(db,"routines")); 
+                allRoutinesCache = [];
+                rS.forEach(r => {
+                    const data = r.data();
+                    allRoutinesCache.push({id: r.id, ...data});
+                    const o = document.createElement('option'); 
+                    o.value = r.id; 
+                    o.innerText = data.name; 
+                    s.appendChild(o); 
+                });
+            } catch(e) { console.error("Error loading routines for dropdown", e); }
+
+            // 2. CARGAR RESTO DE DATOS (SAFE MODE)
             try {
                 const st = u.stats || {};
                 const age = u.age ? u.age : 'N/D';
@@ -1011,10 +1034,9 @@
                 const wData = u.weightHistory || [];
                 coachChart = new Chart(ctx, { type:'line', data:{ labels:wData.map((_,i)=>i+1), datasets:[{label:'Kg', data:wData, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}}});
 
-                // --- RUTINAS ACTIVAS (FIX) ---
+                // Rutinas Activas
                 const rList = document.getElementById('coach-assigned-list');
                 rList.innerHTML = 'Cargando...';
-                // Consulta correcta: busca rutinas donde el uid esté en assignedTo
                 const qR = query(collection(db, "routines"), where("assignedTo", "array-contains", uid));
                 const snapR = await getDocs(qR);
                 rList.innerHTML = '';
@@ -1027,7 +1049,7 @@
                     rList.appendChild(div);
                 });
 
-                // --- HISTORIAL ---
+                // Historial
                 const hList = document.getElementById('coach-history-list');
                 hList.innerHTML = 'Cargando historial...';
                 const qH = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(10));
@@ -1042,14 +1064,8 @@
                 });
 
                 if(!u.approved && confirm("¿Aprobar acceso a este atleta?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
-                
-                // --- BUSCADOR DE RUTINAS (CACHE) ---
-                const rS = await getDocs(collection(db,"routines")); 
-                allRoutinesCache = [];
-                rS.forEach(r => allRoutinesCache.push({id: r.id, ...r.data()}));
-                renderCoachRoutines(allRoutinesCache);
             
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Error loading coach details", e); }
         }
 
         window.renderCoachRoutines = (list) => {
