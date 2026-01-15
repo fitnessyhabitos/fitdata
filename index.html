@@ -22,7 +22,7 @@
             --input-bg: #1f1f1f;
             --text-color: #ffffff;
             --text-dim: #888888;
-            --accent-color: #ff3333;
+            --accent-color: #ff3333; /* Rojo Neón */
             --accent-dim: rgba(255, 51, 51, 0.2);
             --accent-glow: 0 0 12px rgba(255, 51, 51, 0.5);
             --success-color: #00ff88;
@@ -61,6 +61,7 @@
             box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
         }
 
+        /* LOADING */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -153,6 +154,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal.active { opacity: 1; pointer-events: auto; }
         
+        /* MODAL COACH EXPANDIDO */
         .modal-content { 
             background: #1a1a1a; width: 90%; max-width: 400px; padding: 25px; 
             border-radius: 15px; border: 1px solid var(--accent-color); text-align: center;
@@ -183,6 +185,8 @@
         .coach-photos-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
         .coach-photo-box { width: 45%; height: 120px; background: #000; border: 1px solid #333; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .coach-photo-box img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .assigned-routine-item { background: #222; padding: 8px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
 
     </style>
 </head>
@@ -416,7 +420,10 @@
             <hr style="border-color:#333; margin:15px 0;">
             
             <div style="margin-bottom:15px;">
-                <label style="font-size:0.8rem; color:#ccc;">Asignar Rutina:</label>
+                <h4 style="margin-bottom:5px;">📋 Rutinas Activas</h4>
+                <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:10px;">Cargando...</div>
+
+                <label style="font-size:0.8rem; color:#ccc;">Asignar Nueva:</label>
                 <div style="display:flex; gap:5px; margin-top:5px;">
                     <select id="coach-routine-select" style="margin:0;"></select>
                     <button class="btn-small btn-outline" style="width:auto; padding:0 10px;" onclick="goToCreateRoutine()">➕ NUEVA</button>
@@ -432,7 +439,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, where, addDoc, deleteDoc, getDocs, serverTimestamp, increment, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, where, addDoc, deleteDoc, getDocs, serverTimestamp, increment, orderBy, limit, arrayRemove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
@@ -921,7 +928,7 @@
             try {
                 // Stats Summary (Safe access)
                 const st = u.stats || {};
-                const age = u.age || '?';
+                const age = u.age || '?'; // FIX EDAD
                 document.getElementById('coach-stats-text').innerText = `${st.workouts||0} Entrenos | ${(st.totalKg/1000||0).toFixed(1)}t Carga | ${age} Años`;
 
                 // Chart
@@ -929,6 +936,21 @@
                 const ctx = document.getElementById('coachWeightChart');
                 const wData = u.weightHistory || [];
                 coachChart = new Chart(ctx, { type:'line', data:{ labels:wData.map((_,i)=>i+1), datasets:[{label:'Kg', data:wData, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}}});
+
+                // RUTINAS ASIGNADAS (LISTADO)
+                const rList = document.getElementById('coach-assigned-list');
+                rList.innerHTML = 'Cargando...';
+                const qR = query(collection(db, "routines"), where("assignedTo", "array-contains", uid));
+                const snapR = await getDocs(qR);
+                rList.innerHTML = '';
+                if(snapR.empty) rList.innerHTML = 'Ninguna rutina asignada.';
+                snapR.forEach(r => {
+                    const rd = r.data();
+                    const div = document.createElement('div');
+                    div.className = "assigned-routine-item";
+                    div.innerHTML = `<span>${rd.name}</span><button style="background:none;border:none;color:#f55;font-weight:bold;cursor:pointer;" onclick="unassignRoutine('${r.id}')">❌</button>`;
+                    rList.appendChild(div);
+                });
 
                 // History List
                 const hList = document.getElementById('coach-history-list');
@@ -964,8 +986,22 @@
         window.assignRoutine = async () => {
             const rid=document.getElementById('coach-routine-select').value; if(!rid||!selectedUserCoach)return;
             const rRef=doc(db,"routines",rid); const rSnap=await getDoc(rRef);
-            let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ arr.push(selectedUserCoach); await updateDoc(rRef,{assignedTo:arr}); alert("Rutina asignada correctamente."); }
-            document.getElementById('modal-coach').classList.remove('active');
+            let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ arr.push(selectedUserCoach); await updateDoc(rRef,{assignedTo:arr}); alert("Rutina asignada."); 
+            // Refresh modal
+            const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
+            openCoachModal(selectedUserCoach, uSnap.data());
+            }
+        };
+
+        window.unassignRoutine = async (rid) => {
+            if(confirm("¿Quitar esta rutina al atleta?")) {
+                await updateDoc(doc(db, "routines", rid), {
+                    assignedTo: arrayRemove(selectedUserCoach)
+                });
+                // Refresh modal
+                const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
+                openCoachModal(selectedUserCoach, uSnap.data());
+            }
         };
 
         window.deleteUser = async () => {
@@ -984,7 +1020,7 @@
         document.getElementById('btn-login').onclick=()=>signInWithEmailAndPassword(auth,document.getElementById('login-email').value,document.getElementById('login-pass').value).catch(e=>alert(e.message));
         document.getElementById('btn-register').onclick=async()=>{
             if(document.getElementById('reg-code').value!==CODE)return alert("Código mal");
-            try{ const c=await createUserWithEmailAndPassword(auth,document.getElementById('reg-email').value,document.getElementById('reg-pass').value); await setDoc(doc(db,"users",c.user.uid),{name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,approved:document.getElementById('reg-email').value===ADMIN, age:document.getElementById('reg-age').value, height:document.getElementById('reg-height').value}); }catch(e){alert(e.message);}
+            try{ const c=await createUserWithEmailAndPassword(auth,document.getElementById('reg-email').value,document.getElementById('reg-pass').value); await setDoc(doc(db,"users",c.user.uid),{name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,approved:document.getElementById('reg-email').value===ADMIN, age:parseInt(document.getElementById('reg-age').value), height:parseInt(document.getElementById('reg-height').value)}); }catch(e){alert(e.message);}
         };
     </script>
 </body>
