@@ -22,7 +22,7 @@
             --input-bg: #1f1f1f;
             --text-color: #ffffff;
             --text-dim: #888888;
-            --accent-color: #ff3333; /* Rojo Neón */
+            --accent-color: #ff3333;
             --accent-dim: rgba(255, 51, 51, 0.2);
             --accent-glow: 0 0 12px rgba(255, 51, 51, 0.5);
             --success-color: #00ff88;
@@ -145,16 +145,19 @@
         .nav-item.active { color: var(--accent-color); }
         .nav-icon { font-size: 1.5rem; margin-bottom: 3px; }
 
+        /* FIXED FLOATING BUTTON */
         .btn-float {
-            position: absolute; bottom: 30px; right: 20px; width: 60px; height: 60px;
+            position: fixed; /* FIXED PARA QUE NO SE PIERDA AL SCROLLEAR */
+            bottom: 100px; /* Un poco más arriba del nav */
+            right: 20px; 
+            width: 60px; height: 60px;
             border-radius: 50%; background: var(--accent-color); color: white; display: grid; place-items: center;
-            font-size: 28px; box-shadow: 0 5px 20px rgba(255,51,51,0.6); z-index: 80;
+            font-size: 28px; box-shadow: 0 5px 20px rgba(255,51,51,0.6); z-index: 1000;
         }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal.active { opacity: 1; pointer-events: auto; }
         
-        /* MODAL COACH EXPANDIDO */
         .modal-content { 
             background: #1a1a1a; width: 90%; max-width: 400px; padding: 25px; 
             border-radius: 15px; border: 1px solid var(--accent-color); text-align: center;
@@ -186,7 +189,23 @@
         .coach-photo-box { width: 45%; height: 120px; background: #000; border: 1px solid #333; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .coach-photo-box img { width: 100%; height: 100%; object-fit: contain; }
         
-        .assigned-routine-item { background: #222; padding: 8px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+        .assigned-routine-item { background: #222; padding: 8px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; border:1px solid #333; }
+
+        /* HISTORY BADGES */
+        .history-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 8px 0; align-items: center; }
+        .hist-date { font-size: 0.7rem; color: #888; width: 60px; }
+        .hist-name { font-size: 0.8rem; color: #fff; flex: 1; text-align: left; padding-left: 10px; }
+        .hist-rpe { width: 80px; text-align: right; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+        .badge.green { background: rgba(46, 125, 50, 0.3); color: #4caf50; border: 1px solid #2e7d32; }
+        .badge.orange { background: rgba(245, 127, 23, 0.3); color: #ffb74d; border: 1px solid #f57f17; }
+        .badge.red { background: rgba(198, 40, 40, 0.3); color: #ef5350; border: 1px solid #c62828; }
+        .badge.gray { background: #333; color: #aaa; }
+
+        .stat-pill-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
+        .stat-pill { background: #111; border: 1px solid #333; padding: 8px 4px; border-radius: 6px; }
+        .stat-pill b { display: block; font-size: 1rem; color: var(--accent-color); }
+        .stat-pill span { font-size: 0.65rem; color: #888; text-transform: uppercase; }
 
     </style>
 </head>
@@ -401,9 +420,7 @@
                 <p id="coach-user-email" style="color:#666; font-size:0.8rem;"></p>
             </div>
             
-            <div style="background:#222; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem;">
-                <strong>STATS:</strong> <span id="coach-stats-text">Cargando...</span>
-            </div>
+            <div id="coach-stats-text" class="stat-pill-grid" style="margin-bottom:15px;"></div>
 
             <h4 style="margin-bottom:5px;">📸 Fotos Progreso</h4>
             <div class="coach-photos-row" id="coach-photos-container">
@@ -415,7 +432,7 @@
             <div style="height:120px; margin-bottom:15px;"><canvas id="coachWeightChart"></canvas></div>
 
             <h4 style="margin-bottom:5px;">Últimos Entrenos</h4>
-            <div id="coach-history-list" style="height:100px; overflow-y:auto; font-size:0.75rem; color:#aaa; margin-bottom:15px; border:1px solid #333; padding:5px; background:#000;"></div>
+            <div id="coach-history-list" style="height:120px; overflow-y:auto; font-size:0.75rem; color:#aaa; margin-bottom:15px; border:1px solid #333; padding:5px; background:#000;"></div>
 
             <hr style="border-color:#333; margin:15px 0;">
             
@@ -439,7 +456,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, where, addDoc, deleteDoc, getDocs, serverTimestamp, increment, orderBy, limit, arrayRemove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, where, addDoc, deleteDoc, getDocs, serverTimestamp, increment, orderBy, limit, arrayRemove, arrayUnion } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCmM0gViU3itZ4HIZZVTEm7OaV0iBtsiGs",
@@ -914,6 +931,13 @@
                 initial.style.display = 'block';
             }
             
+            // Populate routine select FIRST
+            try {
+                const sel=document.getElementById('coach-routine-select'); sel.innerHTML='';
+                const rS=await getDocs(collection(db,"routines")); 
+                rS.forEach(r=>{ const o=document.createElement('option'); o.value=r.id; o.innerText=r.data().name; sel.appendChild(o); });
+            } catch(e) { console.log("Error loading routines list", e); }
+
             // PHOTOS PROGRESO
             const pCont = document.getElementById('coach-photos-container');
             if(u.photoBefore || u.photoAfter) {
@@ -926,10 +950,14 @@
             }
             
             try {
-                // Stats Summary (Safe access)
+                // Stats Summary (Safe access & Style Fix)
                 const st = u.stats || {};
-                const age = u.age || '?'; // FIX EDAD
-                document.getElementById('coach-stats-text').innerText = `${st.workouts||0} Entrenos | ${(st.totalKg/1000||0).toFixed(1)}t Carga | ${age} Años`;
+                const age = u.age ? u.age : 'N/D';
+                document.getElementById('coach-stats-text').innerHTML = `
+                    <div class="stat-pill"><b>${st.workouts||0}</b><span>ENTRENOS</span></div>
+                    <div class="stat-pill"><b>${(st.totalKg/1000||0).toFixed(1)}t</b><span>CARGA</span></div>
+                    <div class="stat-pill"><b>${age}</b><span>AÑOS</span></div>
+                `;
 
                 // Chart
                 if(coachChart) coachChart.destroy();
@@ -952,29 +980,36 @@
                     rList.appendChild(div);
                 });
 
-                // History List
+                // History List (VISUAL RPE)
                 const hList = document.getElementById('coach-history-list');
                 hList.innerHTML = 'Cargando historial...';
-                const q = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(5));
+                const q = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(10));
                 const wSnap = await getDocs(q);
                 hList.innerHTML = '';
                 if(wSnap.empty) hList.innerHTML='Sin datos recientes.';
                 wSnap.forEach(w=>{
                     const d = w.data();
                     const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
-                    const rpeColor = d.rpe==='Fallo'?'#d32f2f':(d.rpe==='Duro'?'#f57f17':'#388e3c');
-                    hList.innerHTML += `<div style="border-bottom:1px solid #333; padding:5px; font-size:0.75rem;">${date} - ${d.routine} <span style="float:right; font-weight:bold; color:${rpeColor}">${d.rpe||'?'}</span></div>`;
+                    
+                    let rpeBadge = '';
+                    if(d.rpe === 'Suave') rpeBadge = '<span class="badge green">🟢 Suave</span>';
+                    else if(d.rpe === 'Duro') rpeBadge = '<span class="badge orange">🟠 Duro</span>';
+                    else if(d.rpe === 'Fallo') rpeBadge = '<span class="badge red">🔴 Fallo</span>';
+                    else rpeBadge = '<span class="badge gray">--</span>';
+
+                    hList.innerHTML += `
+                        <div class="history-row">
+                            <div class="hist-date">${date}</div>
+                            <div class="hist-name">${d.routine}</div>
+                            <div class="hist-rpe">${rpeBadge}</div>
+                        </div>`;
                 });
 
                 if(!u.approved && confirm("¿Aprobar acceso a este atleta?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
                 
-                const sel=document.getElementById('coach-routine-select'); sel.innerHTML='';
-                const rS=await getDocs(collection(db,"routines")); 
-                rS.forEach(r=>{ const o=document.createElement('option'); o.value=r.id; o.innerText=r.data().name; sel.appendChild(o); });
-            
             } catch(e) {
                 console.error(e);
-                document.getElementById('coach-history-list').innerHTML = "Error cargando datos.";
+                // document.getElementById('coach-history-list').innerHTML = "Error cargando datos.";
             }
         }
 
@@ -986,10 +1021,11 @@
         window.assignRoutine = async () => {
             const rid=document.getElementById('coach-routine-select').value; if(!rid||!selectedUserCoach)return;
             const rRef=doc(db,"routines",rid); const rSnap=await getDoc(rRef);
-            let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ arr.push(selectedUserCoach); await updateDoc(rRef,{assignedTo:arr}); alert("Rutina asignada."); 
-            // Refresh modal
-            const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
-            openCoachModal(selectedUserCoach, uSnap.data());
+            let arr=rSnap.data().assignedTo||[]; if(!arr.includes(selectedUserCoach)){ 
+                await updateDoc(rRef,{assignedTo: arrayUnion(selectedUserCoach)}); 
+                // Refresh modal
+                const uSnap = await getDoc(doc(db,"users",selectedUserCoach));
+                openCoachModal(selectedUserCoach, uSnap.data());
             }
         };
 
@@ -1005,14 +1041,16 @@
         };
 
         window.deleteUser = async () => {
-            if(confirm("⚠ ¿ELIMINAR ATLETA DEFINITIVAMENTE?\nEsta acción no se puede deshacer.")) {
-                try {
-                    await deleteDoc(doc(db, "users", selectedUserCoach));
-                    alert("Atleta eliminado.");
-                    document.getElementById('modal-coach').classList.remove('active');
-                    loadAdminUsers();
-                } catch(e) {
-                    alert("Error: " + e.message);
+            if(confirm("⚠ ¿ELIMINAR ATLETA DEFINITIVAMENTE?")) {
+                if(confirm("Esta acción borrará todo su historial y acceso. ¿Proceder?")) {
+                    try {
+                        await deleteDoc(doc(db, "users", selectedUserCoach));
+                        alert("Atleta eliminado.");
+                        document.getElementById('modal-coach').classList.remove('active');
+                        loadAdminUsers();
+                    } catch(e) {
+                        alert("Error: " + e.message);
+                    }
                 }
             }
         };
