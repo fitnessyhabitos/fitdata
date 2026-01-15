@@ -37,7 +37,6 @@
 
         .hidden { display: none !important; }
 
-        /* UI KIT */
         .btn { background: var(--accent-color); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; width: 100%; box-shadow: var(--accent-glow); display: flex; justify-content: center; align-items: center; transition: transform 0.1s; }
         .btn:active { transform: scale(0.98); }
         .btn-outline { background: transparent; border: 1px solid #444; color: #ccc; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 0.85rem; }
@@ -123,7 +122,7 @@
         .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 5px; border:1px solid #333; }
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         .img-overlay { clip-path: inset(0 0 0 0); border-right: 2px solid white; }
-        .slider-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; cursor: ew-resize; z-index: 10; background: rgba(255,255,255,0.5); }
+        .slider-handle { position: absolute; top: 0; bottom: 0; left: 100%; width: 2px; cursor: ew-resize; z-index: 10; background: rgba(255,255,255,0.5); }
         .slider-btn { display: none; }
         .slider-labels { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20; }
         .label-tag { background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; color: white; border: 1px solid #555; }
@@ -163,7 +162,7 @@
     </div>
 
     <header id="main-header" class="hidden">
-        <div class="brand">FIT DATA <span>PRO</span></div>
+        <div class="brand">FIT DATA <span>PRO v45</span></div>
         <button id="coach-btn" class="hidden btn-neon-text">COACH</button>
     </header>
 
@@ -260,7 +259,8 @@
                     <img src="" id="img-overlay" class="compare-img img-overlay">
                     <div class="slider-handle" id="slider-handle"><div class="slider-btn"></div></div>
                 </div>
-                <input type="range" min="0" max="100" value="0" style="width:100%; margin-top:15px;" oninput="moveSlider(this.value)">
+                <input type="range" min="0" max="100" value="100" style="width:100%; margin-top:15px;" oninput="moveSlider(this.value)">
+                
                 <div class="photo-actions">
                     <button class="btn-outline" style="margin:0; padding:10px 5px;" onclick="document.getElementById('f-before').click()">1. ANTES</button>
                     <button class="btn-danger btn-small" style="margin:0;" onclick="deletePhoto('before')">🗑️</button>
@@ -360,12 +360,12 @@
                 </div>
                 
                 <div class="compare-wrapper">
-                    <div class="slider-labels"><span class="label-tag">ANTES</span><span class="label-tag">AHORA</span></div>
+                     <div class="slider-labels"><span class="label-tag">ANTES</span><span class="label-tag">AHORA</span></div>
                     <img src="" id="coach-img-before" class="compare-img">
                     <img src="" id="coach-img-overlay" class="compare-img img-overlay">
                     <div class="slider-handle" id="coach-slider-handle"><div class="slider-btn"></div></div>
                 </div>
-                <input type="range" min="0" max="100" value="0" style="width:100%; margin-top:15px;" oninput="moveCoachSlider(this.value)">
+                <input type="range" min="0" max="100" value="100" style="width:100%; margin-top:15px;" oninput="moveCoachSlider(this.value)">
                 
                 <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.7rem; color:#888;">
                     <span id="coach-date-before">-</span>
@@ -383,10 +383,12 @@
                 <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:15px;">Cargando...</div>
 
                 <label style="font-size:0.7rem; color:#ccc; text-transform:uppercase;">Asignar Nueva:</label>
+                <select id="coach-routine-select" style="margin:0 0 10px 0;">
+                    <option value="">Cargando lista...</option>
+                </select>
                 <input type="text" placeholder="🔍 Buscar rutina..." id="coach-routine-filter" style="margin-bottom:5px; padding:10px; font-size:0.9rem;" oninput="filterCoachRoutines(this.value)">
                 
                 <div style="display:flex; gap:5px; margin-top:5px;">
-                    <select id="coach-routine-select" style="margin:0;"></select>
                     <button class="btn-small btn-outline" style="width:auto; padding:0 15px;" onclick="goToCreateRoutine()">➕ CREAR</button>
                     <button class="btn-small btn" style="width:auto; padding:0 15px;" onclick="assignRoutine()">ENVIAR</button>
                 </div>
@@ -760,7 +762,8 @@
             document.getElementById('date-before').innerText = `ANTES (${dateB})`;
             document.getElementById('date-after').innerText = `AHORA (${dateA})`;
             
-            // RESET TO LEFT (0%) -> Show Full Overlay (ANTES)
+            // Reset to 0 (Left = Show Overlay = Show Before)
+            // Clip path: inset(0 0 0 0) -> shows full overlay
             document.getElementById('slider-handle').style.left = '0%';
             imgA.style.clipPath = 'inset(0 0 0 0)';
         }
@@ -815,6 +818,7 @@
             updatePhotoDisplay(userData);
         }
 
+        // SLIDER LOGIC INVERTED: 0 (Left) = Show Overlay (Before), 100 (Right) = Hide Overlay (After)
         window.moveSlider = (v) => { 
             document.getElementById('img-overlay').style.clipPath = `inset(0 0 0 ${v}%)`; 
             document.getElementById('slider-handle').style.left = `${v}%`; 
@@ -1053,13 +1057,13 @@
             switchTab('routines-view');
         };
 
-        // GLOBAL ADMIN LOADER - FAIL-SAFE
+        // GLOBAL ADMIN LOADER - ATTACHED TO WINDOW FOR BUTTON TO WORK
         window.loadAdminUsers = async () => {
             const l = document.getElementById('admin-list');
             l.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">↻ Cargando base de datos...</div>';
             
             try {
-                // FORCE FRESH FETCH
+                // FORCE FRESH FETCH FROM SERVER
                 const s = await getDocs(collection(db, "users"));
                 l.innerHTML = '';
                 
@@ -1074,6 +1078,7 @@
                     const div = document.createElement('div');
                     div.className = "admin-user-row";
                     
+                    // STATUS ICON
                     const statusIcon = u.approved ? '🟢' : '⏳';
                     const statusText = u.approved ? 'Activo' : 'Pendiente';
 
@@ -1096,15 +1101,17 @@
         async function openCoachView(uid,u) {
             selectedUserCoach=uid;
             
+            // FIX: Refresh user data to ensure realtime
             const freshSnap = await getDoc(doc(db, "users", uid));
             const freshU = freshSnap.data();
-            selectedUserObj = freshU; 
+            selectedUserObj = freshU; // Update local obj
 
             switchTab('coach-detail-view');
             
             document.getElementById('coach-user-name').innerText=freshU.name;
             document.getElementById('coach-user-email').innerText=freshU.email;
 
+            // SHOW APPROVE BUTTON IF PENDING
             const banner = document.getElementById('pending-approval-banner');
             if(!freshU.approved) {
                 banner.classList.remove('hidden');
@@ -1283,7 +1290,18 @@
         document.getElementById('btn-register').onclick=async()=>{
             if(document.getElementById('reg-code').value!==CODE)return alert("Código incorrecto");
             try{ const c=await createUserWithEmailAndPassword(auth,document.getElementById('reg-email').value,document.getElementById('reg-pass').value);
-            await setDoc(doc(db,"users",c.user.uid),{name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,approved:document.getElementById('reg-email').value===ADMIN,age:parseInt(document.getElementById('reg-age').value),height:parseInt(document.getElementById('reg-height').value), weightHistory: [], prs: {}});
+            // CRITICAL FIX: Ensure user object has ALL fields to prevent permission errors
+            await setDoc(doc(db,"users",c.user.uid),{
+                name:document.getElementById('reg-name').value,
+                email:document.getElementById('reg-email').value,
+                approved:document.getElementById('reg-email').value===ADMIN,
+                age:parseInt(document.getElementById('reg-age').value),
+                height:parseInt(document.getElementById('reg-height').value), 
+                weightHistory: [],
+                prs: {}, // Fixed: Initialize PRs object
+                stats: {workouts:0, totalKg:0, totalSets:0, totalReps:0},
+                muscleStats: {}
+            });
             }catch(e){alert(e.message)}
         };
     </script>
