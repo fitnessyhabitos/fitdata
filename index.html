@@ -122,7 +122,8 @@
         .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 5px; border:1px solid #333; }
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         .img-overlay { clip-path: inset(0 0 0 0); border-right: 2px solid white; }
-        .slider-handle { position: absolute; top: 0; bottom: 0; left: 100%; width: 2px; cursor: ew-resize; z-index: 10; background: rgba(255,255,255,0.5); }
+        /* INVISIBLE SLIDER HANDLE */
+        .slider-handle { position: absolute; top: 0; bottom: 0; left: 100%; width: 2px; cursor: ew-resize; z-index: 10; background: rgba(255,255,255,0.0); }
         .slider-btn { display: none; }
         .slider-labels { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20; }
         .label-tag { background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; color: white; border: 1px solid #555; }
@@ -162,7 +163,7 @@
     </div>
 
     <header id="main-header" class="hidden">
-        <div class="brand">FIT DATA <span>PRO v47</span></div>
+        <div class="brand">FIT DATA <span>PRO v48</span></div>
         <button id="coach-btn" class="hidden btn-neon-text">COACH</button>
     </header>
 
@@ -380,18 +381,19 @@
 
             <div class="card">
                 <h3>RUTINAS ASIGNADAS</h3>
-                <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:15px;">Cargando...</div>
-
-                <label style="font-size:0.7rem; color:#ccc; text-transform:uppercase;">Asignar Nueva:</label>
-                <select id="coach-routine-select" style="margin:0 0 10px 0;">
-                    <option value="">Cargando lista...</option>
-                </select>
-                <input type="text" placeholder="🔍 Buscar rutina..." id="coach-routine-filter" style="margin-bottom:5px; padding:10px; font-size:0.9rem;" oninput="filterCoachRoutines(this.value)">
+                <div id="coach-assigned-list" style="margin-bottom:15px; font-size:0.9rem;"></div>
                 
-                <div style="display:flex; gap:5px; margin-top:5px;">
-                    <button class="btn-small btn-outline" style="width:auto; padding:0 15px;" onclick="goToCreateRoutine()">➕ CREAR</button>
-                    <button class="btn-small btn" style="width:auto; padding:0 15px;" onclick="assignRoutine()">ENVIAR</button>
+                <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+
+                <label style="font-size:0.8rem; color:#aaa; margin-bottom:5px; display:block;">Asignar existente:</label>
+                <div style="display:flex; gap:10px;">
+                    <select id="simple-routine-select" style="flex:1; background:#222; color:white; padding:10px; border:1px solid #444; border-radius:6px; margin:0;">
+                        <option value="">Cargando...</option>
+                    </select>
+                    <button class="btn-small btn" style="width:auto; margin:0;" onclick="assignSimpleRoutine()">ASIGNAR</button>
                 </div>
+                
+                <button class="btn-small btn-outline" style="width:100%; margin-top:10px;" onclick="goToCreateRoutine()">+ CREAR NUEVA Y ASIGNAR</button>
             </div>
 
             <div class="card">
@@ -546,9 +548,8 @@
 
         let currentUser=null, userData=null, activeWorkout=null, timerInt=null, restTimeRemaining=0, wakeLock=null, chartInstance=null, selectedUserCoach=null, selectedUserObj=null, editingRoutineId=null, coachChart=null, currentPose='front', coachCurrentPose='front', allRoutinesCache=[], adminUnsub=null;
         
-        // GLOBAL SELECTION STATE FOR EDITOR
         let currentRoutineSelections = [];
-        let creatingForAthleteId = null; // IMPORTANT: Coach Creation Context
+        let creatingForAthleteId = null; 
 
         function getExerciseData(name) {
             let match = EXERCISES.find(e => e.n === name);
@@ -725,8 +726,6 @@
             btn.innerText = "💾 GUARDANDO...";
             
             try {
-                // IMPORTANT: Initialize assignedTo as empty array for athletes
-                // For coach creation flow, we handle assignment below
                 let assignedArr = [];
                 if(creatingForAthleteId) assignedArr = [creatingForAthleteId];
 
@@ -735,7 +734,7 @@
                     name:n, 
                     exercises:s, 
                     createdAt:serverTimestamp(), 
-                    assignedTo: assignedArr // FIX: Initialize array to avoid permission errors
+                    assignedTo: assignedArr 
                 };
 
                 if(editingRoutineId) await updateDoc(doc(db,"routines",editingRoutineId), {name:n, exercises:s});
@@ -744,7 +743,7 @@
                 if(creatingForAthleteId) {
                     const u = await getDoc(doc(db,"users",creatingForAthleteId));
                     openCoachView(creatingForAthleteId, u.data());
-                    creatingForAthleteId = null; // Reset flag
+                    creatingForAthleteId = null; 
                 } else {
                     switchTab('routines-view');
                 }
@@ -759,7 +758,7 @@
         
         window.delRoutine = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db,"routines",id)); };
 
-        // --- PHOTO COMPARISON LOGIC ---
+        // --- PHOTO LOGIC ---
         window.switchPose = (pose) => {
             currentPose = pose;
             document.getElementById('tab-front').classList.toggle('active', pose==='front');
@@ -777,14 +776,13 @@
             const imgB = document.getElementById('img-before');
             const imgA = document.getElementById('img-overlay');
             
-            if(after) imgB.src = after; else imgB.src = "";
-            if(before) imgA.src = before; else imgA.src = "";
+            if(after) imgB.src = after; else imgB.removeAttribute('src');
+            if(before) imgA.src = before; else imgA.removeAttribute('src');
 
             document.getElementById('date-before').innerText = `ANTES (${dateB})`;
             document.getElementById('date-after').innerText = `AHORA (${dateA})`;
             
-            // RESET TO LEFT (100%) -> Show Full Overlay (ANTES)
-            document.getElementById('slider-handle').style.left = '100%';
+            document.getElementById('slider-handle').style.left = '0%';
             imgA.style.clipPath = 'inset(0 0 0 0)';
         }
 
@@ -838,7 +836,6 @@
             updatePhotoDisplay(userData);
         }
 
-        // SLIDER LOGIC INVERTED: 0 (Left) = Show Overlay (Before), 100 (Right) = Hide Overlay (After)
         window.moveSlider = (v) => { 
             document.getElementById('img-overlay').style.clipPath = `inset(0 0 0 ${v}%)`; 
             document.getElementById('slider-handle').style.left = `${v}%`; 
@@ -937,7 +934,6 @@
             const r = snap.data();
             activeWorkout = { name: r.name, exs: r.exercises.map(n => {
                 const data = getExerciseData(n);
-                // FIXED SETS: 5 SETS TOTAL. 1st is 20 reps, others 16.
                 return { n:n, img:data.img, mInfo: data.mInfo, sets:Array(5).fill().map((_,i)=>({r: i===0 ? 20 : 16, w:0, d:false})) }; 
             })};
             
@@ -1077,13 +1073,12 @@
             switchTab('routines-view');
         };
 
-        // GLOBAL ADMIN LOADER - ATTACHED TO WINDOW FOR BUTTON TO WORK
+        // GLOBAL ADMIN LOADER
         window.loadAdminUsers = async () => {
             const l = document.getElementById('admin-list');
             l.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">↻ Cargando base de datos...</div>';
             
             try {
-                // FORCE FRESH FETCH FROM SERVER
                 const s = await getDocs(collection(db, "users"));
                 l.innerHTML = '';
                 
@@ -1098,7 +1093,6 @@
                     const div = document.createElement('div');
                     div.className = "admin-user-row";
                     
-                    // STATUS ICON
                     const statusIcon = u.approved ? '🟢' : '⏳';
                     const statusText = u.approved ? 'Activo' : 'Pendiente';
 
@@ -1118,20 +1112,18 @@
             }
         };
 
-        // NEW: ROBUST COACH VIEW WITH ROUTINE LOADER
         async function openCoachView(uid,u) {
             selectedUserCoach=uid;
             
             const freshSnap = await getDoc(doc(db, "users", uid));
             const freshU = freshSnap.data();
-            selectedUserObj = freshU; // Update local obj
+            selectedUserObj = freshU; 
 
             switchTab('coach-detail-view');
             
             document.getElementById('coach-user-name').innerText=freshU.name;
             document.getElementById('coach-user-email').innerText=freshU.email;
 
-            // SHOW APPROVE BUTTON IF PENDING
             const banner = document.getElementById('pending-approval-banner');
             if(!freshU.approved) {
                 banner.classList.remove('hidden');
@@ -1148,9 +1140,8 @@
             }
             
             updateCoachPhotoDisplay('front');
-            loadRoutinesForCoach(uid); // TRIGGER ROUTINE LOADING
+            loadRoutinesForCoach(uid); // Simplified Routine Loader
             
-            // LOAD STATS & GRAPH
             try {
                 const st = freshU.stats || {};
                 const age = freshU.age ? freshU.age : 'N/D';
@@ -1160,7 +1151,7 @@
                     <div class="stat-pill"><b>${age}</b><span>AÑOS</span></div>
                 `;
 
-                // GRAPH LOAD WITH DELAY TO ENSURE CANVAS IS READY
+                // DELAYED CHART RENDER
                 setTimeout(() => {
                     if(coachChart) coachChart.destroy();
                     const ctx = document.getElementById('coachWeightChart');
@@ -1181,7 +1172,6 @@
                     });
                 }, 300);
 
-                // LOAD HISTORY
                 const hList = document.getElementById('coach-history-list');
                 hList.innerHTML = 'Cargando historial...';
                 const qH = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(10));
@@ -1199,68 +1189,58 @@
             } catch(e) { console.error("Error loading coach details", e); }
         }
 
-        // SEPARATE FUNCTION TO LOAD ROUTINES ROBUSTLY
+        // SIMPLIFIED ROUTINE LOADER (Direct Fetch)
         async function loadRoutinesForCoach(uid) {
-             const s = document.getElementById('coach-routine-select'); 
+             const s = document.getElementById('simple-routine-select'); 
              const rList = document.getElementById('coach-assigned-list');
              
-             s.innerHTML = '<option>Cargando lista...</option>';
+             s.innerHTML = '<option value="">Cargando...</option>';
              rList.innerHTML = 'Cargando asignadas...';
              
              try {
                 const allRoutinesSnap = await getDocs(collection(db, "routines"));
-                allRoutinesCache = [];
-                s.innerHTML = '';
-                rList.innerHTML = '';
+                let options = '<option value="">-- Selecciona Rutina --</option>';
+                let assignedHtml = '';
 
-                let assignedCount = 0;
+                if(allRoutinesSnap.empty) {
+                    s.innerHTML = '<option>No hay rutinas creadas</option>';
+                    rList.innerHTML = 'Sin datos.';
+                    return;
+                }
 
-                allRoutinesSnap.forEach(r => {
-                    const data = r.data();
-                    const routineObj = {id: r.id, ...data};
-                    allRoutinesCache.push(routineObj);
-                    
-                    // ADD TO SELECT
-                    const o = document.createElement('option'); 
-                    o.value = r.id; 
-                    o.innerText = data.name; 
-                    s.appendChild(o);
+                allRoutinesSnap.forEach(doc => {
+                    const r = doc.data();
+                    const rid = doc.id;
 
-                    // CHECK IF ASSIGNED
-                    if(data.assignedTo && data.assignedTo.includes(uid)) {
-                        assignedCount++;
-                        const div = document.createElement('div');
-                        div.className = "assigned-routine-item";
-                        div.innerHTML = `<span>${data.name}</span><button style="background:none;border:none;color:#f55;font-weight:bold;cursor:pointer;" onclick="unassignRoutine('${r.id}')">❌</button>`;
-                        rList.appendChild(div);
+                    // Add to dropdown
+                    options += `<option value="${rid}">${r.name}</option>`;
+
+                    // Check if assigned (Safety check for array existence)
+                    if(r.assignedTo && Array.isArray(r.assignedTo) && r.assignedTo.includes(uid)) {
+                        assignedHtml += `
+                            <div class="assigned-routine-item" style="display:flex; justify-content:space-between; align-items:center; background:#222; padding:10px; margin-bottom:5px; border-radius:6px; border:1px solid #333;">
+                                <span>${r.name}</span>
+                                <button style="background:none; border:none; cursor:pointer;" onclick="unassignRoutine('${rid}')">❌</button>
+                            </div>
+                        `;
                     }
                 });
 
-                if(assignedCount === 0) rList.innerHTML = 'Ninguna rutina asignada.';
+                s.innerHTML = options;
+                rList.innerHTML = assignedHtml || '<div style="color:#666; font-style:italic;">Ninguna asignada todavía.</div>';
 
              } catch(e) {
-                 console.error("Error fetching routines:", e);
-                 s.innerHTML = '<option>Error de carga</option>';
+                 console.error(e);
+                 rList.innerText = "Error cargando rutinas.";
              }
         }
 
-        // NEW APPROVE FUNCTION
         window.approveUser = async () => {
             if(confirm("¿Confirmar acceso a este atleta?")) {
                 await updateDoc(doc(db,"users",selectedUserCoach), {approved: true});
                 alert("Atleta Aprobado ✅");
-                openCoachView(selectedUserCoach, selectedUserObj); // REFRESH FULL SCREEN VIEW
+                openCoachView(selectedUserCoach, selectedUserObj); 
             }
-        };
-
-        window.renderCoachRoutines = (list) => {
-            const s = document.getElementById('coach-routine-select'); s.innerHTML = '';
-            list.forEach(r => { const o = document.createElement('option'); o.value = r.id; o.innerText = r.name; s.appendChild(o); });
-        };
-
-        window.filterCoachRoutines = (val) => {
-            const filtered = allRoutinesCache.filter(r => r.name.toLowerCase().includes(val.toLowerCase()));
-            renderCoachRoutines(filtered);
         };
 
         window.switchCoachPose = (pose) => {
@@ -1300,32 +1280,32 @@
             document.getElementById('coach-slider-handle').style.left = `${v}%`;
         };
 
-        // GLOBAL FLAG FOR CREATION CONTEXT
         window.goToCreateRoutine = () => {
-            creatingForAthleteId = selectedUserCoach; // SET CONTEXT
+            creatingForAthleteId = selectedUserCoach; 
             switchTab('routines-view'); 
             openEditor(); 
         };
 
-        window.assignRoutine = async () => {
-            const rid=document.getElementById('coach-routine-select').value; 
-            if(!rid||!selectedUserCoach) return alert("Selecciona una rutina");
-            
-            try {
-                const rRef=doc(db,"routines",rid); 
-                await updateDoc(rRef,{assignedTo: arrayUnion(selectedUserCoach)}); 
-                alert("Rutina Asignada ✅");
-                // Refresh list manually
-                loadRoutinesForCoach(selectedUserCoach);
-            } catch(e) {
-                alert("Error al asignar: " + e.message);
-            }
-        };
+        // SIMPLIFIED ASSIGNMENT
+        window.assignSimpleRoutine = async () => {
+             const rid = document.getElementById('simple-routine-select').value;
+             if(!rid) return alert("Por favor, selecciona una rutina del listado.");
+
+             try {
+                 await updateDoc(doc(db, "routines", rid), {
+                     assignedTo: arrayUnion(selectedUserCoach)
+                 });
+                 alert("✅ Rutina asignada con éxito");
+                 loadRoutinesForCoach(selectedUserCoach); // Refresh
+             } catch(e) {
+                 alert("Error: " + e.message);
+             }
+        }
 
         window.unassignRoutine = async (rid) => {
             if(confirm("¿Quitar esta rutina al atleta?")) {
                 await updateDoc(doc(db, "routines", rid), { assignedTo: arrayRemove(selectedUserCoach) });
-                loadRoutinesForCoach(selectedUserCoach); // Refresh list manually
+                loadRoutinesForCoach(selectedUserCoach); 
             }
         };
 
