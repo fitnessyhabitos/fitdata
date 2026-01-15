@@ -35,12 +35,11 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* FIX IOS: Body fixed para evitar rebotes, layout vertical estricto */
         body {
             background-color: var(--bg-color); 
             color: var(--text-color); 
             font-family: var(--font-main);
-            position: fixed; 
+            position: fixed; /* Evita rebote elástico en iOS */
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%;
             overflow: hidden; 
@@ -75,7 +74,7 @@
         }
         #loading-logo { 
             width: 140px; border-radius: 25px; 
-            box-shadow: 0 0 40px rgba(255, 51, 51, 0.6); /* GLOW RESTAURADO */
+            box-shadow: 0 0 40px rgba(255, 51, 51, 0.6);
             animation: breathe 3s infinite; clip-path: inset(0 round 25px); 
         }
         .loading-text {
@@ -100,7 +99,7 @@
             font-weight: 800; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; letter-spacing: 1px;
         }
 
-        /* CONTAINER - SCROLL FLUIDO */
+        /* CONTAINER */
         #main-container { 
             flex: 1; 
             overflow-y: auto; 
@@ -149,26 +148,21 @@
         .ex-select-item img { width: 45px; height: 45px; object-fit: contain; background: black; border: 1px solid #333; border-radius: 4px; }
         .ex-select-item.selected { border-color: var(--accent-color); background: rgba(255,51,51,0.1); }
 
-        /* FIX MENU IOS: Altura estricta y control de Safe Area */
+        /* FIX MENU IOS DEFINITIVO */
         nav.bottom-nav {
             flex-shrink: 0; 
-            /* 50px de altura funcional + el padding del iPhone */
-            height: calc(50px + var(--safe-bottom)); 
+            /* Altura fija para el contenido + el padding seguro */
+            height: calc(60px + var(--safe-bottom)); 
             padding-bottom: var(--safe-bottom);
+            box-sizing: border-box; /* ESTO ES CRUCIAL PARA QUE NO SE SUME DOBLE */
             
             background: #0f0f0f; border-top: 1px solid #222; 
-            display: flex; justify-content: space-around; 
-            align-items: center; /* Centrar iconos verticalmente en el espacio disponible */
+            display: flex; justify-content: space-around; align-items: center;
             z-index: 999;
         }
-        .nav-item { 
-            flex: 1; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; 
-            color: #555; font-size: 0.65rem; 
-            height: 50px; /* Forzar altura del botón */
-        }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 0.65rem; height: 100%; }
         .nav-item.active { color: var(--accent-color); }
-        .nav-icon { font-size: 1.5rem; margin-bottom: 2px; }
+        .nav-icon { font-size: 1.5rem; margin-bottom: 3px; }
 
         .btn-float { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--accent-color); color: white; display: grid; place-items: center; font-size: 28px; box-shadow: 0 5px 20px rgba(255,51,51,0.6); z-index: 1000; cursor: pointer; }
 
