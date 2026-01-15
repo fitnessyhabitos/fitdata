@@ -27,7 +27,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* IOS FIX: Bloqueo de rebote elástico */
         body {
             background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-main);
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%;
@@ -98,7 +97,6 @@
         .ex-select-item img { width: 45px; height: 45px; object-fit: contain; background: black; border: 1px solid #333; border-radius: 4px; }
         .ex-select-item.selected { border-color: var(--accent-color); background: rgba(255,51,51,0.1); }
 
-        /* IOS MENU PERFECTO */
         nav.bottom-nav { flex-shrink: 0; height: calc(60px + var(--safe-bottom)); padding-bottom: var(--safe-bottom); box-sizing: border-box; background: #0f0f0f; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 999; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 0.65rem; height: 100%; }
         .nav-item.active { color: var(--accent-color); }
@@ -944,8 +942,7 @@
             switchTab('routines-view');
         };
 
-        // REAL-TIME COACH LIST (FIX)
-        let adminUnsub = null;
+        // REAL-TIME COACH LIST (FIXED)
         function loadAdminUsers() {
             const l = document.getElementById('admin-list');
             if(adminUnsub) adminUnsub(); 
