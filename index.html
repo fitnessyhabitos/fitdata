@@ -52,6 +52,7 @@
         @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 50px rgba(255,51,51,0.7); } 50% { transform: scale(1.05); opacity: 0.8; box-shadow: 0 0 20px rgba(255,51,51,0.3); } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
+        /* HEADER & BRAND */
         header { flex-shrink: 0; height: calc(var(--header-height) + var(--safe-top)); padding-top: var(--safe-top); background: rgba(5,5,5,0.98); border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; padding-left: 20px; padding-right: 20px; z-index: 100; }
         .brand { font-family: var(--font-sport); font-size: 1.5rem; color: white; letter-spacing: 1px; text-transform: uppercase; }
         .brand span { color: var(--accent-color); text-shadow: 0 0 10px rgba(255,51,51,0.5); }
@@ -122,10 +123,10 @@
 
         .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 5px; border:1px solid #333; }
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
-        /* LÓGICA INVERTIDA: Overlay es ANTES, Fondo es AHORA. Empezamos con el slider a la derecha (100) -> overlay invisible */
-        .img-overlay { clip-path: inset(0 100% 0 0); border-right: 2px solid white; }
-        /* BARRA TRANSPARENTE */
-        .slider-handle { position: absolute; top: 0; bottom: 0; left: 100%; width: 50px; margin-left:-25px; cursor: ew-resize; z-index: 10; background: transparent; }
+        /* INICIALMENTE OVERLAY OCULTO (inset from right 100%) PARA VER EL FONDO (ACTUAL) */
+        .img-overlay { clip-path: inset(0 0 0 100%); border-left: 2px solid white; }
+        /* BARRA INVISIBLE */
+        .slider-handle { position: absolute; top: 0; bottom: 0; left: 100%; width: 50px; margin-left: -25px; cursor: ew-resize; z-index: 10; background: transparent; }
         .slider-btn { display: none; }
         .slider-labels { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20; }
         .label-tag { background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; color: white; border: 1px solid #555; }
@@ -165,7 +166,7 @@
     </div>
 
     <header id="main-header" class="hidden">
-        <div class="brand">FIT DATA <span>PRO</span></div>
+        <div class="brand">FIT DATA <span>PRO v49</span></div>
         <button id="coach-btn" class="hidden btn-neon-text">COACH</button>
     </header>
 
@@ -252,10 +253,7 @@
                     <div class="photo-tab active" id="tab-front" onclick="switchPose('front')">👤 FRONTAL</div>
                     <div class="photo-tab" id="tab-back" onclick="switchPose('back')">🛡️ ESPALDA</div>
                 </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.7rem; color:#888;">
-                    <span id="date-before">-</span>
-                    <span id="date-after">-</span>
-                </div>
+                
                 <div class="compare-wrapper">
                     <div class="slider-labels"><span class="label-tag">ANTES</span><span class="label-tag">AHORA</span></div>
                     <img src="" id="img-before" class="compare-img">
@@ -263,6 +261,12 @@
                     <div class="slider-handle" id="slider-handle"><div class="slider-btn"></div></div>
                 </div>
                 <input type="range" min="0" max="100" value="100" style="width:100%; margin-top:15px;" oninput="moveSlider(this.value)">
+                
+                <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.7rem; color:#888;">
+                    <span id="date-before">-</span>
+                    <span id="date-after">-</span>
+                </div>
+
                 <div class="photo-actions">
                     <button class="btn-outline" style="margin:0; padding:10px 5px;" onclick="document.getElementById('f-before').click()">1. ANTES</button>
                     <button class="btn-danger btn-small" style="margin:0;" onclick="deletePhoto('before')">🗑️</button>
@@ -390,7 +394,7 @@
                 <h3>RUTINAS ASIGNADAS</h3>
                 <div id="coach-assigned-list" style="font-size:0.8rem; color:#888; margin-bottom:15px;">Cargando...</div>
 
-                <label style="font-size:0.7rem; color:#ccc; text-transform:uppercase;">Asignar Existente:</label>
+                <label style="font-size:0.7rem; color:#ccc; text-transform:uppercase;">Asignar Nueva:</label>
                 <div style="display:flex; gap:10px;">
                     <select id="simple-routine-select" style="flex:1; background:#222; color:white; padding:10px; border:1px solid #444; border-radius:6px; margin:0;">
                         <option value="">Cargando...</option>
@@ -555,8 +559,9 @@
 
         let currentUser=null, userData=null, activeWorkout=null, timerInt=null, restTimeRemaining=0, wakeLock=null, chartInstance=null, selectedUserCoach=null, selectedUserObj=null, editingRoutineId=null, coachChart=null, currentPose='front', coachCurrentPose='front', allRoutinesCache=[], adminUnsub=null;
         
+        // GLOBAL SELECTION STATE FOR EDITOR
         let currentRoutineSelections = [];
-        let creatingForAthleteId = null;
+        let creatingForAthleteId = null; // IMPORTANT: Coach Creation Context
 
         function getExerciseData(name) {
             let match = EXERCISES.find(e => e.n === name);
@@ -765,7 +770,7 @@
         
         window.delRoutine = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db,"routines",id)); };
 
-        // --- PHOTO COMPARISON LOGIC ---
+        // --- PHOTO COMPARISON LOGIC (USER) ---
         window.switchPose = (pose) => {
             currentPose = pose;
             document.getElementById('tab-front').classList.toggle('active', pose==='front');
@@ -784,14 +789,15 @@
             const imgA = document.getElementById('img-overlay');
             
             // Logic: Background = Current (After), Overlay = Past (Before)
-            if(after) imgB.src = after; else imgB.removeAttribute('src');
-            if(before) imgA.src = before; else imgA.removeAttribute('src');
+            if(after) imgB.src = after; else imgB.src = ""; // Base is Current
+            if(before) imgA.src = before; else imgA.src = ""; // Overlay is Past
 
             document.getElementById('date-before').innerText = `ANTES (${dateB})`;
             document.getElementById('date-after').innerText = `AHORA (${dateA})`;
             
-            // RESET TO LEFT (100%) -> Show Full Overlay (ANTES)
-            document.getElementById('slider-handle').style.left = '100%';
+            // Reset to 0 (Left = Show Overlay = Show Before)
+            // Clip path: inset(0 0 0 0) -> shows full overlay
+            document.getElementById('slider-handle').style.left = '0%';
             imgA.style.clipPath = 'inset(0 0 0 0)';
         }
 
@@ -847,6 +853,9 @@
 
         // SLIDER LOGIC INVERTED: 0 (Left) = Show Overlay (Before), 100 (Right) = Hide Overlay (After)
         window.moveSlider = (v) => { 
+            // clip-path: inset(top right bottom left)
+            // v=0 -> inset(0 0 0 0) -> shows all
+            // v=100 -> inset(0 100% 0 0) -> hides all from right
             document.getElementById('img-overlay').style.clipPath = `inset(0 0 0 ${v}%)`; 
             document.getElementById('slider-handle').style.left = `${v}%`; 
         };
