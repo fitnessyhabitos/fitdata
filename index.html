@@ -37,13 +37,19 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-main);
-            height: 100dvh; width: 100vw; overflow: hidden; display: flex; flex-direction: column;
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: var(--font-main);
+            height: 100dvh; 
+            width: 100vw; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
         }
 
         .hidden { display: none !important; }
         
-        /* BOTONES Y ESTILOS GENERALES (DISEÑO v15) */
+        /* BOTONES */
         .btn {
             background: var(--accent-color); color: white; border: none; padding: 14px;
             border-radius: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
@@ -67,7 +73,7 @@
             box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
         }
 
-        /* LOADING SCREEN */
+        /* LOADING */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); z-index: 9999; 
@@ -99,15 +105,15 @@
             font-weight: 800; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; letter-spacing: 1px;
         }
 
-        /* LAYOUT & CARDS */
+        /* LAYOUT */
         #main-container { flex: 1; overflow-y: auto; position: relative; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         .view-container { min-height: 100%; padding: 20px 15px 180px 15px; display: none; opacity: 0; animation: fadeIn 0.3s forwards; }
         .view-container.active { display: block; opacity: 1; }
         @keyframes fadeIn { to { opacity: 1; } }
 
         .card { background: var(--card-color); border-radius: 12px; padding: 18px; margin-bottom: 18px; border: 1px solid #222; position: relative; }
-        input, select { background: var(--input-bg); border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 12px; font-size: 16px; }
-        input:focus { outline: 1px solid var(--accent-color); }
+        input, select, textarea { background: var(--input-bg); border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 12px; font-size: 16px; font-family: var(--font-main); }
+        input:focus, textarea:focus { outline: 1px solid var(--accent-color); }
 
         /* PROFILE */
         .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; }
@@ -124,7 +130,7 @@
         .stat-num { font-size: 1.2rem; font-weight: 800; color: white; display: block; }
         .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
 
-        /* WORKOUT & EDITOR */
+        /* WORKOUT CARDS */
         .workout-split { display: grid; grid-template-columns: 80px 1fr; gap: 15px; margin-bottom: 15px; align-items: center; }
         .workout-visual { width: 80px; height: 80px; background: #000; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; padding: 5px; }
         .workout-visual img { width: 100%; height: 100%; object-fit: contain; }
@@ -141,6 +147,7 @@
         .set-num { font-size: 0.85rem; color: #666; font-weight: bold; text-align: center; }
         .shadow-val { display: block; font-size: 0.65rem; color: #555; text-align: center; margin-bottom: 2px; }
 
+        /* EDITOR */
         .sticky-editor-header {
             position: sticky; top: -20px; background: var(--bg-color); z-index: 50;
             padding: 20px 0 10px 0; border-bottom: 1px solid #222; margin-top: -20px; margin-bottom: 15px;
@@ -160,9 +167,10 @@
         .btn-float {
             position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px;
             border-radius: 50%; background: var(--accent-color); color: white; display: grid; place-items: center;
-            font-size: 28px; box-shadow: 0 5px 20px rgba(255,51,51,0.6); z-index: 1000;
+            font-size: 28px; box-shadow: 0 5px 20px rgba(255,51,51,0.6); z-index: 1000; cursor: pointer;
         }
 
+        /* MODALS */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; }
         .modal.active { opacity: 1; pointer-events: auto; }
         .modal-content { 
@@ -178,14 +186,14 @@
         input:checked + .slider { background-color: var(--accent-color); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* FOTOS & SLIDERS */
-        .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 10px; border:1px solid #333; }
+        /* PHOTOS & SLIDER */
+        .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 5px; border:1px solid #333; }
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
         .img-overlay { clip-path: inset(0 50% 0 0); border-right: 2px solid white; }
         .slider-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; cursor: ew-resize; z-index: 10; }
         .slider-btn { position: absolute; top: 50%; left: -15px; width: 30px; height: 30px; background: white; border-radius: 50%; display: grid; place-items: center; color: black; box-shadow: 0 0 10px black; }
 
-        /* COACH ELEMENTS */
+        /* COACH UI */
         .admin-user-row { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .coach-photos-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
         .coach-photo-box { width: 45%; height: 150px; background: #000; border: 1px solid #333; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position:relative; }
@@ -194,14 +202,17 @@
         
         .assigned-routine-item { background: #222; padding: 10px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; border:1px solid #333; }
 
-        .history-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 10px 0; align-items: center; font-size: 0.75rem; }
-        .hist-date { font-size: 0.7rem; color: #888; width: 70px; }
-        .hist-name { font-size: 0.8rem; color: #fff; flex: 1; text-align: left; padding-left: 10px; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+        .history-row { display: grid; grid-template-columns: 60px 1fr 20px 80px; border-bottom: 1px solid #333; padding: 10px 0; align-items: center; font-size: 0.75rem; text-align: left; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; text-align: center; }
         .badge.green { background: rgba(46, 125, 50, 0.3); color: #4caf50; border: 1px solid #2e7d32; }
         .badge.orange { background: rgba(245, 127, 23, 0.3); color: #ffb74d; border: 1px solid #f57f17; }
         .badge.red { background: rgba(198, 40, 40, 0.3); color: #ef5350; border: 1px solid #c62828; }
         .badge.gray { background: #333; color: #aaa; }
+
+        .stat-pill-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
+        .stat-pill { background: #111; border: 1px solid #333; padding: 8px 4px; border-radius: 6px; }
+        .stat-pill b { display: block; font-size: 1rem; color: var(--accent-color); }
+        .stat-pill span { font-size: 0.65rem; color: #888; text-transform: uppercase; }
 
         .photo-tabs { display: flex; margin-bottom: 10px; background: #222; border-radius: 8px; padding: 2px; }
         .photo-tab { flex: 1; text-align: center; padding: 10px; font-size: 0.8rem; cursor: pointer; color: #888; border-radius: 6px; }
@@ -209,24 +220,20 @@
         
         .tip-box { background: rgba(255, 170, 0, 0.15); border: 1px solid var(--warning-color); color: #ffcc80; padding: 10px; border-radius: 8px; font-size: 0.75rem; text-align: center; margin-bottom: 15px; }
         .photo-actions { display: grid; grid-template-columns: 1fr 40px 1fr 40px; gap: 5px; margin-top: 15px; }
-        
-        .stat-pill-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
-        .stat-pill { background: #111; border: 1px solid #333; padding: 8px 4px; border-radius: 6px; }
-        .stat-pill b { display: block; font-size: 1rem; color: var(--accent-color); }
-        .stat-pill span { font-size: 0.65rem; color: #888; text-transform: uppercase; }
 
         /* RPE BUTTONS */
         .rpe-btn { width: 100%; margin-bottom: 10px; border: none; padding: 15px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         .rpe-easy { background: #2e7d32; }
         .rpe-hard { background: #f57f17; color: black; }
         .rpe-max { background: #c62828; }
+        .note-icon { font-size: 1rem; cursor: pointer; }
 
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
-        <img src="logo.png" id="loading-logo" alt="Logo" onerror="this.style.display='none'">
+        <img src="logo.png" id="loading-logo" onerror="this.style.display='none'">
         <div class="loading-text">SYSTEM INITIALIZED</div>
     </div>
 
@@ -236,7 +243,6 @@
     </header>
 
     <main id="main-container">
-
         <section id="auth-view" class="view-container">
             <div style="text-align:center; margin: 50px 0;">
                 <img src="logo.png" style="width:110px; border-radius:20px; margin-bottom:15px;" onerror="this.src='https://placehold.co/100x100?text=FD'">
@@ -313,9 +319,8 @@
 
             <div class="card">
                 <h3>EVOLUCIÓN FÍSICA</h3>
+                <div style="background:rgba(255,170,0,0.15); border:1px solid #ffaa00; color:#ffcc80; padding:10px; border-radius:8px; font-size:0.7rem; text-align:center; margin-bottom:15px;">💡 TIP: Usa siempre la misma luz, ropa y lugar.</div>
                 
-                <div class="tip-box">💡 TIP: Usa siempre la misma luz, ropa y lugar.</div>
-
                 <div class="photo-tabs">
                     <div class="photo-tab active" id="tab-front" onclick="switchPose('front')">👤 FRONTAL</div>
                     <div class="photo-tab" id="tab-back" onclick="switchPose('back')">🛡️ ESPALDA</div>
@@ -340,7 +345,6 @@
                     <button class="btn-outline" style="margin:0; padding:10px 5px;" onclick="document.getElementById('f-after').click()">2. AHORA</button>
                     <button class="btn-danger btn-small" style="margin:0;" onclick="deletePhoto('after')">🗑️</button>
                 </div>
-
                 <input type="file" id="f-before" class="hidden" accept="image/*" onchange="loadCompImg(this,'before')">
                 <input type="file" id="f-after" class="hidden" accept="image/*" onchange="loadCompImg(this,'after')">
             </div>
@@ -350,18 +354,10 @@
                 <div style="margin-bottom:15px;">
                     <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">Recordatorio Fotos:</div>
                     <div style="display:flex; gap:10px;">
-                        <select id="photo-day" style="margin:0;">
-                            <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
-                            <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option><option value="0">Domingo</option>
-                        </select>
+                        <select id="photo-day" style="margin:0;"><option value="1">Lunes</option><option value="5">Viernes</option></select>
                         <input type="time" id="photo-time" value="09:00" style="margin:0;">
                         <button class="btn-small btn" onclick="savePhotoReminder()">OK</button>
                     </div>
-                </div>
-                
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-                    <span>Descanso (seg)</span>
-                    <input type="number" id="cfg-rest-time" value="60" style="width:70px; padding:5px; margin:0; text-align:center;">
                 </div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
                     <span>Sonido (5 Beeps)</span>
@@ -410,12 +406,8 @@
     </main>
 
     <nav class="bottom-nav hidden" id="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('routines-view')">
-            <span class="nav-icon">🏋️</span><span>Rutinas</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('profile-view')">
-            <span class="nav-icon">⚙️</span><span>Perfil</span>
-        </div>
+        <div class="nav-item active" onclick="switchTab('routines-view')"><span class="nav-icon">🏋️</span><span>Rutinas</span></div>
+        <div class="nav-item" onclick="switchTab('profile-view')"><span class="nav-icon">⚙️</span><span>Perfil</span></div>
     </nav>
 
     <div id="modal-timer" class="modal">
@@ -436,6 +428,7 @@
             <button class="rpe-btn rpe-easy" onclick="finishWorkout('Suave')">🟢 Suave / Moderado</button>
             <button class="rpe-btn rpe-hard" onclick="finishWorkout('Duro')">🟠 Duro / Intenso</button>
             <button class="rpe-btn rpe-max" onclick="finishWorkout('Fallo')">🔴 Fallo / Extremo</button>
+            <textarea id="workout-notes" rows="3" placeholder="📝 Notas (opcional)..." style="width:100%; background:#222; border:1px solid #333; color:white; border-radius:8px; padding:10px; margin-top:10px;"></textarea>
             <button class="btn-outline" onclick="document.getElementById('modal-rpe').classList.remove('active')">Cancelar</button>
         </div>
     </div>
@@ -549,7 +542,7 @@
 
         window.testSound = () => { play5Beeps(); };
 
-        // BASE DE DATOS COMPLETA
+        // BASE DE DATOS COMPLETA 82 EJERCICIOS
         const EXERCISES = [
             {n:"Sentadilla con Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Jaca", img:"cuadriceps.png", m:"Cuádriceps"},
             {n:"Sentadilla Cinturón", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa de Piernas", img:"cuadriceps.png", m:"Cuádriceps"},
@@ -828,10 +821,10 @@
 
             const muscles = ["Pecho","Espalda","Cuádriceps","Isquios","Glúteos","Hombros","Bíceps","Tríceps"];
             const hC = document.getElementById('heatmap-container'); hC.innerHTML = '';
-            const muscleStats = userData.muscleStats || {};
+            const mS = userData.muscleStats || {};
             
             muscles.forEach(m=>{
-                const count = muscleStats[m] || 0;
+                const count = mS[m] || 0;
                 const pct = Math.min((count / 20) * 100, 100); 
                 const d = document.createElement('div'); d.className = 'muscle-bar-group';
                 d.innerHTML = `<div class="muscle-label"><span>${m}</span><span>${count} series</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
@@ -932,34 +925,49 @@
 
         window.finishWorkout = async (rpeVal) => {
             document.getElementById('modal-rpe').classList.remove('active');
-            
+            const note = document.getElementById('workout-notes').value; // NOTAS
             let s=0, r=0, k=0;
             let muscleCounts = {};
+            let prAlert = ""; // NEW PR
+
+            // Check previous PRs (create if not exists)
+            if(!userData.prs) userData.prs = {};
             
             activeWorkout.exs.forEach(e => {
                 e.sets.forEach(st => { 
                     if(st.d) { 
                         s++; 
                         r+=parseInt(st.r)||0; 
-                        k+=(parseInt(st.w)||0)*(parseInt(st.r)||0); 
+                        const weight = parseInt(st.w)||0;
+                        k+=weight*(parseInt(st.r)||0); 
                         const mName = e.mInfo.main;
                         muscleCounts[mName] = (muscleCounts[mName] || 0) + 1;
+
+                        // PR CHECK
+                        if(weight > (userData.prs[e.n] || 0)) {
+                            userData.prs[e.n] = weight;
+                            prAlert = `🏆 RÉCORD: ${e.n} (${weight}kg)\n`;
+                        }
                     }
                 });
             });
+
+            if(prAlert) alert(prAlert); // SHOW PR
 
             await addDoc(collection(db,"workouts"), {
                 uid:currentUser.uid, 
                 date:serverTimestamp(), 
                 routine:activeWorkout.name,
-                rpe: rpeVal
+                rpe: rpeVal,
+                note: note
             });
             
             const updates = { 
                 "stats.workouts": increment(1), 
                 "stats.totalSets": increment(s), 
                 "stats.totalReps": increment(r), 
-                "stats.totalKg": increment(k) 
+                "stats.totalKg": increment(k),
+                "prs": userData.prs 
             };
             
             for (const [muscle, count] of Object.entries(muscleCounts)) {
@@ -1049,7 +1057,7 @@
                     rList.appendChild(div);
                 });
 
-                // Historial
+                // Historial (CON NOTAS)
                 const hList = document.getElementById('coach-history-list');
                 hList.innerHTML = 'Cargando historial...';
                 const qH = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(10));
@@ -1060,7 +1068,8 @@
                     const d = w.data();
                     const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
                     let rpeBadge = d.rpe === 'Suave' ? '<span class="badge green">🟢 Suave</span>' : (d.rpe === 'Duro' ? '<span class="badge orange">🟠 Duro</span>' : (d.rpe === 'Fallo' ? '<span class="badge red">🔴 Fallo</span>' : '<span class="badge gray">--</span>'));
-                    hList.innerHTML += `<div class="history-row"><div class="hist-date">${date}</div><div class="hist-name">${d.routine}</div><div class="hist-rpe">${rpeBadge}</div></div>`;
+                    const noteIcon = d.note ? `<span class="note-icon" title="${d.note}" onclick="alert('${d.note}')">📝</span>` : '';
+                    hList.innerHTML += `<div class="history-row"><div class="hist-date">${date}</div><div class="hist-name">${d.routine} ${noteIcon}</div><div class="hist-rpe">${rpeBadge}</div></div>`;
                 });
 
                 if(!u.approved && confirm("¿Aprobar acceso a este atleta?")) { await updateDoc(doc(db,"users",uid),{approved:true}); loadAdminUsers(); }
@@ -1139,9 +1148,12 @@
 
         document.getElementById('btn-login').onclick=()=>signInWithEmailAndPassword(auth,document.getElementById('login-email').value,document.getElementById('login-pass').value).catch(e=>alert(e.message));
         document.getElementById('btn-register').onclick=async()=>{
-            if(document.getElementById('reg-code').value!==CODE)return alert("Código mal");
-            try{ const c=await createUserWithEmailAndPassword(auth,document.getElementById('reg-email').value,document.getElementById('reg-pass').value); await setDoc(doc(db,"users",c.user.uid),{name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,approved:document.getElementById('reg-email').value===ADMIN, age:parseInt(document.getElementById('reg-age').value), height:parseInt(document.getElementById('reg-height').value)}); }catch(e){alert(e.message);}
+            if(document.getElementById('reg-code').value!==CODE)return alert("Código incorrecto");
+            try{ const c=await createUserWithEmailAndPassword(auth,document.getElementById('reg-email').value,document.getElementById('reg-pass').value);
+            await setDoc(doc(db,"users",c.user.uid),{name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,approved:document.getElementById('reg-email').value===ADMIN,age:parseInt(document.getElementById('reg-age').value),height:parseInt(document.getElementById('reg-height').value)});
+            }catch(e){alert(e.message)}
         };
     </script>
 </body>
 </html>
+
