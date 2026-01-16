@@ -123,6 +123,7 @@
 
         .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 5px; border:1px solid #333; }
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+        
         .img-overlay { clip-path: inset(0 0 0 0); border-right: 2px solid white; }
         .slider-handle { position: absolute; top: 0; bottom: 0; left: 0%; width: 50px; margin-left: -25px; cursor: ew-resize; z-index: 10; background: transparent; }
         .slider-btn { display: none; }
@@ -154,9 +155,9 @@
         .note-icon { font-size: 1rem; cursor: pointer; }
         .tip-box { background: rgba(255, 170, 0, 0.15); border: 1px solid var(--warning-color); color: #ffcc80; padding: 10px; border-radius: 8px; font-size: 0.75rem; text-align: center; margin-bottom: 15px; }
 
-        /* TAB STYLES FOR ADMIN LIBRARY */
+        /* TABS ADMIN */
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .admin-tab-btn { flex: 1; background: #222; border: 1px solid #444; color: #888; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .admin-tab-btn { flex: 1; background: #222; border: 1px solid #444; color: #888; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; font-size: 0.8rem; }
         .admin-tab-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
 
     </style>
@@ -235,6 +236,11 @@
                     <h3 id="profile-name" style="margin:0;">Cargando...</h3>
                     <span style="color:#666; font-size:0.8rem;">Atleta de Alto Rendimiento</span>
                 </div>
+            </div>
+
+            <div class="card">
+                <h3>HISTORIAL RECIENTE</h3>
+                <div id="user-history-list" style="font-size:0.8rem; color:#888;">Cargando...</div>
             </div>
 
             <div class="card">
@@ -483,17 +489,13 @@
         const ADMIN = "toni@fitdatapro.es";
         const CODE = "fityhab";
 
-        // AUDIO SYSTEM (5 BEEPS)
         let audioCtx = null;
-
         function unlockAudio() {
             if(!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
             }
-            if(audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if(audioCtx.state === 'suspended') { audioCtx.resume(); }
             const buffer = audioCtx.createBuffer(1, 1, 22050);
             const source = audioCtx.createBufferSource();
             source.buffer = buffer;
@@ -510,307 +512,29 @@
                 for(let i=0; i<5; i++) {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
-                    osc.type = 'square';
-                    osc.frequency.value = 880; 
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    const start = now + (i * 0.6);
-                    const end = start + 0.15;
-                    osc.start(start);
-                    osc.stop(end);
+                    osc.type = 'square'; osc.frequency.value = 880; 
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    const start = now + (i * 0.6); const end = start + 0.15;
+                    osc.start(start); osc.stop(end);
                     gain.gain.setValueAtTime(0.5, start);
                     gain.gain.exponentialRampToValueAtTime(0.01, end);
                 }
             }
         }
-
         window.testSound = () => { play5Beeps(); };
 
-        // BASE DE DATOS COMPLETA 82 EJERCICIOS
         const EXERCISES = [
-            // --- CUÁDRICEPS ---
-            {n:"Sentadilla con Barra", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Frontal Barra", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Jaca (Hack)", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Jaca Inversa", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Cinturón", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Multipower", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Goblet", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Sissy", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Sissy Banco", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Sumo Mancuerna", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Búlgara Mancuernas", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Búlgara Multipower", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Pistol", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Zumo", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Jefferson", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Hack Sentado", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Pendulum", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Prensa de Piernas 45º", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Prensa Horizontal", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Prensa Vertical", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Prensa Unilateral", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Extensión Cuádriceps", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Extensión Cuádriceps Unilateral", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Zancadas Barra", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Zancadas Mancuernas", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Zancadas Caminando", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Zancadas Atrás Multipower", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Zancadas Estáticas", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Step-Up Cajón", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Step-Up con Barra", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Aductores en Máquina", img:"cuadriceps.png", m:"Cuádriceps"},
-            // --- ISQUIOTIBIALES (FEMORAL) ---
-            {n:"Curl Femoral Tumbado", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Curl Femoral Sentado", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Curl Femoral de Pie", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Curl Femoral Unilateral", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Curl Nórdico", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Curl Nórdico Polea", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Curl Swiss Ball", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Peso Muerto Rumano Barra", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Peso Muerto Rumano Mancuernas", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Peso Muerto Rumano Multipower", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Peso Muerto Rumano Unilateral", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Peso Muerto Piernas Rígidas", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Buenos Días Barra", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Buenos Días Multipower", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Buenos Días Banda Elástica", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Glute Ham Raise (GHR)", img:"isquiotibiales.png", m:"Isquios"},
-            // --- GLÚTEOS ---
-            {n:"Hip Thrust Barra", img:"gluteos.png", m:"Glúteos"},
-            {n:"Hip Thrust Máquina", img:"gluteos.png", m:"Glúteos"},
-            {n:"Hip Thrust Multipower", img:"gluteos.png", m:"Glúteos"},
-            {n:"Hip Thrust Unilateral", img:"gluteos.png", m:"Glúteos"},
-            {n:"Hip Thrust Mancuerna", img:"gluteos.png", m:"Glúteos"},
-            {n:"Puente de Glúteo Suelo", img:"gluteos.png", m:"Glúteos"},
-            {n:"Kas Glute Bridge", img:"gluteos.png", m:"Glúteos"},
-            {n:"Sentadilla Búlgara (Enfoque Glúteo)", img:"gluteos.png", m:"Glúteos"},
-            {n:"Patada Glúteo Polea", img:"gluteos.png", m:"Glúteos"},
-            {n:"Patada Glúteo Máquina", img:"gluteos.png", m:"Glúteos"},
-            {n:"Patada Glúteo Suelo", img:"gluteos.png", m:"Glúteos"},
-            {n:"Abducción Máquina", img:"gluteos.png", m:"Glúteos"},
-            {n:"Abducción Polea", img:"gluteos.png", m:"Glúteos"},
-            {n:"Abducción con Gomas", img:"gluteos.png", m:"Glúteos"},
-            {n:"Prensa Glúteos (Pies altos)", img:"gluteos.png", m:"Glúteos"},
-            {n:"Frog Pumps", img:"gluteos.png", m:"Glúteos"},
-            {n:"Step-Up Lateral", img:"gluteos.png", m:"Glúteos"},
-            {n:"Pull Through Polea", img:"gluteos.png", m:"Glúteos"},
-            {n:"Hiperextensiones Glúteo (45º)", img:"gluteos.png", m:"Glúteos"},
-            {n:"Peso Muerto Sumo", img:"gluteos.png", m:"Glúteos"},
-            {n:"Monster Walk", img:"gluteos.png", m:"Glúteos"},
-            // --- GEMELOS ---
-            {n:"Gemelo Sentado Máquina", img:"gemelos.png", m:"Gemelos"},
-            {n:"Gemelo Sentado Barra", img:"gemelos.png", m:"Gemelos"},
-            {n:"Gemelo de Pie Máquina", img:"gemelos.png", m:"Gemelos"},
-            {n:"Gemelo de Pie Multipower", img:"gemelos.png", m:"Gemelos"},
-            {n:"Gemelo de Pie Mancuernas", img:"gemelos.png", m:"Gemelos"},
-            {n:"Gemelo en Prensa", img:"gemelos.png", m:"Gemelos"},
-            {n:"Gemelo Donkey (Burro)", img:"gemelos.png", m:"Gemelos"},
-            {n:"Gemelo Unilateral", img:"gemelos.png", m:"Gemelos"},
-            {n:"Sóleo en Máquina", img:"gemelos.png", m:"Gemelos"},
-            // --- ESPALDA ---
-            {n:"Peso Muerto Convencional", img:"espalda.png", m:"Espalda"},
-            {n:"Peso Muerto Déficit", img:"espalda.png", m:"Espalda"},
-            {n:"Rack Pull", img:"espalda.png", m:"Espalda"},
-            {n:"Dominadas Pronas", img:"espalda.png", m:"Espalda"},
-            {n:"Dominadas Supinas", img:"espalda.png", m:"Espalda"},
-            {n:"Dominadas Neutras", img:"espalda.png", m:"Espalda"},
-            {n:"Dominadas Asistidas", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón al Pecho", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón al Pecho Supino", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón Cerrado (Triángulo)", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón Neutro", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón Unilateral Polea", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón Trasnuca", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón Brazos Rectos (Pullover Polea)", img:"espalda.png", m:"Espalda"},
-            {n:"Remo con Barra 90º", img:"espalda.png", m:"Espalda"},
-            {n:"Remo con Barra 45º (Yates)", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Pendlay", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Mancuerna Unilateral", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Mancuerna Dos Brazos", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Mancuernas Apoyo Pecho", img:"espalda.png", m:"Espalda"},
-            {n:"Remo T (Barra esquina)", img:"espalda.png", m:"Espalda"},
-            {n:"Remo T con Apoyo Pecho", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Gironda (Polea Baja)", img:"espalda.png", m:"Espalda"},
-            {n:"Remo en Punta", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Kroc", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Meadows", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Máquina Placas", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Máquina Discos (Hammer)", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Invertido (TRX/Barra)", img:"espalda.png", m:"Espalda"},
-            {n:"Remo al Mentón (Cuello)", img:"espalda.png", m:"Espalda"},
-            {n:"Hiperextensiones Lumbares", img:"espalda.png", m:"Espalda"},
-            {n:"Superman Suelo", img:"espalda.png", m:"Espalda"},
-            {n:"Face Pull", img:"hombros.png", m:"Hombros"},
-            // --- PECHO ---
-            {n:"Press Banca Barra", img:"pecho.png", m:"Pecho"},
-            {n:"Press Banca Mancuernas", img:"pecho.png", m:"Pecho"},
-            {n:"Press Banca Multipower", img:"pecho.png", m:"Pecho"},
-            {n:"Press Inclinado Barra", img:"pecho.png", m:"Pecho"},
-            {n:"Press Inclinado Mancuernas", img:"pecho.png", m:"Pecho"},
-            {n:"Press Inclinado Multipower", img:"pecho.png", m:"Pecho"},
-            {n:"Press Declinado Barra", img:"pecho.png", m:"Pecho"},
-            {n:"Press Declinado Mancuernas", img:"pecho.png", m:"Pecho"},
-            {n:"Press Declinado Multipower", img:"pecho.png", m:"Pecho"},
-            {n:"Press Pecho Máquina Sentado", img:"pecho.png", m:"Pecho"},
-            {n:"Press Hammer Strength", img:"pecho.png", m:"Pecho"},
-            {n:"Press Iso-Lateral", img:"pecho.png", m:"Pecho"},
-            {n:"Press Guillotina", img:"pecho.png", m:"Pecho"},
-            {n:"Press Svend", img:"pecho.png", m:"Pecho"},
-            {n:"Press Landmine", img:"pecho.png", m:"Pecho"},
-            {n:"Press Suelo (Floor Press)", img:"pecho.png", m:"Pecho"},
-            {n:"Aperturas Mancuernas Planas", img:"pecho.png", m:"Pecho"},
-            {n:"Aperturas Mancuernas Inclinadas", img:"pecho.png", m:"Pecho"},
-            {n:"Aperturas en Máquina (Peck Deck)", img:"pecho.png", m:"Pecho"},
-            {n:"Contractora de Pecho", img:"pecho.png", m:"Pecho"},
-            {n:"Cruce de Poleas Alta", img:"pecho.png", m:"Pecho"},
-            {n:"Cruce de Poleas Media", img:"pecho.png", m:"Pecho"},
-            {n:"Cruce de Poleas Baja", img:"pecho.png", m:"Pecho"},
-            {n:"Fondos en Paralelas", img:"pecho.png", m:"Pecho"},
-            {n:"Fondos Asistidos", img:"pecho.png", m:"Pecho"},
-            {n:"Pullover Mancuerna", img:"pecho.png", m:"Pecho"},
-            {n:"Flexiones (Push Ups)", img:"pecho.png", m:"Pecho"},
-            {n:"Flexiones Inclinadas", img:"pecho.png", m:"Pecho"},
-            {n:"Flexiones Declinadas", img:"pecho.png", m:"Pecho"},
-            {n:"Flexiones Diamante", img:"pecho.png", m:"Pecho"},
-            // --- HOMBROS ---
-            {n:"Press Militar Barra de Pie", img:"hombros.png", m:"Hombros"},
-            {n:"Press Militar Barra Sentado", img:"hombros.png", m:"Hombros"},
-            {n:"Press Hombro Mancuernas", img:"hombros.png", m:"Hombros"},
-            {n:"Press Hombro Multipower", img:"hombros.png", m:"Hombros"},
-            {n:"Press Hombro Máquina", img:"hombros.png", m:"Hombros"},
-            {n:"Press Arnold", img:"hombros.png", m:"Hombros"},
-            {n:"Press Trasnuca", img:"hombros.png", m:"Hombros"},
-            {n:"Press Landmine Unilateral", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Laterales Mancuerna", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Laterales Polea", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Laterales Máquina", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Laterales Sentado", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Laterales Egipcias", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Frontales Mancuerna", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Frontales Barra", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Frontales Disco", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Frontales Polea", img:"hombros.png", m:"Hombros"},
-            {n:"Pájaros Mancuerna (Posterior)", img:"hombros.png", m:"Hombros"},
-            {n:"Pájaros en Máquina", img:"hombros.png", m:"Hombros"},
-            {n:"Face Pull Polea Alta", img:"hombros.png", m:"Hombros"},
-            {n:"Cruces Polea Inversos", img:"hombros.png", m:"Hombros"},
-            {n:"Remo al Mentón Barra", img:"hombros.png", m:"Hombros"},
-            {n:"Remo al Mentón Polea", img:"hombros.png", m:"Hombros"},
-            {n:"Encogimientos Barra (Trapecio)", img:"hombros.png", m:"Hombros"},
-            {n:"Encogimientos Mancuerna", img:"hombros.png", m:"Hombros"},
-            {n:"Encogimientos Multipower", img:"hombros.png", m:"Hombros"},
-            {n:"Encogimientos en Máquina", img:"hombros.png", m:"Hombros"},
-            {n:"Y-Raise Mancuernas", img:"hombros.png", m:"Hombros"},
-            // --- BÍCEPS ---
-            {n:"Curl con Barra Recta", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl con Barra Z", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl con Mancuernas Supino", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl con Mancuernas Alterno", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Martillo Mancuernas", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Martillo Cuerda Polea", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Predicador Barra Z (Scott)", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Predicador Mancuerna", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Predicador Máquina", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Concentrado", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Araña (Spider Curl)", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl en Banco Inclinado", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Polea Baja", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Polea Alta (Doble)", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Bayesiano (Espalda a Polea)", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl 21", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Zottman", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl con Disco", img:"biceps.png", m:"Bíceps"},
-            {n:"Dominadas Supinas (Bíceps)", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl de Muñeca (Antebrazo)", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Inverso Barra (Antebrazo)", img:"biceps.png", m:"Bíceps"},
-            // --- TRÍCEPS ---
-            {n:"Extensión Polea Cuerda", img:"triceps.png", m:"Tríceps"},
-            {n:"Extensión Polea Barra Recta", img:"triceps.png", m:"Tríceps"},
-            {n:"Extensión Polea Barra V", img:"triceps.png", m:"Tríceps"},
-            {n:"Extensión Polea Unilateral", img:"triceps.png", m:"Tríceps"},
-            {n:"Extensión Katana", img:"triceps.png", m:"Tríceps"},
-            {n:"Press Francés Barra Z", img:"triceps.png", m:"Tríceps"},
-            {n:"Press Francés Mancuernas", img:"triceps.png", m:"Tríceps"},
-            {n:"Press Francés Polea", img:"triceps.png", m:"Tríceps"},
-            {n:"Rompecráneos", img:"triceps.png", m:"Tríceps"},
-            {n:"Press Cerrado Barra", img:"triceps.png", m:"Tríceps"},
-            {n:"Press Cerrado Multipower", img:"triceps.png", m:"Tríceps"},
-            {n:"Fondos Tríceps (Dips)", img:"triceps.png", m:"Tríceps"},
-            {n:"Fondos entre Bancos", img:"triceps.png", m:"Tríceps"},
-            {n:"Fondos en Máquina", img:"triceps.png", m:"Tríceps"},
-            {n:"Patada de Tríceps Mancuerna", img:"triceps.png", m:"Tríceps"},
-            {n:"Patada de Tríceps Polea", img:"triceps.png", m:"Tríceps"},
-            {n:"Copa Tríceps a Dos Manos", img:"triceps.png", m:"Tríceps"},
-            {n:"Copa Tríceps Unilateral", img:"triceps.png", m:"Tríceps"},
-            {n:"Extensiones Trasnuca Polea", img:"triceps.png", m:"Tríceps"},
-            {n:"JM Press", img:"triceps.png", m:"Tríceps"},
-            {n:"Tate Press", img:"triceps.png", m:"Tríceps"},
-            // --- ABDOMINALES (ABS) ---
-            {n:"Crunch Suelo", img:"abs.png", m:"Abs"},
-            {n:"Crunch Polea Alta", img:"abs.png", m:"Abs"},
-            {n:"Crunch Máquina", img:"abs.png", m:"Abs"},
-            {n:"Crunch en Fitball", img:"abs.png", m:"Abs"},
-            {n:"Elevación de Piernas Colgado", img:"abs.png", m:"Abs"},
-            {n:"Elevación de Piernas Suelo", img:"abs.png", m:"Abs"},
-            {n:"Elevación de Rodillas (Silla romana)", img:"abs.png", m:"Abs"},
-            {n:"Rueda Abdominal (Ab Wheel)", img:"abs.png", m:"Abs"},
-            {n:"Plancha Abdominal (Plank)", img:"abs.png", m:"Abs"},
-            {n:"Plancha Lateral", img:"abs.png", m:"Abs"},
-            {n:"V-Ups", img:"abs.png", m:"Abs"},
-            {n:"Tijeras", img:"abs.png", m:"Abs"},
-            {n:"Bicicleta", img:"abs.png", m:"Abs"},
-            {n:"Mountain Climbers", img:"abs.png", m:"Abs"},
-            {n:"Russian Twist (Giros)", img:"abs.png", m:"Abs"},
-            {n:"Woodchopper Polea (Leñador)", img:"abs.png", m:"Abs"},
-            {n:"Press Pallof", img:"abs.png", m:"Abs"},
-            {n:"Toques de Talón", img:"abs.png", m:"Abs"},
-            {n:"Hipopresivos", img:"abs.png", m:"Abs"},
-            {n:"Dragon Flag", img:"abs.png", m:"Abs"},
-            // --- ANTIGUOS ---
-            {n:"Sentadilla con Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Jaca", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Sentadilla Cinturón", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa de Piernas", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Extensión Cuádriceps", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Zancadas Mancuernas", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Curl Femoral Tumbado", img:"isquiotibiales.png", m:"Isquios"}, {n:"Curl Femoral Sentado", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Prensa Horizontal", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa 45 Grados", img:"cuadriceps.png", m:"Cuádriceps"},
-            {n:"Gemelo Sentado", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo de Pie", img:"gemelos.png", m:"Gemelos"},
-            {n:"Gemelo Máquina", img:"gemelos.png", m:"Gemelos"}, {n:"Hip Thrust", img:"gluteos.png", m:"Glúteos"},
-            {n:"Sentadilla Búlgara", img:"gluteos.png", m:"Glúteos"}, {n:"Patada Glúteo Polea", img:"gluteos.png", m:"Glúteos"},
-            {n:"Abducción Máquina", img:"gluteos.png", m:"Glúteos"}, {n:"Prensa Glúteos", img:"gluteos.png", m:"Glúteos"},
-            {n:"Peso Muerto Rumano", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Peso Muerto", img:"espalda.png", m:"Espalda"}, {n:"Peso Muerto Sumo", img:"espalda.png", m:"Espalda"},
-            {n:"Remo con Barra", img:"espalda.png", m:"Espalda"}, {n:"Remo Mancuernas", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón al Pecho", img:"espalda.png", m:"Espalda"}, {n:"Jalón Cerrado", img:"espalda.png", m:"Espalda"},
-            {n:"Remo en Máquina", img:"espalda.png", m:"Espalda"}, {n:"Remo Polea Baja", img:"espalda.png", m:"Espalda"},
-            {n:"Dominadas", img:"espalda.png", m:"Espalda"}, {n:"Dominadas Asistidas", img:"espalda.png", m:"Espalda"},
-            {n:"Remo Invertido", img:"espalda.png", m:"Espalda"}, {n:"Remo T", img:"espalda.png", m:"Espalda"},
-            {n:"Hiperextensiones", img:"espalda.png", m:"Espalda"}, {n:"Buenos Días", img:"isquiotibiales.png", m:"Isquios"},
-            {n:"Remo Hammer", img:"espalda.png", m:"Espalda"}, {n:"Jalón Neutro", img:"espalda.png", m:"Espalda"},
-            {n:"Jalón Abierto", img:"espalda.png", m:"Espalda"}, {n:"Remo al Cuello", img:"espalda.png", m:"Espalda"},
-            {n:"Press Banca", img:"pecho.png", m:"Pecho"}, {n:"Press Inclinado Mancuernas", img:"pecho.png", m:"Pecho"},
-            {n:"Aperturas Mancuernas", img:"pecho.png", m:"Pecho"}, {n:"Cruce de Poleas", img:"pecho.png", m:"Pecho"},
-            {n:"Press Máquina", img:"pecho.png", m:"Pecho"}, {n:"Press Declinado", img:"pecho.png", m:"Pecho"},
-            {n:"Fondos", img:"triceps.png", m:"Tríceps"}, {n:"Contractora Pecho", img:"pecho.png", m:"Pecho"},
-            {n:"Press Inclinado Barra", img:"pecho.png", m:"Pecho"}, {n:"Press Plano Mancuernas", img:"pecho.png", m:"Pecho"},
-            {n:"Press Iso Lateral", img:"pecho.png", m:"Pecho"}, {n:"Press Vertical", img:"pecho.png", m:"Pecho"},
-            {n:"Encogimientos Barra", img:"hombros.png", m:"Hombros"}, {n:"Encogimientos Mancuerna", img:"hombros.png", m:"Hombros"},
-            {n:"Press Militar", img:"hombros.png", m:"Hombros"}, {n:"Press Hombro Mancuerna", img:"hombros.png", m:"Hombros"},
-            {n:"Press Hombro Máquina", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Laterales", img:"hombros.png", m:"Hombros"},
-            {n:"Elevaciones Frontales", img:"hombros.png", m:"Hombros"}, {n:"Pájaros", img:"hombros.png", m:"Hombros"},
-            {n:"Laterales Polea", img:"hombros.png", m:"Hombros"}, {n:"Press Arnold", img:"hombros.png", m:"Hombros"},
-            {n:"Press Trasnuca", img:"hombros.png", m:"Hombros"}, {n:"Face Pull", img:"hombros.png", m:"Hombros"},
-            {n:"Curl Barra", img:"biceps.png", m:"Bíceps"}, {n:"Curl Mancuernas", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Polea", img:"biceps.png", m:"Bíceps"}, {n:"Curl Martillo", img:"biceps.png", m:"Bíceps"},
-            {n:"Curl Concentrado", img:"biceps.png", m:"Bíceps"}, {n:"Curl Predicador", img:"biceps.png", m:"Bíceps"},
-            {n:"Extensión Polea", img:"triceps.png", m:"Tríceps"}, {n:"Press Francés", img:"triceps.png", m:"Tríceps"},
-            {n:"Rompecráneos", img:"triceps.png", m:"Tríceps"}, {n:"Fondos Tríceps", img:"triceps.png", m:"Tríceps"},
-            {n:"Extensión Unilateral", img:"triceps.png", m:"Tríceps"}, {n:"Patada Tríceps", img:"triceps.png", m:"Tríceps"},
-            {n:"Copa Tríceps", img:"triceps.png", m:"Tríceps"}, {n:"Elevaciones Posteriores", img:"hombros.png", m:"Hombros"},
-            {n:"Rueda Abdominal", img:"abs.png", m:"Abs"}, {n:"Crunch Polea", img:"abs.png", m:"Abs"},
-            {n:"Elevación Piernas", img:"abs.png", m:"Abs"}, {n:"Abdominales Banco", img:"abs.png", m:"Abs"},
-            {n:"Crunch Máquina", img:"abs.png", m:"Abs"}, {n:"Rodillas al Pecho", img:"abs.png", m:"Abs"},
-            {n:"Abductor", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Extensión Triceps Barra", img:"triceps.png", m:"Tríceps"},
+            {n:"Sentadilla con Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Frontal Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Jaca (Hack)", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Jaca Inversa", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Cinturón", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Multipower", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Goblet", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Sissy", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Sissy Banco", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Sumo Mancuerna", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Búlgara Mancuernas", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Búlgara Multipower", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Pistol", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Zumo", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Jefferson", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Hack Sentado", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Pendulum", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa de Piernas 45º", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa Horizontal", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa Vertical", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa Unilateral", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Extensión Cuádriceps", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Extensión Cuádriceps Unilateral", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Zancadas Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Zancadas Mancuernas", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Zancadas Caminando", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Zancadas Atrás Multipower", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Zancadas Estáticas", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Step-Up Cajón", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Step-Up con Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Aductores en Máquina", img:"cuadriceps.png", m:"Cuádriceps"},
+            {n:"Curl Femoral Tumbado", img:"isquiotibiales.png", m:"Isquios"}, {n:"Curl Femoral Sentado", img:"isquiotibiales.png", m:"Isquios"}, {n:"Curl Femoral de Pie", img:"isquiotibiales.png", m:"Isquios"}, {n:"Curl Femoral Unilateral", img:"isquiotibiales.png", m:"Isquios"}, {n:"Curl Nórdico", img:"isquiotibiales.png", m:"Isquios"}, {n:"Curl Nórdico Polea", img:"isquiotibiales.png", m:"Isquios"}, {n:"Curl Swiss Ball", img:"isquiotibiales.png", m:"Isquios"}, {n:"Peso Muerto Rumano Barra", img:"isquiotibiales.png", m:"Isquios"}, {n:"Peso Muerto Rumano Mancuernas", img:"isquiotibiales.png", m:"Isquios"}, {n:"Peso Muerto Rumano Multipower", img:"isquiotibiales.png", m:"Isquios"}, {n:"Peso Muerto Rumano Unilateral", img:"isquiotibiales.png", m:"Isquios"}, {n:"Peso Muerto Piernas Rígidas", img:"isquiotibiales.png", m:"Isquios"}, {n:"Buenos Días Barra", img:"isquiotibiales.png", m:"Isquios"}, {n:"Buenos Días Multipower", img:"isquiotibiales.png", m:"Isquios"}, {n:"Buenos Días Banda Elástica", img:"isquiotibiales.png", m:"Isquios"}, {n:"Glute Ham Raise (GHR)", img:"isquiotibiales.png", m:"Isquios"},
+            {n:"Hip Thrust Barra", img:"gluteos.png", m:"Glúteos"}, {n:"Hip Thrust Máquina", img:"gluteos.png", m:"Glúteos"}, {n:"Hip Thrust Multipower", img:"gluteos.png", m:"Glúteos"}, {n:"Hip Thrust Unilateral", img:"gluteos.png", m:"Glúteos"}, {n:"Hip Thrust Mancuerna", img:"gluteos.png", m:"Glúteos"}, {n:"Puente de Glúteo Suelo", img:"gluteos.png", m:"Glúteos"}, {n:"Kas Glute Bridge", img:"gluteos.png", m:"Glúteos"}, {n:"Sentadilla Búlgara (Enfoque Glúteo)", img:"gluteos.png", m:"Glúteos"}, {n:"Patada Glúteo Polea", img:"gluteos.png", m:"Glúteos"}, {n:"Patada Glúteo Máquina", img:"gluteos.png", m:"Glúteos"}, {n:"Patada Glúteo Suelo", img:"gluteos.png", m:"Glúteos"}, {n:"Abducción Máquina", img:"gluteos.png", m:"Glúteos"}, {n:"Abducción Polea", img:"gluteos.png", m:"Glúteos"}, {n:"Abducción con Gomas", img:"gluteos.png", m:"Glúteos"}, {n:"Prensa Glúteos (Pies altos)", img:"gluteos.png", m:"Glúteos"}, {n:"Frog Pumps", img:"gluteos.png", m:"Glúteos"}, {n:"Step-Up Lateral", img:"gluteos.png", m:"Glúteos"}, {n:"Pull Through Polea", img:"gluteos.png", m:"Glúteos"}, {n:"Hiperextensiones Glúteo (45º)", img:"gluteos.png", m:"Glúteos"}, {n:"Peso Muerto Sumo", img:"gluteos.png", m:"Glúteos"}, {n:"Monster Walk", img:"gluteos.png", m:"Glúteos"},
+            {n:"Gemelo Sentado Máquina", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo Sentado Barra", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo de Pie Máquina", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo de Pie Multipower", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo de Pie Mancuernas", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo en Prensa", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo Donkey (Burro)", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo Unilateral", img:"gemelos.png", m:"Gemelos"}, {n:"Sóleo en Máquina", img:"gemelos.png", m:"Gemelos"},
+            {n:"Peso Muerto Convencional", img:"espalda.png", m:"Espalda"}, {n:"Peso Muerto Déficit", img:"espalda.png", m:"Espalda"}, {n:"Rack Pull", img:"espalda.png", m:"Espalda"}, {n:"Dominadas Pronas", img:"espalda.png", m:"Espalda"}, {n:"Dominadas Supinas", img:"espalda.png", m:"Espalda"}, {n:"Dominadas Neutras", img:"espalda.png", m:"Espalda"}, {n:"Dominadas Asistidas", img:"espalda.png", m:"Espalda"}, {n:"Jalón al Pecho", img:"espalda.png", m:"Espalda"}, {n:"Jalón al Pecho Supino", img:"espalda.png", m:"Espalda"}, {n:"Jalón Cerrado (Triángulo)", img:"espalda.png", m:"Espalda"}, {n:"Jalón Neutro", img:"espalda.png", m:"Espalda"}, {n:"Jalón Unilateral Polea", img:"espalda.png", m:"Espalda"}, {n:"Jalón Trasnuca", img:"espalda.png", m:"Espalda"}, {n:"Jalón Brazos Rectos (Pullover Polea)", img:"espalda.png", m:"Espalda"}, {n:"Remo con Barra 90º", img:"espalda.png", m:"Espalda"}, {n:"Remo con Barra 45º (Yates)", img:"espalda.png", m:"Espalda"}, {n:"Remo Pendlay", img:"espalda.png", m:"Espalda"}, {n:"Remo Mancuerna Unilateral", img:"espalda.png", m:"Espalda"}, {n:"Remo Mancuerna Dos Brazos", img:"espalda.png", m:"Espalda"}, {n:"Remo Mancuernas Apoyo Pecho", img:"espalda.png", m:"Espalda"}, {n:"Remo T (Barra esquina)", img:"espalda.png", m:"Espalda"}, {n:"Remo T con Apoyo Pecho", img:"espalda.png", m:"Espalda"}, {n:"Remo Gironda (Polea Baja)", img:"espalda.png", m:"Espalda"}, {n:"Remo en Punta", img:"espalda.png", m:"Espalda"}, {n:"Remo Kroc", img:"espalda.png", m:"Espalda"}, {n:"Remo Meadows", img:"espalda.png", m:"Espalda"}, {n:"Remo Máquina Placas", img:"espalda.png", m:"Espalda"}, {n:"Remo Máquina Discos (Hammer)", img:"espalda.png", m:"Espalda"}, {n:"Remo Invertido (TRX/Barra)", img:"espalda.png", m:"Espalda"}, {n:"Remo al Mentón (Cuello)", img:"espalda.png", m:"Espalda"}, {n:"Hiperextensiones Lumbares", img:"espalda.png", m:"Espalda"}, {n:"Superman Suelo", img:"espalda.png", m:"Espalda"}, {n:"Face Pull", img:"hombros.png", m:"Hombros"},
+            {n:"Press Banca Barra", img:"pecho.png", m:"Pecho"}, {n:"Press Banca Mancuernas", img:"pecho.png", m:"Pecho"}, {n:"Press Banca Multipower", img:"pecho.png", m:"Pecho"}, {n:"Press Inclinado Barra", img:"pecho.png", m:"Pecho"}, {n:"Press Inclinado Mancuernas", img:"pecho.png", m:"Pecho"}, {n:"Press Inclinado Multipower", img:"pecho.png", m:"Pecho"}, {n:"Press Declinado Barra", img:"pecho.png", m:"Pecho"}, {n:"Press Declinado Mancuernas", img:"pecho.png", m:"Pecho"}, {n:"Press Declinado Multipower", img:"pecho.png", m:"Pecho"}, {n:"Press Pecho Máquina Sentado", img:"pecho.png", m:"Pecho"}, {n:"Press Hammer Strength", img:"pecho.png", m:"Pecho"}, {n:"Press Iso-Lateral", img:"pecho.png", m:"Pecho"}, {n:"Press Guillotina", img:"pecho.png", m:"Pecho"}, {n:"Press Svend", img:"pecho.png", m:"Pecho"}, {n:"Press Landmine", img:"pecho.png", m:"Pecho"}, {n:"Press Suelo (Floor Press)", img:"pecho.png", m:"Pecho"}, {n:"Aperturas Mancuernas Planas", img:"pecho.png", m:"Pecho"}, {n:"Aperturas Mancuernas Inclinadas", img:"pecho.png", m:"Pecho"}, {n:"Aperturas en Máquina (Peck Deck)", img:"pecho.png", m:"Pecho"}, {n:"Contractora de Pecho", img:"pecho.png", m:"Pecho"}, {n:"Cruce de Poleas Alta", img:"pecho.png", m:"Pecho"}, {n:"Cruce de Poleas Media", img:"pecho.png", m:"Pecho"}, {n:"Cruce de Poleas Baja", img:"pecho.png", m:"Pecho"}, {n:"Fondos en Paralelas", img:"pecho.png", m:"Pecho"}, {n:"Fondos Asistidos", img:"pecho.png", m:"Pecho"}, {n:"Pullover Mancuerna", img:"pecho.png", m:"Pecho"}, {n:"Flexiones (Push Ups)", img:"pecho.png", m:"Pecho"}, {n:"Flexiones Inclinadas", img:"pecho.png", m:"Pecho"}, {n:"Flexiones Declinadas", img:"pecho.png", m:"Pecho"}, {n:"Flexiones Diamante", img:"pecho.png", m:"Pecho"},
+            {n:"Press Militar Barra de Pie", img:"hombros.png", m:"Hombros"}, {n:"Press Militar Barra Sentado", img:"hombros.png", m:"Hombros"}, {n:"Press Hombro Mancuernas", img:"hombros.png", m:"Hombros"}, {n:"Press Hombro Multipower", img:"hombros.png", m:"Hombros"}, {n:"Press Hombro Máquina", img:"hombros.png", m:"Hombros"}, {n:"Press Arnold", img:"hombros.png", m:"Hombros"}, {n:"Press Trasnuca", img:"hombros.png", m:"Hombros"}, {n:"Press Landmine Unilateral", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Laterales Mancuerna", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Laterales Polea", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Laterales Máquina", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Laterales Sentado", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Laterales Egipcias", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Frontales Mancuerna", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Frontales Barra", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Frontales Disco", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Frontales Polea", img:"hombros.png", m:"Hombros"}, {n:"Pájaros Mancuerna (Posterior)", img:"hombros.png", m:"Hombros"}, {n:"Pájaros en Máquina", img:"hombros.png", m:"Hombros"}, {n:"Face Pull Polea Alta", img:"hombros.png", m:"Hombros"}, {n:"Cruces Polea Inversos", img:"hombros.png", m:"Hombros"}, {n:"Remo al Mentón Barra", img:"hombros.png", m:"Hombros"}, {n:"Remo al Mentón Polea", img:"hombros.png", m:"Hombros"}, {n:"Encogimientos Barra (Trapecio)", img:"hombros.png", m:"Hombros"}, {n:"Encogimientos Mancuerna", img:"hombros.png", m:"Hombros"}, {n:"Encogimientos Multipower", img:"hombros.png", m:"Hombros"}, {n:"Encogimientos en Máquina", img:"hombros.png", m:"Hombros"}, {n:"Y-Raise Mancuernas", img:"hombros.png", m:"Hombros"},
+            {n:"Curl con Barra Recta", img:"biceps.png", m:"Bíceps"}, {n:"Curl con Barra Z", img:"biceps.png", m:"Bíceps"}, {n:"Curl con Mancuernas Supino", img:"biceps.png", m:"Bíceps"}, {n:"Curl con Mancuernas Alterno", img:"biceps.png", m:"Bíceps"}, {n:"Curl Martillo Mancuernas", img:"biceps.png", m:"Bíceps"}, {n:"Curl Martillo Cuerda Polea", img:"biceps.png", m:"Bíceps"}, {n:"Curl Predicador Barra Z (Scott)", img:"biceps.png", m:"Bíceps"}, {n:"Curl Predicador Mancuerna", img:"biceps.png", m:"Bíceps"}, {n:"Curl Predicador Máquina", img:"biceps.png", m:"Bíceps"}, {n:"Curl Concentrado", img:"biceps.png", m:"Bíceps"}, {n:"Curl Araña (Spider Curl)", img:"biceps.png", m:"Bíceps"}, {n:"Curl en Banco Inclinado", img:"biceps.png", m:"Bíceps"}, {n:"Curl Polea Baja", img:"biceps.png", m:"Bíceps"}, {n:"Curl Polea Alta (Doble)", img:"biceps.png", m:"Bíceps"}, {n:"Curl Bayesiano (Espalda a Polea)", img:"biceps.png", m:"Bíceps"}, {n:"Curl 21", img:"biceps.png", m:"Bíceps"}, {n:"Curl Zottman", img:"biceps.png", m:"Bíceps"}, {n:"Curl con Disco", img:"biceps.png", m:"Bíceps"}, {n:"Dominadas Supinas (Bíceps)", img:"biceps.png", m:"Bíceps"}, {n:"Curl de Muñeca (Antebrazo)", img:"biceps.png", m:"Bíceps"}, {n:"Curl Inverso Barra (Antebrazo)", img:"biceps.png", m:"Bíceps"},
+            {n:"Extensión Polea Cuerda", img:"triceps.png", m:"Tríceps"}, {n:"Extensión Polea Barra Recta", img:"triceps.png", m:"Tríceps"}, {n:"Extensión Polea Barra V", img:"triceps.png", m:"Tríceps"}, {n:"Extensión Polea Unilateral", img:"triceps.png", m:"Tríceps"}, {n:"Extensión Katana", img:"triceps.png", m:"Tríceps"}, {n:"Press Francés Barra Z", img:"triceps.png", m:"Tríceps"}, {n:"Press Francés Mancuernas", img:"triceps.png", m:"Tríceps"}, {n:"Press Francés Polea", img:"triceps.png", m:"Tríceps"}, {n:"Rompecráneos", img:"triceps.png", m:"Tríceps"}, {n:"Press Cerrado Barra", img:"triceps.png", m:"Tríceps"}, {n:"Press Cerrado Multipower", img:"triceps.png", m:"Tríceps"}, {n:"Fondos Tríceps (Dips)", img:"triceps.png", m:"Tríceps"}, {n:"Fondos entre Bancos", img:"triceps.png", m:"Tríceps"}, {n:"Fondos en Máquina", img:"triceps.png", m:"Tríceps"}, {n:"Patada de Tríceps Mancuerna", img:"triceps.png", m:"Tríceps"}, {n:"Patada de Tríceps Polea", img:"triceps.png", m:"Tríceps"}, {n:"Copa Tríceps a Dos Manos", img:"triceps.png", m:"Tríceps"}, {n:"Copa Tríceps Unilateral", img:"triceps.png", m:"Tríceps"}, {n:"Extensiones Trasnuca Polea", img:"triceps.png", m:"Tríceps"}, {n:"JM Press", img:"triceps.png", m:"Tríceps"}, {n:"Tate Press", img:"triceps.png", m:"Tríceps"},
+            {n:"Crunch Suelo", img:"abs.png", m:"Abs"}, {n:"Crunch Polea Alta", img:"abs.png", m:"Abs"}, {n:"Crunch Máquina", img:"abs.png", m:"Abs"}, {n:"Crunch en Fitball", img:"abs.png", m:"Abs"}, {n:"Elevación de Piernas Colgado", img:"abs.png", m:"Abs"}, {n:"Elevación de Piernas Suelo", img:"abs.png", m:"Abs"}, {n:"Elevación de Rodillas (Silla romana)", img:"abs.png", m:"Abs"}, {n:"Rueda Abdominal (Ab Wheel)", img:"abs.png", m:"Abs"}, {n:"Plancha Abdominal (Plank)", img:"abs.png", m:"Abs"}, {n:"Plancha Lateral", img:"abs.png", m:"Abs"}, {n:"V-Ups", img:"abs.png", m:"Abs"}, {n:"Tijeras", img:"abs.png", m:"Abs"}, {n:"Bicicleta", img:"abs.png", m:"Abs"}, {n:"Mountain Climbers", img:"abs.png", m:"Abs"}, {n:"Russian Twist (Giros)", img:"abs.png", m:"Abs"}, {n:"Woodchopper Polea (Leñador)", img:"abs.png", m:"Abs"}, {n:"Press Pallof", img:"abs.png", m:"Abs"}, {n:"Toques de Talón", img:"abs.png", m:"Abs"}, {n:"Hipopresivos", img:"abs.png", m:"Abs"}, {n:"Dragon Flag", img:"abs.png", m:"Abs"},
+            {n:"Sentadilla con Barra", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Jaca", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Sentadilla Cinturón", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa de Piernas", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Extensión Cuádriceps", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Zancadas Mancuernas", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Curl Femoral Tumbado", img:"isquiotibiales.png", m:"Isquios"}, {n:"Curl Femoral Sentado", img:"isquiotibiales.png", m:"Isquios"}, {n:"Prensa Horizontal", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Prensa 45 Grados", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Gemelo Sentado", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo de Pie", img:"gemelos.png", m:"Gemelos"}, {n:"Gemelo Máquina", img:"gemelos.png", m:"Gemelos"}, {n:"Hip Thrust", img:"gluteos.png", m:"Glúteos"}, {n:"Sentadilla Búlgara", img:"gluteos.png", m:"Glúteos"}, {n:"Patada Glúteo Polea", img:"gluteos.png", m:"Glúteos"}, {n:"Abducción Máquina", img:"gluteos.png", m:"Glúteos"}, {n:"Prensa Glúteos", img:"gluteos.png", m:"Glúteos"}, {n:"Peso Muerto Rumano", img:"isquiotibiales.png", m:"Isquios"}, {n:"Peso Muerto", img:"espalda.png", m:"Espalda"}, {n:"Peso Muerto Sumo", img:"espalda.png", m:"Espalda"}, {n:"Remo con Barra", img:"espalda.png", m:"Espalda"}, {n:"Remo Mancuernas", img:"espalda.png", m:"Espalda"}, {n:"Jalón al Pecho", img:"espalda.png", m:"Espalda"}, {n:"Jalón Cerrado", img:"espalda.png", m:"Espalda"}, {n:"Remo en Máquina", img:"espalda.png", m:"Espalda"}, {n:"Remo Polea Baja", img:"espalda.png", m:"Espalda"}, {n:"Dominadas", img:"espalda.png", m:"Espalda"}, {n:"Dominadas Asistidas", img:"espalda.png", m:"Espalda"}, {n:"Remo Invertido", img:"espalda.png", m:"Espalda"}, {n:"Remo T", img:"espalda.png", m:"Espalda"}, {n:"Hiperextensiones", img:"espalda.png", m:"Espalda"}, {n:"Buenos Días", img:"isquiotibiales.png", m:"Isquios"}, {n:"Remo Hammer", img:"espalda.png", m:"Espalda"}, {n:"Jalón Neutro", img:"espalda.png", m:"Espalda"}, {n:"Jalón Abierto", img:"espalda.png", m:"Espalda"}, {n:"Remo al Cuello", img:"espalda.png", m:"Espalda"}, {n:"Press Banca", img:"pecho.png", m:"Pecho"}, {n:"Press Inclinado Mancuernas", img:"pecho.png", m:"Pecho"}, {n:"Aperturas Mancuernas", img:"pecho.png", m:"Pecho"}, {n:"Cruce de Poleas", img:"pecho.png", m:"Pecho"}, {n:"Press Máquina", img:"pecho.png", m:"Pecho"}, {n:"Press Declinado", img:"pecho.png", m:"Pecho"}, {n:"Fondos", img:"triceps.png", m:"Tríceps"}, {n:"Contractora Pecho", img:"pecho.png", m:"Pecho"}, {n:"Press Inclinado Barra", img:"pecho.png", m:"Pecho"}, {n:"Press Plano Mancuernas", img:"pecho.png", m:"Pecho"}, {n:"Press Iso Lateral", img:"pecho.png", m:"Pecho"}, {n:"Press Vertical", img:"pecho.png", m:"Pecho"}, {n:"Encogimientos Barra", img:"hombros.png", m:"Hombros"}, {n:"Encogimientos Mancuerna", img:"hombros.png", m:"Hombros"}, {n:"Press Militar", img:"hombros.png", m:"Hombros"}, {n:"Press Hombro Mancuerna", img:"hombros.png", m:"Hombros"}, {n:"Press Hombro Máquina", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Laterales", img:"hombros.png", m:"Hombros"}, {n:"Elevaciones Frontales", img:"hombros.png", m:"Hombros"}, {n:"Pájaros", img:"hombros.png", m:"Hombros"}, {n:"Laterales Polea", img:"hombros.png", m:"Hombros"}, {n:"Press Arnold", img:"hombros.png", m:"Hombros"}, {n:"Press Trasnuca", img:"hombros.png", m:"Hombros"}, {n:"Face Pull", img:"hombros.png", m:"Hombros"}, {n:"Curl Barra", img:"biceps.png", m:"Bíceps"}, {n:"Curl Mancuernas", img:"biceps.png", m:"Bíceps"}, {n:"Curl Polea", img:"biceps.png", m:"Bíceps"}, {n:"Curl Martillo", img:"biceps.png", m:"Bíceps"}, {n:"Curl Concentrado", img:"biceps.png", m:"Bíceps"}, {n:"Curl Predicador", img:"biceps.png", m:"Bíceps"}, {n:"Extensión Polea", img:"triceps.png", m:"Tríceps"}, {n:"Press Francés", img:"triceps.png", m:"Tríceps"}, {n:"Rompecráneos", img:"triceps.png", m:"Tríceps"}, {n:"Fondos Tríceps", img:"triceps.png", m:"Tríceps"}, {n:"Extensión Unilateral", img:"triceps.png", m:"Tríceps"}, {n:"Patada Tríceps", img:"triceps.png", m:"Tríceps"}, {n:"Copa Tríceps", img:"triceps.png", m:"Tríceps"}, {n:"Elevaciones Posteriores", img:"hombros.png", m:"Hombros"}, {n:"Rueda Abdominal", img:"abs.png", m:"Abs"}, {n:"Crunch Polea", img:"abs.png", m:"Abs"}, {n:"Elevación Piernas", img:"abs.png", m:"Abs"}, {n:"Abdominales Banco", img:"abs.png", m:"Abs"}, {n:"Crunch Máquina", img:"abs.png", m:"Abs"}, {n:"Rodillas al Pecho", img:"abs.png", m:"Abs"}, {n:"Abductor", img:"cuadriceps.png", m:"Cuádriceps"}, {n:"Extensión Triceps Barra", img:"triceps.png", m:"Tríceps"},
         ];
 
         let currentUser=null, userData=null, activeWorkout=null, timerInt=null, restTimeRemaining=0, wakeLock=null, chartInstance=null, selectedUserCoach=null, selectedUserObj=null, editingRoutineId=null, coachChart=null, currentPose='front', coachCurrentPose='front', allRoutinesCache=[], adminUnsub=null;
@@ -865,9 +589,7 @@
                         document.getElementById('coach-btn').onclick = () => { window.loadAdminUsers(); switchTab('admin-view'); };
                     }
                     if(userData.approved){
-                        setTimeout(() => {
-                            document.getElementById('loading-screen').classList.add('hidden');
-                        }, 1500); 
+                        setTimeout(() => { document.getElementById('loading-screen').classList.add('hidden'); }, 1500); 
                         document.getElementById('main-header').classList.remove('hidden');
                         document.getElementById('bottom-nav').classList.remove('hidden');
                         loadRoutines();
@@ -875,9 +597,7 @@
                     } else { alert("Cuenta en revisión."); signOut(auth); }
                 }
             } else {
-                setTimeout(() => {
-                    document.getElementById('loading-screen').classList.add('hidden');
-                }, 1500);
+                setTimeout(() => { document.getElementById('loading-screen').classList.add('hidden'); }, 1500);
                 switchTab('auth-view');
                 document.getElementById('main-header').classList.add('hidden');
                 document.getElementById('bottom-nav').classList.add('hidden');
@@ -1114,6 +834,33 @@
                 data:{ labels:data.map((_,i)=>`T${i}`), datasets:[{label:'Kg', data:data, borderColor:'#ff3333', backgroundColor:'rgba(255,51,51,0.1)', fill:true, tension:0.4}] }, 
                 options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}, maintainAspectRatio:false} 
             });
+
+            // CARGAR HISTORIAL RECIENTE DEL USUARIO (NUEVO)
+            const histDiv = document.getElementById('user-history-list');
+            histDiv.innerHTML = "Cargando...";
+            try {
+                // Truco: pedimos sin ordenar para que no pida índice, ordenamos en JS
+                const q = query(collection(db, "workouts"), where("uid", "==", currentUser.uid));
+                const snap = await getDocs(q);
+                // Convertir a array, ordenar por fecha descendente, coger 5
+                const workouts = snap.docs.map(d => ({id:d.id, ...d.data()}))
+                                        .sort((a,b) => b.date - a.date)
+                                        .slice(0, 5);
+                
+                histDiv.innerHTML = "";
+                if(workouts.length === 0) histDiv.innerHTML = "Sin historial aún.";
+                
+                workouts.forEach(d => {
+                    const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
+                    const detailsStr = d.details ? encodeURIComponent(JSON.stringify(d.details)) : "";
+                    const btnVer = d.details ? `<button class="btn-small btn-outline" style="margin:0; padding:2px 6px;" onclick="viewWorkoutDetails('${d.routine}', '${detailsStr}')">🔍</button>` : '';
+                    histDiv.innerHTML += `
+                        <div class="history-row" style="grid-template-columns: 1fr 40px;">
+                            <div><span style="color:#accent-color">${date}</span> - ${d.routine}</div>
+                            <div style="text-align:right;">${btnVer}</div>
+                        </div>`;
+                });
+            } catch(e) { console.error(e); histDiv.innerHTML = "Error cargando historial."; }
         }
 
         window.saveConfig = async () => {
@@ -1238,7 +985,6 @@
             let muscleCounts = {};
             let prAlert = ""; 
 
-            // --- NUEVO: GUARDAR DETALLES (Pesos y Reps) ---
             const cleanLog = activeWorkout.exs.map(e => {
                 return {
                     n: e.n, 
@@ -1270,7 +1016,7 @@
                 routine:activeWorkout.name, 
                 rpe: rpeVal,
                 note: note,
-                details: cleanLog // AQUÍ SE GUARDA EL LOG
+                details: cleanLog 
             });
             
             const updates = { 
@@ -1282,7 +1028,6 @@
             switchTab('routines-view');
         };
 
-        // --- ADMIN / COACH LOGIC ---
         window.toggleAdminMode = (mode) => {
             document.getElementById('tab-users').classList.toggle('active', mode==='users');
             document.getElementById('tab-lib').classList.toggle('active', mode==='lib');
@@ -1321,10 +1066,21 @@
                 s.forEach(d => {
                     const r = d.data();
                     const div = document.createElement('div');
-                    div.className = "assigned-routine-item"; // Reutilizamos estilo
-                    // Truco para ver contenido: Pasar objeto como string
+                    div.className = "assigned-routine-item"; 
                     const dataStr = encodeURIComponent(JSON.stringify(r.exercises));
-                    div.innerHTML = `<span><b>${r.name}</b> (${r.exercises.length} ej)</span><button class="btn-small btn-outline" style="margin:0; width:auto;" onclick="viewRoutineContent('${r.name}','${dataStr}')">👁️</button>`;
+                    // Check creator
+                    const author = r.uid === currentUser.uid ? "Mía" : (r.uid === 'admin' || r.uid === ADMIN ? 'Admin' : 'Usuario');
+                    
+                    div.innerHTML = `
+                        <div style="flex:1;">
+                            <b>${r.name}</b><br>
+                            <span style="font-size:0.7rem; color:#666;">Por: ${author} • ${r.exercises.length} Ejercicios</span>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-small btn-outline" style="margin:0; width:auto;" onclick="viewRoutineContent('${r.name}','${dataStr}')">👁️</button>
+                            <button class="btn-small btn-danger" style="margin:0; width:auto; border:none;" onclick="delRoutine('${d.id}')">🗑️</button>
+                        </div>
+                    `;
                     l.appendChild(div);
                 });
             } catch (e) { l.innerHTML = '<div style="text-align:center;color:red;padding:20px;">Error.</div>'; }
@@ -1356,7 +1112,7 @@
             updateCoachPhotoDisplay('front');
 
             try {
-                // LOAD ROUTINES FOR ASSIGN
+                // LOAD ROUTINES
                 const s = document.getElementById('coach-routine-select'); s.innerHTML = '';
                 const allRoutinesSnap = await getDocs(collection(db, "routines"));
                 allRoutinesCache = [];
@@ -1385,26 +1141,32 @@
                 const data = (wData && wData.length > 0) ? wData : [70];
                 coachChart = new Chart(ctx, { type:'line', data:{ labels:data.map((_,i)=>i+1), datasets:[{label:'Kg', data:data, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}, maintainAspectRatio: false}});
 
+                // CARGA DE HISTORIAL CORREGIDA (EVITA BLOQUEO DE ÍNDICE)
                 const hList = document.getElementById('coach-history-list');
                 hList.innerHTML = 'Cargando historial...';
-                const qH = query(collection(db,"workouts"), where("uid","==",uid), orderBy("date","desc"), limit(10));
+                // Solo filtramos por UID, el orden lo hacemos en memoria (JS) para evitar errores de índice
+                const qH = query(collection(db,"workouts"), where("uid","==",uid));
                 const wSnap = await getDocs(qH);
-                hList.innerHTML = '';
-                if(wSnap.empty) hList.innerHTML='Sin datos recientes.';
                 
-                wSnap.forEach(w=>{
-                    const d = w.data();
-                    const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
-                    let rpeBadge = d.rpe === 'Suave' ? '<span class="badge green">🟢</span>' : (d.rpe === 'Duro' ? '<span class="badge orange">🟠</span>' : (d.rpe === 'Fallo' ? '<span class="badge red">🔴</span>' : '<span class="badge gray">-</span>'));
-                    
-                    // --- BOTÓN VER DETALLES ---
-                    const detailsStr = d.details ? encodeURIComponent(JSON.stringify(d.details)) : "";
-                    const btnVer = d.details ? `<button class="btn-small btn-outline" style="margin:0; padding:2px 6px;" onclick="viewWorkoutDetails('${d.routine}', '${detailsStr}')">🔍</button>` : '';
+                hList.innerHTML = '';
+                if(wSnap.empty) {
+                    hList.innerHTML='Sin datos recientes.';
+                } else {
+                    // Ordenamos aquí
+                    const sortedDocs = wSnap.docs.map(doc => ({id: doc.id, ...doc.data()}))
+                                                   .sort((a,b) => b.date - a.date)
+                                                   .slice(0, 10); // Cogemos los 10 últimos
 
-                    hList.innerHTML += `<div class="history-row" style="grid-template-columns: 60px 1fr 30px 40px;"><div class="hist-date">${date}</div><div class="hist-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.routine}</div><div class="hist-rpe">${rpeBadge}</div><div>${btnVer}</div></div>`;
-                });
-            
-            } catch(e) { console.error("Error loading coach details", e); }
+                    sortedDocs.forEach(d => {
+                        const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
+                        let rpeBadge = d.rpe === 'Suave' ? '<span class="badge green">🟢</span>' : (d.rpe === 'Duro' ? '<span class="badge orange">🟠</span>' : (d.rpe === 'Fallo' ? '<span class="badge red">🔴</span>' : '<span class="badge gray">-</span>'));
+                        const detailsStr = d.details ? encodeURIComponent(JSON.stringify(d.details)) : "";
+                        const btnVer = d.details ? `<button class="btn-small btn-outline" style="margin:0; padding:2px 6px;" onclick="viewWorkoutDetails('${d.routine}', '${detailsStr}')">🔍</button>` : '';
+
+                        hList.innerHTML += `<div class="history-row" style="grid-template-columns: 60px 1fr 30px 40px;"><div class="hist-date">${date}</div><div class="hist-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.routine}</div><div class="hist-rpe">${rpeBadge}</div><div>${btnVer}</div></div>`;
+                    });
+                }
+            } catch(e) { console.error("Error loading coach details", e); hList.innerHTML='Error cargando datos.'; }
         }
 
         window.viewWorkoutDetails = (title, dataStr) => {
