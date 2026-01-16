@@ -53,25 +53,8 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         header { flex-shrink: 0; height: calc(var(--header-height) + var(--safe-top)); padding-top: var(--safe-top); background: rgba(5,5,5,0.98); border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; padding-left: 20px; padding-right: 20px; z-index: 100; }
-        /* ESTILOS DE LA CABECERA CORREGIDOS */
-        .brand { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; /* Espacio entre logo y texto */
-            font-family: var(--font-sport); 
-            font-size: 1.3rem; 
-            color: white; 
-            letter-spacing: 1px; 
-            text-transform: uppercase; 
-        }
-        
-        .header-logo {
-            height: 32px; 
-            width: 32px;
-            object-fit: cover;
-            border-radius: 6px; 
-            border: 1px solid #333; /* Borde sutil para que destaque si el fondo es oscuro */
-        }
+        .brand { display: flex; align-items: center; gap: 12px; font-family: var(--font-sport); font-size: 1.3rem; color: white; letter-spacing: 1px; text-transform: uppercase; }
+        .header-logo { height: 32px; width: 32px; object-fit: cover; border-radius: 6px; border: 1px solid #333; }
         .brand span { color: var(--accent-color); text-shadow: 0 0 10px rgba(255,51,51,0.5); }
         .btn-neon-text { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-weight: 800; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; letter-spacing: 1px; }
 
@@ -140,11 +123,7 @@
 
         .compare-wrapper { position: relative; width: 100%; height: 250px; background: black; border-radius: 8px; overflow: hidden; margin-top: 5px; border:1px solid #333; }
         .compare-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
-        
-        /* LOGICA FOTOS INVERTIDA */
-        /* Overlay empieza visible 100% (inset 0) */
         .img-overlay { clip-path: inset(0 0 0 0); border-right: 2px solid white; }
-        /* BARRA INVISIBLE */
         .slider-handle { position: absolute; top: 0; bottom: 0; left: 0%; width: 50px; margin-left: -25px; cursor: ew-resize; z-index: 10; background: transparent; }
         .slider-btn { display: none; }
         .slider-labels { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-between; padding: 0 10px; pointer-events: none; z-index: 20; }
@@ -174,6 +153,11 @@
         .rpe-easy { background: #2e7d32; } .rpe-hard { background: #f57f17; color: black; } .rpe-max { background: #c62828; }
         .note-icon { font-size: 1rem; cursor: pointer; }
         .tip-box { background: rgba(255, 170, 0, 0.15); border: 1px solid var(--warning-color); color: #ffcc80; padding: 10px; border-radius: 8px; font-size: 0.75rem; text-align: center; margin-bottom: 15px; }
+
+        /* TAB STYLES FOR ADMIN LIBRARY */
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .admin-tab-btn { flex: 1; background: #222; border: 1px solid #444; color: #888; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .admin-tab-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
 
     </style>
 </head>
@@ -352,12 +336,24 @@
         <section id="admin-view" class="view-container">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                 <h2>PANEL COACH</h2>
-                <button class="btn-small btn-outline" style="width:auto; margin:0;" onclick="window.loadAdminUsers()">🔄 ACTUALIZAR</button>
+                <button class="btn-small btn-outline" style="width:auto; margin:0;" onclick="window.loadAdminUsers()">🔄</button>
             </div>
-            <div class="card">
+            
+            <div class="admin-tabs">
+                <div id="tab-users" class="admin-tab-btn active" onclick="toggleAdminMode('users')">👥 ATLETAS</div>
+                <div id="tab-lib" class="admin-tab-btn" onclick="toggleAdminMode('lib')">📚 LIBRERÍA</div>
+            </div>
+
+            <div class="card" id="admin-users-card">
                 <h3>Lista de Atletas</h3>
                 <div id="admin-list"></div>
             </div>
+
+            <div class="card hidden" id="admin-lib-card">
+                <h3>Todas las Rutinas</h3>
+                <div id="admin-lib-list"></div>
+            </div>
+
             <button class="btn-outline" onclick="switchTab('routines-view')">VOLVER</button>
         </section>
 
@@ -456,6 +452,14 @@
             <button class="rpe-btn rpe-max" onclick="finishWorkout('Fallo')">🔴 Fallo / Extremo</button>
             <textarea id="workout-notes" rows="3" placeholder="📝 Notas (opcional)..." style="width:100%; background:#222; border:1px solid #333; color:white; border-radius:8px; padding:10px; margin-top:10px; font-family:inherit;"></textarea>
             <button class="btn-outline" onclick="document.getElementById('modal-rpe').classList.remove('active')">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="modal-details" class="modal">
+        <div class="modal-content" style="text-align:left;">
+            <h3 id="detail-title" style="color:var(--accent-color); text-align:center; margin-bottom:15px;">DETALLES</h3>
+            <div id="detail-content" style="font-size:0.85rem; max-height:60vh; overflow-y:auto;"></div>
+            <button class="btn-outline" style="margin-top:15px;" onclick="document.getElementById('modal-details').classList.remove('active')">CERRAR</button>
         </div>
     </div>
 
@@ -811,7 +815,6 @@
 
         let currentUser=null, userData=null, activeWorkout=null, timerInt=null, restTimeRemaining=0, wakeLock=null, chartInstance=null, selectedUserCoach=null, selectedUserObj=null, editingRoutineId=null, coachChart=null, currentPose='front', coachCurrentPose='front', allRoutinesCache=[], adminUnsub=null;
         
-        // GLOBAL SELECTION STATE FOR EDITOR
         let currentRoutineSelections = [];
 
         function getExerciseData(name) {
@@ -862,15 +865,9 @@
                         document.getElementById('coach-btn').onclick = () => { window.loadAdminUsers(); switchTab('admin-view'); };
                     }
                     if(userData.approved){
-                        
-                        // --- AQUÍ ESTÁ EL CAMBIO ---
-                        // Envuélvelo en setTimeout. 
-                        // 2000 = 2 segundos. 3000 = 3 segundos.
                         setTimeout(() => {
                             document.getElementById('loading-screen').classList.add('hidden');
                         }, 1500); 
-                        // ---------------------------
-
                         document.getElementById('main-header').classList.remove('hidden');
                         document.getElementById('bottom-nav').classList.remove('hidden');
                         loadRoutines();
@@ -878,11 +875,9 @@
                     } else { alert("Cuenta en revisión."); signOut(auth); }
                 }
             } else {
-                // Lo mismo para cuando no hay usuario (Pantalla de Login)
                 setTimeout(() => {
                     document.getElementById('loading-screen').classList.add('hidden');
                 }, 1500);
-
                 switchTab('auth-view');
                 document.getElementById('main-header').classList.add('hidden');
                 document.getElementById('bottom-nav').classList.add('hidden');
@@ -955,9 +950,7 @@
                 const d = document.createElement('div'); 
                 d.className = 'ex-select-item';
                 if(currentRoutineSelections.includes(e.n)) d.classList.add('selected');
-                
                 d.innerHTML = `<img src="${e.img}" onerror="this.src='logo.png'"><span>${e.n}</span>`;
-                
                 d.onclick = () => {
                     if(currentRoutineSelections.includes(e.n)) {
                         currentRoutineSelections = currentRoutineSelections.filter(x => x !== e.n);
@@ -993,19 +986,14 @@
         window.saveRoutine = async () => {
             const n = document.getElementById('editor-name').value;
             const s = currentRoutineSelections;
-            
             if(!n || s.length===0) return alert("❌ Faltan datos: Pon un nombre y elige ejercicios.");
-            
             const btn = document.getElementById('btn-save-routine');
             const originalText = btn.innerText;
             btn.innerText = "💾 GUARDANDO...";
-            
             try {
-                // ADDED ASSIGNEDTO INIT TO FIX PERMISSIONS
                 const data = { uid:currentUser.uid, name:n, exercises:s, createdAt:serverTimestamp(), assignedTo: [] };
                 if(editingRoutineId) await updateDoc(doc(db,"routines",editingRoutineId), {name:n, exercises:s});
                 else await addDoc(collection(db,"routines"), data);
-                
                 switchTab('routines-view');
             } catch(e) {
                 alert("Error al guardar: " + e.message);
@@ -1030,19 +1018,12 @@
             const after = u[`photoAfter${prefix}`] || '';
             const dateB = u[`dateBefore${prefix}`] || '-';
             const dateA = u[`dateAfter${prefix}`] || '-';
-
-            const imgB = document.getElementById('img-before'); // FONDO = AHORA
-            const imgA = document.getElementById('img-overlay'); // OVERLAY = ANTES
-            
-            // Logic: Background = Current (After), Overlay = Past (Before)
-            if(before) imgB.src = before; else imgB.src = ""; // Fondo = Ahora
-            if(after) imgA.src = after; else imgA.src = ""; // Overlay = Antes
-
+            const imgB = document.getElementById('img-before'); 
+            const imgA = document.getElementById('img-overlay'); 
+            if(before) imgB.src = before; else imgB.src = ""; 
+            if(after) imgA.src = after; else imgA.src = ""; 
             document.getElementById('date-before').innerText = `ANTES (${dateB})`;
             document.getElementById('date-after').innerText = `AHORA (${dateA})`;
-            
-            // Start at 0% (Left) -> Full overlay visible (ANTES)
-            // clip-path: inset(0 0 0 0) means 0 inset from all sides = full visibility
             document.getElementById('slider-handle').style.left = '0%';
             imgA.style.clipPath = 'inset(0 0 0 0)';
         }
@@ -1062,12 +1043,10 @@
                         canvas.height = img.height * scale;
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                        
                         const prefix = currentPose === 'front' ? '' : '_back';
                         const fieldName = field === 'before' ? `photoBefore${prefix}` : `photoAfter${prefix}`;
                         const dateField = field === 'before' ? `dateBefore${prefix}` : `dateAfter${prefix}`;
                         const today = new Date().toLocaleDateString();
-
                         let update = {}; 
                         update[fieldName] = dataUrl;
                         update[dateField] = today;
@@ -1086,29 +1065,20 @@
             const prefix = currentPose === 'front' ? '' : '_back';
             const fieldPhoto = type === 'before' ? `photoBefore${prefix}` : `photoAfter${prefix}`;
             const fieldDate = type === 'before' ? `dateBefore${prefix}` : `dateAfter${prefix}`;
-
             let update = {};
             update[fieldPhoto] = "";
             update[fieldDate] = "";
-
             await updateDoc(doc(db, "users", currentUser.uid), update);
             userData[fieldPhoto] = "";
             userData[fieldDate] = "";
             updatePhotoDisplay(userData);
         }
 
-        // SLIDER LOGIC
-        // 0% (Left) -> Clip 0 -> Full Overlay (ANTES)
-        // 100% (Right) -> Clip 100% -> No Overlay (AHORA)
         window.moveSlider = (v) => { 
-            // clip-path: inset(top right bottom left) -> inset(0 0 0 v%)
-            // v=0 -> inset(0 0 0 0) -> visible
-            // v=100 -> inset(0 0 0 100%) -> hidden
             document.getElementById('img-overlay').style.clipPath = `inset(0 0 0 ${v}%)`; 
             document.getElementById('slider-handle').style.left = `${v}%`; 
         };
         
-        // COACH SLIDER LOGIC (SAME AS USER)
         window.moveCoachSlider = (v) => { 
             document.getElementById('coach-overlay-img').style.clipPath = `inset(0 0 0 ${v}%)`; 
             document.getElementById('coach-slider-handle').style.left = `${v}%`; 
@@ -1117,22 +1087,17 @@
         async function loadProfile() {
             document.getElementById('profile-name').innerText = userData.name;
             if(userData.photo) { document.getElementById('avatar-text').style.display='none'; document.getElementById('avatar-img').src = userData.photo; document.getElementById('avatar-img').style.display='block'; }
-            
             updatePhotoDisplay(userData);
-
             if(userData.restTime) document.getElementById('cfg-rest-time').value = userData.restTime;
-            
             if(userData.stats) {
                 document.getElementById('stat-workouts').innerText = userData.stats.workouts || 0;
                 document.getElementById('stat-kg').innerText = userData.stats.totalKg ? (userData.stats.totalKg/1000).toFixed(1)+'t' : 0;
                 document.getElementById('stat-sets').innerText = userData.stats.totalSets || 0;
                 document.getElementById('stat-reps').innerText = userData.stats.totalReps || 0;
             }
-
             const muscles = ["Pecho","Espalda","Cuádriceps","Isquios","Glúteos","Hombros","Bíceps","Tríceps"];
             const hC = document.getElementById('heatmap-container'); hC.innerHTML = '';
             const mS = userData.muscleStats || {};
-            
             muscles.forEach(m=>{
                 const count = mS[m] || 0;
                 const pct = Math.min((count / 20) * 100, 100); 
@@ -1140,30 +1105,14 @@
                 d.innerHTML = `<div class="muscle-label"><span>${m}</span><span>${count} series</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
                 hC.appendChild(d);
             });
-            
             const ctx = document.getElementById('weightChart'); 
             if(chartInstance) chartInstance.destroy();
             const rawData = userData.weightHistory;
             const data = (rawData && rawData.length > 0) ? rawData : [70]; 
-            
             chartInstance = new Chart(ctx, { 
                 type:'line', 
-                data:{ 
-                    labels:data.map((_,i)=>`T${i}`), 
-                    datasets:[{
-                        label:'Kg', 
-                        data:data, 
-                        borderColor:'#ff3333', 
-                        backgroundColor:'rgba(255,51,51,0.1)', 
-                        fill:true, 
-                        tension:0.4
-                    }] 
-                }, 
-                options:{
-                    plugins:{legend:{display:false}},
-                    scales:{x:{display:false},y:{grid:{color:'#333'}}},
-                    maintainAspectRatio:false
-                } 
+                data:{ labels:data.map((_,i)=>`T${i}`), datasets:[{label:'Kg', data:data, borderColor:'#ff3333', backgroundColor:'rgba(255,51,51,0.1)', fill:true, tension:0.4}] }, 
+                options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}, maintainAspectRatio:false} 
             });
         }
 
@@ -1187,18 +1136,14 @@
             if(!wStr) return;
             const w = parseFloat(wStr.replace(',','.'));
             if(isNaN(w)) return alert("Número inválido");
-
             let history = userData.weightHistory || [];
             history.push(w);
-
             try {
                 await updateDoc(doc(db,"users",currentUser.uid), {weightHistory: history});
                 userData.weightHistory = history; 
                 loadProfile(); 
                 alert("✅ Peso Guardado");
-            } catch(e) {
-                alert("Error al guardar: " + e.message);
-            }
+            } catch(e) { alert("Error al guardar: " + e.message); }
         };
 
         window.startWorkout = async (rid) => {
@@ -1207,10 +1152,8 @@
             const r = snap.data();
             activeWorkout = { name: r.name, exs: r.exercises.map(n => {
                 const data = getExerciseData(n);
-                // FIXED SETS: 5 SETS TOTAL. 1st is 20 reps, others 16.
                 return { n:n, img:data.img, mInfo: data.mInfo, sets:Array(5).fill().map((_,i)=>({r: i===0 ? 20 : 16, w:0, d:false})) }; 
             })};
-            
             renderWorkout();
             switchTab('workout-view');
             startTimerMini();
@@ -1231,19 +1174,15 @@
         function renderWorkout() {
             const c = document.getElementById('workout-exercises'); c.innerHTML = '';
             document.getElementById('workout-title').innerText = activeWorkout.name;
-            
             activeWorkout.exs.forEach((e,i) => {
                 const card = document.createElement('div'); card.className = 'card'; card.style.borderLeft="3px solid var(--accent-color)";
                 let bars = `<div class="mini-bar-label"><span>${e.mInfo.main}</span><span>100%</span></div><div class="mini-track"><div class="mini-fill fill-primary"></div></div>`;
                 e.mInfo.sec.forEach(s => { bars += `<div class="mini-bar-label" style="margin-top:4px;"><span>${s}</span><span>40%</span></div><div class="mini-track"><div class="mini-fill fill-sec"></div></div>`; });
                 let setsHtml = `<div class="set-header"><div>#</div><div>REPS</div><div>KG</div><div></div></div>`;
-                
                 e.sets.forEach((s,j) => {
                     setsHtml += `<div class="set-row"><div class="set-num">${j+1}</div><div><span class="shadow-val">${s.r}</span><input type="number" value="${s.r}" onchange="uS(${i},${j},'r',this.value)"></div><div><span class="shadow-val">--</span><input type="number" placeholder="kg" value="${s.w}" onchange="uS(${i},${j},'w',this.value)"></div><button id="btn-${i}-${j}" class="btn-outline ${s.d?'btn-done':''}" style="margin:0;padding:0;height:35px;" onclick="tS(${i},${j})">${s.d?'✓':''}</button></div>`;
                 });
-
                 setsHtml += `<div class="sets-actions"><button class="btn-set-control" onclick="removeSet(${i})">- Serie</button><button class="btn-set-control" onclick="addSet(${i})">+ Serie</button></div>`;
-
                 card.innerHTML = `<div class="workout-split"><div class="workout-visual"><img src="${e.img}" onerror="this.src='logo.png'"></div><div class="workout-bars" style="width:100%">${bars}</div></div><h3 style="margin-bottom:10px; border:none;">${e.n}</h3>${setsHtml}`;
                 c.appendChild(card);
             });
@@ -1268,7 +1207,6 @@
             const rest = userData.restTime || 60;
             restTimeRemaining = rest;
             document.getElementById('timer-display').innerText = restTimeRemaining;
-            
             if(timerInt) clearInterval(timerInt);
             timerInt = setInterval(() => {
                 restTimeRemaining--;
@@ -1300,18 +1238,23 @@
             let muscleCounts = {};
             let prAlert = ""; 
 
+            // --- NUEVO: GUARDAR DETALLES (Pesos y Reps) ---
+            const cleanLog = activeWorkout.exs.map(e => {
+                return {
+                    n: e.n, 
+                    s: e.sets.filter(set => set.d).map(set => ({ r: set.r, w: set.w })) 
+                };
+            }).filter(e => e.s.length > 0); 
+
             if(!userData.prs) userData.prs = {};
-            
             activeWorkout.exs.forEach(e => {
                 e.sets.forEach(st => { 
                     if(st.d) { 
-                        s++; 
-                        r+=parseInt(st.r)||0; 
+                        s++; r+=parseInt(st.r)||0; 
                         const weight = parseInt(st.w)||0;
                         k+=weight*(parseInt(st.r)||0); 
                         const mName = e.mInfo.main;
                         muscleCounts[mName] = (muscleCounts[mName] || 0) + 1;
-
                         if(weight > (userData.prs[e.n] || 0)) {
                             userData.prs[e.n] = weight;
                             prAlert = `🏆 RÉCORD: ${e.n} (${weight}kg)\n`;
@@ -1319,7 +1262,6 @@
                     }
                 });
             });
-
             if(prAlert) alert(prAlert); 
 
             await addDoc(collection(db,"workouts"), {
@@ -1327,147 +1269,120 @@
                 date:serverTimestamp(), 
                 routine:activeWorkout.name, 
                 rpe: rpeVal,
-                note: note
+                note: note,
+                details: cleanLog // AQUÍ SE GUARDA EL LOG
             });
             
             const updates = { 
-                "stats.workouts": increment(1), 
-                "stats.totalSets": increment(s), 
-                "stats.totalReps": increment(r), 
-                "stats.totalKg": increment(k),
-                "prs": userData.prs 
+                "stats.workouts": increment(1), "stats.totalSets": increment(s), "stats.totalReps": increment(r), "stats.totalKg": increment(k), "prs": userData.prs 
             };
-            
-            for (const [muscle, count] of Object.entries(muscleCounts)) {
-                updates[`muscleStats.${muscle}`] = increment(count);
-            }
-
+            for (const [muscle, count] of Object.entries(muscleCounts)) { updates[`muscleStats.${muscle}`] = increment(count); }
             await updateDoc(doc(db,"users",currentUser.uid), updates);
             if(wakeLock) wakeLock.release(); 
             switchTab('routines-view');
         };
 
-        // GLOBAL ADMIN LOADER - ATTACHED TO WINDOW FOR BUTTON TO WORK
+        // --- ADMIN / COACH LOGIC ---
+        window.toggleAdminMode = (mode) => {
+            document.getElementById('tab-users').classList.toggle('active', mode==='users');
+            document.getElementById('tab-lib').classList.toggle('active', mode==='lib');
+            document.getElementById('admin-users-card').classList.toggle('hidden', mode!=='users');
+            document.getElementById('admin-lib-card').classList.toggle('hidden', mode!=='lib');
+            if(mode==='users') window.loadAdminUsers();
+            if(mode==='lib') window.loadAdminLibrary();
+        };
+
         window.loadAdminUsers = async () => {
             const l = document.getElementById('admin-list');
-            l.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">↻ Cargando base de datos...</div>';
-            
+            l.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">↻ Cargando atletas...</div>';
             try {
-                // FORCE FRESH FETCH FROM SERVER
                 const s = await getDocs(collection(db, "users"));
                 l.innerHTML = '';
-                
-                if (s.empty) {
-                    l.innerHTML = '<div style="text-align:center;padding:20px;">No hay atletas registrados aún.</div>';
-                    return;
-                }
-
+                if (s.empty) { l.innerHTML = '<div style="text-align:center;padding:20px;">Sin atletas.</div>'; return; }
                 s.forEach(d => {
-                    const u = d.data(); 
-                    if(u.email === ADMIN) return;
+                    const u = d.data(); if(u.email === ADMIN) return;
                     const div = document.createElement('div');
                     div.className = "admin-user-row";
-                    
-                    // STATUS ICON
                     const statusIcon = u.approved ? '🟢' : '⏳';
-                    const statusText = u.approved ? 'Activo' : 'Pendiente';
-
-                    div.innerHTML=`
-                        <div>
-                            <strong>${u.name}</strong><br>
-                            <small>${statusIcon} ${statusText} • ${u.email}</small>
-                        </div>
-                        <button class="btn-outline btn-small" style="width:auto;">⚙️ FICHA</button>
-                    `;
+                    div.innerHTML=`<div><strong>${u.name}</strong><br><small>${statusIcon} ${u.email}</small></div><button class="btn-outline btn-small" style="width:auto;">⚙️ FICHA</button>`;
                     div.onclick=()=>openCoachView(d.id,u); 
                     l.appendChild(div);
                 });
-            } catch (e) {
-                console.error(e);
-                l.innerHTML = '<div style="text-align:center;color:red;padding:20px;">Error de conexión. Intenta de nuevo.</div>';
-            }
+            } catch (e) { l.innerHTML = '<div style="text-align:center;color:red;padding:20px;">Error.</div>'; }
+        };
+
+        window.loadAdminLibrary = async () => {
+            const l = document.getElementById('admin-lib-list');
+            l.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">↻ Cargando librería...</div>';
+            try {
+                const s = await getDocs(collection(db, "routines"));
+                l.innerHTML = '';
+                if (s.empty) { l.innerHTML = '<div style="text-align:center;padding:20px;">Sin rutinas.</div>'; return; }
+                s.forEach(d => {
+                    const r = d.data();
+                    const div = document.createElement('div');
+                    div.className = "assigned-routine-item"; // Reutilizamos estilo
+                    // Truco para ver contenido: Pasar objeto como string
+                    const dataStr = encodeURIComponent(JSON.stringify(r.exercises));
+                    div.innerHTML = `<span><b>${r.name}</b> (${r.exercises.length} ej)</span><button class="btn-small btn-outline" style="margin:0; width:auto;" onclick="viewRoutineContent('${r.name}','${dataStr}')">👁️</button>`;
+                    l.appendChild(div);
+                });
+            } catch (e) { l.innerHTML = '<div style="text-align:center;color:red;padding:20px;">Error.</div>'; }
+        };
+
+        window.viewRoutineContent = (name, dataStr) => {
+            const exs = JSON.parse(decodeURIComponent(dataStr));
+            let html = `<ul style="padding-left:20px; margin-top:10px;">`;
+            exs.forEach(e => html += `<li style="margin-bottom:5px;">${e}</li>`);
+            html += `</ul>`;
+            document.getElementById('detail-title').innerText = name;
+            document.getElementById('detail-content').innerHTML = html;
+            document.getElementById('modal-details').classList.add('active');
         };
 
         async function openCoachView(uid,u) {
             selectedUserCoach=uid;
-            
-            // FIX: Refresh user data to ensure realtime
             const freshSnap = await getDoc(doc(db, "users", uid));
             const freshU = freshSnap.data();
-            selectedUserObj = freshU; // Update local obj
-
+            selectedUserObj = freshU; 
             switchTab('coach-detail-view');
-            
             document.getElementById('coach-user-name').innerText=freshU.name;
             document.getElementById('coach-user-email').innerText=freshU.email;
-
-            // SHOW APPROVE BUTTON IF PENDING
             const banner = document.getElementById('pending-approval-banner');
-            if(!freshU.approved) {
-                banner.classList.remove('hidden');
-            } else {
-                banner.classList.add('hidden');
-            }
-            
+            if(!freshU.approved) { banner.classList.remove('hidden'); } else { banner.classList.add('hidden'); }
             const img = document.getElementById('coach-user-img');
             const initial = document.getElementById('coach-user-initial');
-            if(freshU.photo) {
-                img.src = freshU.photo; img.style.display = 'block'; initial.style.display = 'none';
-            } else {
-                img.style.display = 'none'; initial.style.display = 'block';
-            }
-            
+            if(freshU.photo) { img.src = freshU.photo; img.style.display = 'block'; initial.style.display = 'none'; } else { img.style.display = 'none'; initial.style.display = 'block'; }
             updateCoachPhotoDisplay('front');
 
-            // --- COACH ROUTINE LOADING LOGIC RE-INSERTED HERE (Was missing in your base snippet) ---
             try {
-                // 1. Load All Routines for Dropdown
+                // LOAD ROUTINES FOR ASSIGN
                 const s = document.getElementById('coach-routine-select'); s.innerHTML = '';
                 const allRoutinesSnap = await getDocs(collection(db, "routines"));
                 allRoutinesCache = [];
-                
                 allRoutinesSnap.forEach(r => {
-                    const data = r.data();
-                    allRoutinesCache.push({id: r.id, ...data});
-                    const o = document.createElement('option'); 
-                    o.value = r.id; 
-                    o.innerText = data.name; 
-                    s.appendChild(o); 
+                    const data = r.data(); allRoutinesCache.push({id: r.id, ...data});
+                    const o = document.createElement('option'); o.value = r.id; o.innerText = data.name; s.appendChild(o); 
                 });
-
-                // 2. Filter Assigned Routines for List
-                const rList = document.getElementById('coach-assigned-list');
-                rList.innerHTML = '';
-                
+                const rList = document.getElementById('coach-assigned-list'); rList.innerHTML = '';
                 const assignedRoutines = allRoutinesCache.filter(r => r.assignedTo && r.assignedTo.includes(uid));
-                
-                if(assignedRoutines.length === 0) {
-                    rList.innerHTML = 'Ninguna rutina asignada.';
-                } else {
+                if(assignedRoutines.length === 0) { rList.innerHTML = 'Ninguna rutina asignada.'; } else {
                     assignedRoutines.forEach(r => {
-                        const div = document.createElement('div');
-                        div.className = "assigned-routine-item";
+                        const div = document.createElement('div'); div.className = "assigned-routine-item";
                         div.innerHTML = `<span>${r.name}</span><button style="background:none;border:none;color:#f55;font-weight:bold;cursor:pointer;" onclick="unassignRoutine('${r.id}')">❌</button>`;
                         rList.appendChild(div);
                     });
                 }
             } catch(e) { console.error("Error loading routines", e); }
 
-
             try {
                 const st = freshU.stats || {};
                 const age = freshU.age ? freshU.age : 'N/D';
-                document.getElementById('coach-stats-text').innerHTML = `
-                    <div class="stat-pill"><b>${st.workouts||0}</b><span>ENTRENOS</span></div>
-                    <div class="stat-pill"><b>${(st.totalKg/1000||0).toFixed(1)}t</b><span>CARGA</span></div>
-                    <div class="stat-pill"><b>${age}</b><span>AÑOS</span></div>
-                `;
-
+                document.getElementById('coach-stats-text').innerHTML = `<div class="stat-pill"><b>${st.workouts||0}</b><span>ENTRENOS</span></div><div class="stat-pill"><b>${(st.totalKg/1000||0).toFixed(1)}t</b><span>CARGA</span></div><div class="stat-pill"><b>${age}</b><span>AÑOS</span></div>`;
                 if(coachChart) coachChart.destroy();
                 const ctx = document.getElementById('coachWeightChart');
                 const wData = freshU.weightHistory || [];
                 const data = (wData && wData.length > 0) ? wData : [70];
-                
                 coachChart = new Chart(ctx, { type:'line', data:{ labels:data.map((_,i)=>i+1), datasets:[{label:'Kg', data:data, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}, maintainAspectRatio: false}});
 
                 const hList = document.getElementById('coach-history-list');
@@ -1476,22 +1391,42 @@
                 const wSnap = await getDocs(qH);
                 hList.innerHTML = '';
                 if(wSnap.empty) hList.innerHTML='Sin datos recientes.';
+                
                 wSnap.forEach(w=>{
                     const d = w.data();
                     const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
-                    let rpeBadge = d.rpe === 'Suave' ? '<span class="badge green">🟢 Suave</span>' : (d.rpe === 'Duro' ? '<span class="badge orange">🟠 Duro</span>' : (d.rpe === 'Fallo' ? '<span class="badge red">🔴 Fallo</span>' : '<span class="badge gray">--</span>'));
-                    const noteIcon = (d.note && d.note.trim().length > 0) ? `<span class="note-icon" title="${d.note}" onclick="alert('${d.note}')">📝</span>` : '';
-                    hList.innerHTML += `<div class="history-row"><div class="hist-date">${date}</div><div class="hist-name">${d.routine} ${noteIcon}</div><div class="hist-rpe">${rpeBadge}</div></div>`;
+                    let rpeBadge = d.rpe === 'Suave' ? '<span class="badge green">🟢</span>' : (d.rpe === 'Duro' ? '<span class="badge orange">🟠</span>' : (d.rpe === 'Fallo' ? '<span class="badge red">🔴</span>' : '<span class="badge gray">-</span>'));
+                    
+                    // --- BOTÓN VER DETALLES ---
+                    const detailsStr = d.details ? encodeURIComponent(JSON.stringify(d.details)) : "";
+                    const btnVer = d.details ? `<button class="btn-small btn-outline" style="margin:0; padding:2px 6px;" onclick="viewWorkoutDetails('${d.routine}', '${detailsStr}')">🔍</button>` : '';
+
+                    hList.innerHTML += `<div class="history-row" style="grid-template-columns: 60px 1fr 30px 40px;"><div class="hist-date">${date}</div><div class="hist-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.routine}</div><div class="hist-rpe">${rpeBadge}</div><div>${btnVer}</div></div>`;
                 });
             
             } catch(e) { console.error("Error loading coach details", e); }
         }
 
+        window.viewWorkoutDetails = (title, dataStr) => {
+            if(!dataStr) return;
+            const data = JSON.parse(decodeURIComponent(dataStr));
+            const content = document.getElementById('detail-content');
+            document.getElementById('detail-title').innerText = title;
+            let html = "";
+            data.forEach(ex => {
+                html += `<div style="margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;"><strong style="color:white;">${ex.n}</strong><div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">`;
+                ex.s.forEach((set, i) => { html += `<span style="background:#222; padding:3px 6px; border-radius:4px; border:1px solid #444; color:#ccc;">#${i+1}: <b>${set.w}kg</b> x ${set.r}</span>`; });
+                html += `</div></div>`;
+            });
+            content.innerHTML = html;
+            document.getElementById('modal-details').classList.add('active');
+        };
+
         window.approveUser = async () => {
             if(confirm("¿Confirmar acceso a este atleta?")) {
                 await updateDoc(doc(db,"users",selectedUserCoach), {approved: true});
                 alert("Atleta Aprobado ✅");
-                openCoachView(selectedUserCoach, selectedUserObj); // REFRESH FULL SCREEN VIEW
+                openCoachView(selectedUserCoach, selectedUserObj); 
             }
         };
 
@@ -1520,30 +1455,8 @@
             const a = u[`photoAfter${prefix}`];
             const dateB = u[`dateBefore${prefix}`] || '-';
             const dateA = u[`dateAfter${prefix}`] || '-';
-            
             const pCont = document.getElementById('coach-photos-container');
-            
-            // CLEANER SLIDER FOR COACH AS WELL
-            // Logic: Background is Current (After), Overlay is Past (Before)
-            // Slider at 0 (Left) -> Overlay Width full -> Show Background? No.
-            // Let's use same logic as profile:
-            // Background: Current (After)
-            // Overlay: Past (Before)
-            // Slider 0 (Left): Full overlay (Before)
-            // Slider 100 (Right): No overlay (After)
-            
-            pCont.innerHTML = `
-                <div class="compare-wrapper">
-                    <div class="slider-labels"><span class="label-tag">ANTES</span><span class="label-tag">AHORA</span></div>
-                    <img src="${b || ''}" class="compare-img">
-                    <img src="${a || ''}" id="coach-overlay-img" class="compare-img img-overlay" style="clip-path:inset(0 0 0 0)">
-                    <div class="slider-handle" id="coach-slider-handle" style="left:0%"><div class="slider-btn"></div></div>
-                </div>
-                <input type="range" min="0" max="100" value="0" style="width:100%; margin-top:15px;" oninput="moveCoachSlider(this.value)">
-                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;">
-                    <span>ANTES (${dateB})</span><span>AHORA (${dateA})</span>
-                </div>
-            `;
+            pCont.innerHTML = `<div class="compare-wrapper"><div class="slider-labels"><span class="label-tag">ANTES</span><span class="label-tag">AHORA</span></div><img src="${b || ''}" class="compare-img"><img src="${a || ''}" id="coach-overlay-img" class="compare-img img-overlay" style="clip-path:inset(0 0 0 0)"><div class="slider-handle" id="coach-slider-handle" style="left:0%"><div class="slider-btn"></div></div></div><input type="range" min="0" max="100" value="0" style="width:100%; margin-top:15px;" oninput="moveCoachSlider(this.value)"><div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888;"><span>ANTES (${dateB})</span><span>AHORA (${dateA})</span></div>`;
         }
         
         window.moveCoachSlider = (v) => {
@@ -1561,13 +1474,13 @@
             const rRef=doc(db,"routines",rid); 
             await updateDoc(rRef,{assignedTo: arrayUnion(selectedUserCoach)}); 
             alert("Rutina Asignada");
-            openCoachView(selectedUserCoach, selectedUserObj); // Refresh view
+            openCoachView(selectedUserCoach, selectedUserObj); 
         };
 
         window.unassignRoutine = async (rid) => {
             if(confirm("¿Quitar esta rutina al atleta?")) {
                 await updateDoc(doc(db, "routines", rid), { assignedTo: arrayRemove(selectedUserCoach) });
-                openCoachView(selectedUserCoach, selectedUserObj); // Refresh view
+                openCoachView(selectedUserCoach, selectedUserObj); 
             }
         };
 
@@ -1592,7 +1505,7 @@
             await setDoc(doc(db,"users",c.user.uid),{
                 name:document.getElementById('reg-name').value,
                 email:document.getElementById('reg-email').value,
-                approved: false,
+                approved:document.getElementById('reg-email').value===ADMIN,
                 age:parseInt(document.getElementById('reg-age').value),
                 height:parseInt(document.getElementById('reg-height').value), 
                 weightHistory: [],
@@ -1605,4 +1518,3 @@
     </script>
 </body>
 </html>
-
