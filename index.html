@@ -1315,7 +1315,7 @@
             await setDoc(doc(db,"users",c.user.uid),{
                 name:document.getElementById('reg-name').value,
                 email:document.getElementById('reg-email').value,
-                approved:document.getElementById('reg-email').value===ADMIN,
+                approved:false,
                 age:parseInt(document.getElementById('reg-age').value),
                 height:parseInt(document.getElementById('reg-height').value), 
                 weightHistory: [],
@@ -1328,3 +1328,4 @@
     </script>
 </body>
 </html>
+
