@@ -477,7 +477,6 @@
         const db = getFirestore(app);
 
         const ADMIN = "toni@fitdatapro.es";
-        const CODE = "fityhab";
 
         // AUDIO SYSTEM (5 BEEPS)
         let audioCtx = null;
@@ -1584,23 +1583,49 @@
             }
         };
 
-        document.getElementById('btn-login').onclick=()=>signInWithEmailAndPassword(auth,document.getElementById('login-email').value,document.getElementById('login-pass').value).catch(e=>alert(e.message));
-        document.getElementById('btn-register').onclick=async()=>{
-            if(document.getElementById('reg-code').value!==CODE)return alert("Código incorrecto");
-            try{ const c=await createUserWithEmailAndPassword(auth,document.getElementById('reg-email').value,document.getElementById('reg-pass').value);
-            // CRITICAL FIX: Ensure user object has ALL fields to prevent permission errors
-            await setDoc(doc(db,"users",c.user.uid),{
-                name:document.getElementById('reg-name').value,
-                email:document.getElementById('reg-email').value,
-                approved:document.getElementById('reg-email').value===ADMIN,
-                age:parseInt(document.getElementById('reg-age').value),
-                height:parseInt(document.getElementById('reg-height').value), 
-                weightHistory: [],
-                prs: {}, // Fixed: Initialize PRs object
-                stats: {workouts:0, totalKg:0, totalSets:0, totalReps:0},
-                muscleStats: {}
-            });
-            }catch(e){alert(e.message)}
+        document.getElementById('btn-register').onclick = async () => {
+            // Recogemos el código que ha escrito el usuario
+            const inputCode = document.getElementById('reg-code').value;
+            const email = document.getElementById('reg-email').value.toLowerCase().trim();
+            
+            // Validación visual básica
+            if (!inputCode) return alert("Falta el código secreto.");
+
+            try {
+                // 1. Crear usuario en Authentication
+                const c = await createUserWithEmailAndPassword(auth, email, document.getElementById('reg-pass').value);
+                
+                // 2. Guardar ficha en Base de Datos (Aquí está la seguridad)
+                // Enviamos el código (accessCode) y forzamos approved: false.
+                // Si el código no es "xxxx", las REGLAS de Firebase rechazarán esto.
+                await setDoc(doc(db, "users", c.user.uid), {
+                    name: document.getElementById('reg-name').value,
+                    email: email,
+                    approved: false, // SEGURIDAD: Nadie nace aprobado, ni el admin
+                    accessCode: inputCode, // Enviamos el código para validación
+                    age: parseInt(document.getElementById('reg-age').value),
+                    height: parseInt(document.getElementById('reg-height').value), 
+                    weightHistory: [],
+                    prs: {},
+                    stats: {workouts:0, totalKg:0, totalSets:0, totalReps:0},
+                    muscleStats: {},
+                    joined: serverTimestamp()
+                });
+
+                alert("✅ Solicitud enviada correctamente. Espera a que el Coach te active.");
+                location.reload();
+
+            } catch (e) {
+                console.error(e);
+                // Si las reglas rechazan por código incorrecto, da error de permisos
+                if (e.message.includes("permission-denied") || e.code === "permission-denied") {
+                    alert("❌ CÓDIGO SECRETO INCORRECTO.\nTu usuario se ha creado pero no tienes acceso. Contacta con el Coach.");
+                } else if (e.message.includes("email-already-in-use")) {
+                    alert("Ese email ya está registrado.");
+                } else {
+                    alert("Error: " + e.message);
+                }
+            }
         };
     </script>
 </body>
