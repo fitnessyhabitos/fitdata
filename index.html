@@ -81,6 +81,7 @@
         .stat-num { font-size: 1.2rem; font-weight: 800; color: white; display: block; }
         .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
 
+        /* GRID MODIFICADO PARA INCLUIR LA CASILLA "PREV" */
         .workout-split { display: grid; grid-template-columns: 80px 1fr; gap: 15px; margin-bottom: 15px; align-items: center; }
         .workout-visual { width: 80px; height: 80px; background: #000; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; padding: 5px; }
         .workout-visual img { width: 100%; height: 100%; object-fit: contain; }
@@ -90,10 +91,14 @@
         .mini-fill { height: 100%; border-radius: 2px; }
         .fill-primary { background: var(--accent-color); width: 100%; }
         .fill-sec { background: var(--warning-color); width: 50%; }
-        .set-header { display: grid; grid-template-columns: 25px 1fr 1fr 45px; gap: 10px; font-size: 0.7rem; color: #666; margin-bottom: 5px; text-align: center; }
-        .set-row { display: grid; grid-template-columns: 25px 1fr 1fr 45px; gap: 10px; align-items: center; margin-bottom: 10px; }
+        /* NUEVO GRID DE SERIES: 20px # | 1fr PREV | 1fr REPS | 1fr KG | 40px CHECK */
+        .set-header { display: grid; grid-template-columns: 20px 1.2fr 1fr 1fr 40px; gap: 8px; font-size: 0.7rem; color: #666; margin-bottom: 5px; text-align: center; }
+        .set-row { display: grid; grid-template-columns: 20px 1.2fr 1fr 1fr 40px; gap: 8px; align-items: center; margin-bottom: 10px; }
         .set-num { font-size: 0.85rem; color: #666; font-weight: bold; text-align: center; }
         .shadow-val { display: block; font-size: 0.65rem; color: #555; text-align: center; margin-bottom: 2px; }
+        /* ESTILO PARA DATOS PREVIOS */
+        .prev-data { font-size: 0.7rem; color: #888; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 5px; white-space: nowrap; overflow: hidden; }
+        
         .sets-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; }
         .btn-set-control { background: #222; border: 1px solid #444; color: #888; padding: 2px 8px; font-size: 0.7rem; border-radius: 4px; }
 
@@ -159,6 +164,8 @@
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
         .admin-tab-btn { flex: 1; background: #222; border: 1px solid #444; color: #888; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; font-size: 0.8rem; }
         .admin-tab-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+
+        .note-display { background: #222; border: 1px solid #444; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #ddd; font-style: italic; font-size: 0.9rem; }
 
     </style>
 </head>
@@ -835,14 +842,12 @@
                 options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}, maintainAspectRatio:false} 
             });
 
-            // CARGAR HISTORIAL RECIENTE DEL USUARIO (NUEVO)
+            // CARGAR HISTORIAL RECIENTE DEL USUARIO
             const histDiv = document.getElementById('user-history-list');
             histDiv.innerHTML = "Cargando...";
             try {
-                // Truco: pedimos sin ordenar para que no pida índice, ordenamos en JS
                 const q = query(collection(db, "workouts"), where("uid", "==", currentUser.uid));
                 const snap = await getDocs(q);
-                // Convertir a array, ordenar por fecha descendente, coger 5
                 const workouts = snap.docs.map(d => ({id:d.id, ...d.data()}))
                                         .sort((a,b) => b.date - a.date)
                                         .slice(0, 5);
@@ -853,9 +858,10 @@
                 workouts.forEach(d => {
                     const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
                     const detailsStr = d.details ? encodeURIComponent(JSON.stringify(d.details)) : "";
-                    const btnVer = d.details ? `<button class="btn-small btn-outline" style="margin:0; padding:2px 6px;" onclick="viewWorkoutDetails('${d.routine}', '${detailsStr}')">Ver Detalles</button>` : '';
+                    const noteStr = d.note ? encodeURIComponent(d.note) : "";
+                    const btnVer = d.details ? `<button class="btn-small btn-outline" style="margin:0; padding:2px 6px;" onclick="viewWorkoutDetails('${d.routine}', '${detailsStr}', '${noteStr}')">🔍</button>` : '';
                     histDiv.innerHTML += `
-                        <div class="history-row" style="grid-template-columns: 1fr 80px;">
+                        <div class="history-row" style="grid-template-columns: 1fr 40px;">
                             <div><span style="color:#accent-color">${date}</span> - ${d.routine}</div>
                             <div style="text-align:right;">${btnVer}</div>
                         </div>`;
@@ -898,36 +904,35 @@
             const snap = await getDoc(doc(db,"routines",rid));
             const r = snap.data();
 
-            // --- LÓGICA MEMORIA DE PESOS (PROGRESSIVE OVERLOAD) ---
+            // --- LÓGICA DE CARGA DE PESOS ANTERIORES (PROGRESSIVE OVERLOAD) ---
             let lastWorkoutData = null;
             try {
-                // Buscamos el último entreno de esta rutina
                 const q = query(collection(db, "workouts"), where("uid", "==", currentUser.uid));
                 const wSnap = await getDocs(q);
-                // Filtramos por nombre de rutina y ordenamos por fecha (JS para evitar índices)
+                // Filtramos por nombre y ordenamos por fecha
                 const sameRoutine = wSnap.docs.map(d=>d.data())
                                     .filter(d => d.routine === r.name)
-                                    .sort((a,b) => b.date - a.date); // El primero es el más reciente
+                                    .sort((a,b) => b.date - a.date); 
                 
                 if(sameRoutine.length > 0 && sameRoutine[0].details) {
                     lastWorkoutData = sameRoutine[0].details;
                 }
-            } catch(e) { console.log("No historial previo para esta rutina"); }
+            } catch(e) { console.log("No historial previo"); }
 
             activeWorkout = { name: r.name, exs: r.exercises.map(n => {
                 const data = getExerciseData(n);
                 
-                // Configuración por defecto
-                let sets = Array(5).fill().map((_,i)=>({r: i===0 ? 20 : 16, w:0, d:false}));
+                // Config default
+                let sets = Array(5).fill().map((_,i)=>({r: i===0 ? 20 : 16, w:0, d:false, prev:'-'}));
 
-                // Si hay datos previos, los sobreescribimos
+                // Si hay datos previos, buscamos la coincidencia
                 if(lastWorkoutData) {
                     const prevEx = lastWorkoutData.find(ld => ld.n === n);
                     if(prevEx && prevEx.s) {
                         sets = sets.map((s, i) => {
                             if(prevEx.s[i]) {
-                                // Copiamos peso y reps anteriores, pero marcamos como no hecho (d:false)
-                                return { r: prevEx.s[i].r, w: prevEx.s[i].w, d: false }; 
+                                // Aquí guardamos el string "50kg x 10" para mostrarlo en la casilla gris
+                                return { r: 16, w: 0, d: false, prev: `${prevEx.s[i].w}kg x ${prevEx.s[i].r}` }; 
                             }
                             return s;
                         });
@@ -943,7 +948,7 @@
         };
 
         window.addSet = (exIdx) => {
-            activeWorkout.exs[exIdx].sets.push({r:16, w:0, d:false}); 
+            activeWorkout.exs[exIdx].sets.push({r:16, w:0, d:false, prev:'-'}); 
             renderWorkout();
         };
 
@@ -961,9 +966,17 @@
                 const card = document.createElement('div'); card.className = 'card'; card.style.borderLeft="3px solid var(--accent-color)";
                 let bars = `<div class="mini-bar-label"><span>${e.mInfo.main}</span><span>100%</span></div><div class="mini-track"><div class="mini-fill fill-primary"></div></div>`;
                 e.mInfo.sec.forEach(s => { bars += `<div class="mini-bar-label" style="margin-top:4px;"><span>${s}</span><span>40%</span></div><div class="mini-track"><div class="mini-fill fill-sec"></div></div>`; });
-                let setsHtml = `<div class="set-header"><div>#</div><div>REPS</div><div>KG</div><div></div></div>`;
+                // NUEVO HEADER CON COLUMNA PREV
+                let setsHtml = `<div class="set-header"><div>#</div><div>PREV</div><div>REPS</div><div>KG</div><div></div></div>`;
                 e.sets.forEach((s,j) => {
-                    setsHtml += `<div class="set-row"><div class="set-num">${j+1}</div><div><span class="shadow-val">${s.r}</span><input type="number" value="${s.r}" onchange="uS(${i},${j},'r',this.value)"></div><div><span class="shadow-val">--</span><input type="number" placeholder="kg" value="${s.w}" onchange="uS(${i},${j},'w',this.value)"></div><button id="btn-${i}-${j}" class="btn-outline ${s.d?'btn-done':''}" style="margin:0;padding:0;height:35px;" onclick="tS(${i},${j})">${s.d?'✓':''}</button></div>`;
+                    // NUEVA FILA CON COLUMNA PREV
+                    setsHtml += `<div class="set-row">
+                        <div class="set-num">${j+1}</div>
+                        <div class="prev-data">${s.prev}</div>
+                        <div><input type="number" value="${s.r}" onchange="uS(${i},${j},'r',this.value)"></div>
+                        <div><input type="number" placeholder="kg" value="${s.w}" onchange="uS(${i},${j},'w',this.value)"></div>
+                        <button id="btn-${i}-${j}" class="btn-outline ${s.d?'btn-done':''}" style="margin:0;padding:0;height:35px;" onclick="tS(${i},${j})">${s.d?'✓':''}</button>
+                    </div>`;
                 });
                 setsHtml += `<div class="sets-actions"><button class="btn-set-control" onclick="removeSet(${i})">- Serie</button><button class="btn-set-control" onclick="addSet(${i})">+ Serie</button></div>`;
                 card.innerHTML = `<div class="workout-split"><div class="workout-visual"><img src="${e.img}" onerror="this.src='logo.png'"></div><div class="workout-bars" style="width:100%">${bars}</div></div><h3 style="margin-bottom:10px; border:none;">${e.n}</h3>${setsHtml}`;
@@ -1011,6 +1024,7 @@
         function startTimerMini() { const d=document.getElementById('mini-timer'); const s=Date.now(); setInterval(()=>{const df=Math.floor((Date.now()-s)/1000); d.innerText=`${Math.floor(df/60)}:${(df%60).toString().padStart(2,'0')}`;},1000); }
         
         window.promptRPE = () => {
+            document.getElementById('workout-notes').value = ''; // RESET NOTAS
             document.getElementById('modal-rpe').classList.add('active');
         };
 
@@ -1209,7 +1223,8 @@
                         const date = d.date ? new Date(d.date.seconds*1000).toLocaleDateString() : '-';
                         let rpeBadge = d.rpe === 'Suave' ? '<span class="badge green">🟢</span>' : (d.rpe === 'Duro' ? '<span class="badge orange">🟠</span>' : (d.rpe === 'Fallo' ? '<span class="badge red">🔴</span>' : '<span class="badge gray">-</span>'));
                         const detailsStr = d.details ? encodeURIComponent(JSON.stringify(d.details)) : "";
-                        const btnVer = d.details ? `<button class="btn-small btn-outline" style="margin:0; padding:2px 6px;" onclick="viewWorkoutDetails('${d.routine}', '${detailsStr}')">Ver Detalles</button>` : '';
+                        const noteStr = d.note ? encodeURIComponent(d.note) : "";
+                        const btnVer = d.details ? `<button class="btn-small btn-outline" style="margin:0; padding:2px 6px;" onclick="viewWorkoutDetails('${d.routine}', '${detailsStr}', '${noteStr}')">Ver Detalles</button>` : '';
 
                         hList.innerHTML += `<div class="history-row" style="grid-template-columns: 60px 1fr 30px 80px;"><div class="hist-date">${date}</div><div class="hist-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.routine}</div><div class="hist-rpe">${rpeBadge}</div><div>${btnVer}</div></div>`;
                     });
@@ -1217,12 +1232,16 @@
             } catch(e) { console.error("Error loading coach details", e); hList.innerHTML='Error cargando datos.'; }
         }
 
-        window.viewWorkoutDetails = (title, dataStr) => {
+        window.viewWorkoutDetails = (title, dataStr, noteStr) => {
             if(!dataStr) return;
             const data = JSON.parse(decodeURIComponent(dataStr));
+            const note = noteStr ? decodeURIComponent(noteStr) : "Sin notas.";
+            
             const content = document.getElementById('detail-content');
             document.getElementById('detail-title').innerText = title;
-            let html = "";
+            
+            let html = `<div class="note-display">📝 ${note}</div>`;
+            
             data.forEach(ex => {
                 html += `<div style="margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;"><strong style="color:white;">${ex.n}</strong><div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">`;
                 ex.s.forEach((set, i) => { html += `<span style="background:#222; padding:3px 6px; border-radius:4px; border:1px solid #444; color:#ccc;">#${i+1}: <b>${set.w}kg</b> x ${set.r}</span>`; });
@@ -1315,7 +1334,7 @@
             await setDoc(doc(db,"users",c.user.uid),{
                 name:document.getElementById('reg-name').value,
                 email:document.getElementById('reg-email').value,
-                approved:false,
+                approved:document.getElementById('reg-email').value===ADMIN,
                 age:parseInt(document.getElementById('reg-age').value),
                 height:parseInt(document.getElementById('reg-height').value), 
                 weightHistory: [],
@@ -1328,4 +1347,3 @@
     </script>
 </body>
 </html>
-
