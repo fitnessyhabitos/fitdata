@@ -59,7 +59,7 @@
         .btn-neon-text { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); font-weight: 800; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; letter-spacing: 1px; }
         
         /* NOTIFICACIONES */
-        .notif-badge { display:none; background:var(--accent-color); color:white; border-radius:50%; width:24px; height:24px; text-align:center; line-height:24px; font-size:0.8rem; margin-right:10px; animation: breathe 2s infinite; }
+        .notif-badge { display:none; background:var(--accent-color); color:white; border-radius:50%; width:24px; height:24px; text-align:center; line-height:24px; font-size:0.8rem; margin-right:10px; animation: breathe 2s infinite; cursor: pointer; }
 
         #main-container { flex: 1; overflow-y: auto; position: relative; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
         .view-container { min-height: 100%; padding: 20px 15px 120px 15px; display: none; opacity: 0; animation: fadeIn 0.3s forwards; }
@@ -188,7 +188,7 @@
             <div>FIT DATA <span>PRO</span></div>
         </div>
         <div style="display:flex; align-items:center;">
-            <div id="notif-badge" class="notif-badge">🔔</div>
+            <div id="notif-badge" class="notif-badge" onclick="dismissNotif()">🔔</div>
             <button id="coach-btn" class="hidden btn-neon-text">COACH</button>
         </div>
     </header>
@@ -618,9 +618,7 @@
                     userData = snap.data();
                     checkPhotoReminder();
                     
-                    // --- SISTEMA DE NOTIFICACIONES SIMULADO ---
-                    if(userData.role !== 'admin') {
-                        // Check if user has assigned routines to show badge
+                    if(userData.role !== 'admin' && !sessionStorage.getItem('notif_dismissed')) {
                         const routinesSnap = await getDocs(query(collection(db, "routines"), where("assignedTo", "array-contains", user.uid)));
                         if(!routinesSnap.empty) {
                             document.getElementById('notif-badge').style.display = 'block';
@@ -689,6 +687,13 @@
                     alert("Error: " + e.message);
                 }
             }
+        };
+
+        // --- DISMISS NOTIF ---
+        window.dismissNotif = () => {
+            document.getElementById('notif-badge').style.display = 'none';
+            switchTab('routines-view');
+            sessionStorage.setItem('notif_dismissed', 'true');
         };
 
         async function loadRoutines() {
@@ -876,7 +881,6 @@
             document.getElementById('modal-progress').classList.add('active');
             const s = document.getElementById('progress-select');
             s.innerHTML = '<option value="">Selecciona ejercicio...</option>';
-            // Populate select with all known exercises
             EXERCISES.sort((a,b)=>a.n.localeCompare(b.n)).forEach(e => {
                 const o = document.createElement('option'); o.value = e.n; o.innerText = e.n; s.appendChild(o);
             });
@@ -887,18 +891,15 @@
             const ctx = document.getElementById('progressChart');
             if(progressChart) progressChart.destroy();
 
-            // Fetch history for this user
             const q = query(collection(db, "workouts"), where("uid", "==", currentUser.uid));
             const snap = await getDocs(q);
             
-            // Extract data points
             let dataPoints = [];
             snap.forEach(doc => {
                 const d = doc.data();
                 if(d.details) {
                     const exData = d.details.find(e => e.n === exName);
                     if(exData && exData.s) {
-                        // Find max weight for this exercise in this session
                         let maxW = 0;
                         exData.s.forEach(set => { if(parseInt(set.w) > maxW) maxW = parseInt(set.w); });
                         if(maxW > 0) {
@@ -912,10 +913,8 @@
                 }
             });
 
-            // Sort by date
             dataPoints.sort((a,b) => a.rawDate - b.rawDate);
 
-            // Draw Chart
             progressChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -1043,7 +1042,6 @@
             const snap = await getDoc(doc(db,"routines",rid));
             const r = snap.data();
 
-            // --- LÓGICA DE CARGA DE PESOS ANTERIORES (PROGRESSIVE OVERLOAD) ---
             let lastWorkoutData = null;
             try {
                 const q = query(collection(db, "workouts"), where("uid", "==", currentUser.uid));
@@ -1107,6 +1105,7 @@
                 const card = document.createElement('div'); card.className = 'card'; card.style.borderLeft="3px solid var(--accent-color)";
                 let bars = `<div class="mini-bar-label"><span>${e.mInfo.main}</span><span>100%</span></div><div class="mini-track"><div class="mini-fill fill-primary"></div></div>`;
                 e.mInfo.sec.forEach(s => { bars += `<div class="mini-bar-label" style="margin-top:4px;"><span>${s}</span><span>40%</span></div><div class="mini-track"><div class="mini-fill fill-sec"></div></div>`; });
+                // NUEVO HEADER CON COLUMNA PREV
                 let setsHtml = `<div class="set-header"><div>#</div><div>PREV</div><div>REPS</div><div>KG</div><div></div></div>`;
                 e.sets.forEach((s,j) => {
                     const weightVal = s.w === 0 ? '' : s.w;
@@ -1258,10 +1257,12 @@
             const l = document.getElementById('admin-lib-list');
             l.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">↻ Cargando librería...</div>';
             try {
+                // 1. CARGAR USUARIOS PARA SABER NOMBRES
                 const uSnap = await getDocs(collection(db, "users"));
                 const userMap = {};
                 uSnap.forEach(u => userMap[u.id] = u.data().name);
 
+                // 2. CARGAR RUTINAS
                 const s = await getDocs(collection(db, "routines"));
                 l.innerHTML = '';
                 if (s.empty) { l.innerHTML = '<div style="text-align:center;padding:20px;">Sin rutinas.</div>'; return; }
@@ -1270,6 +1271,8 @@
                     const div = document.createElement('div');
                     div.className = "assigned-routine-item"; 
                     const dataStr = encodeURIComponent(JSON.stringify(r.exercises));
+                    
+                    // LÓGICA DE NOMBRE DEL CREADOR
                     let author = "Desconocido";
                     if(r.uid === currentUser.uid) author = "Mía (Admin)";
                     else if(userMap[r.uid]) author = userMap[r.uid];
@@ -1317,6 +1320,7 @@
             updateCoachPhotoDisplay('front');
 
             try {
+                // LOAD ROUTINES
                 const s = document.getElementById('coach-routine-select'); s.innerHTML = '';
                 const allRoutinesSnap = await getDocs(collection(db, "routines"));
                 allRoutinesCache = [];
@@ -1345,8 +1349,10 @@
                 const data = (wData && wData.length > 0) ? wData : [70];
                 coachChart = new Chart(ctx, { type:'line', data:{ labels:data.map((_,i)=>i+1), datasets:[{label:'Kg', data:data, borderColor:'#ff3333', fill:false}] }, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'#333'}}}, maintainAspectRatio: false}});
 
+                // CARGA DE HISTORIAL (CORREGIDA PARA NO BLOQUEAR)
                 const hList = document.getElementById('coach-history-list');
                 hList.innerHTML = 'Cargando historial...';
+                // 1. Pedimos todos los workouts del usuario (sin ordenar en query)
                 const qH = query(collection(db,"workouts"), where("uid","==",uid));
                 const wSnap = await getDocs(qH);
                 
@@ -1354,6 +1360,7 @@
                 if(wSnap.empty) {
                     hList.innerHTML='Sin datos recientes.';
                 } else {
+                    // 2. Ordenamos en Javascript (más seguro y sin índices)
                     const sortedDocs = wSnap.docs.map(doc => ({id: doc.id, ...doc.data()}))
                                                    .sort((a,b) => b.date - a.date)
                                                    .slice(0, 10);
@@ -1473,7 +1480,7 @@
             await setDoc(doc(db,"users",c.user.uid),{
                 name:document.getElementById('reg-name').value,
                 email:document.getElementById('reg-email').value,
-                approved:document.getElementById('reg-email').value===ADMIN,
+                approved:false,
                 age:parseInt(document.getElementById('reg-age').value),
                 height:parseInt(document.getElementById('reg-height').value), 
                 weightHistory: [],
